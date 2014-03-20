@@ -294,5 +294,9 @@
     <bcf:datasource type="file" datatype="bibtex">bib/BibtexDatabase.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
+    <bcf:citekey>ds-ant</bcf:citekey>
+    <bcf:citekey>*</bcf:citekey>
+    <bcf:citekey>*</bcf:citekey>
+    <bcf:citekey>ds-ant</bcf:citekey>
   </bcf:section>
 </bcf:controlfile>
