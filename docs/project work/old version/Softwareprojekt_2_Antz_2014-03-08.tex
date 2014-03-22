@@ -1,0 +1,96 @@
+\documentclass{article}
+
+\usepackage{textcomp}
+\usepackage{ucs}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{amsmath, amssymb, amsthm, array, ulem}
+
+\setlength{\parindent}{0in} % kein Absatzeinzug in der ersten Zeile eines neuen Absatzes 
+
+\usepackage{graphicx}
+\usepackage{dsfont}
+\usepackage{paralist} % für kompakte Listen
+\usepackage{siunitx} % SI-Einheiten, Zahlendarstellung
+
+\sisetup{exponent-product = \cdot} % Exponentendarstellung mit Punkt als Malzeichen
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Softwareprojekt 2}
+\rhead{B. Fuchs, F. Müller}
+
+\usepackage[headsep=1cm,left=2.5cm,right=3cm,bottom=3.5cm]{geometry}
+
+
+\title{Antz}
+\author{Bernhard Fuchs, Florian Müller}
+\date{30. Mai 2014}
+
+\begin{document}
+
+\maketitle
+
+
+
+
+
+\section{Einführung}
+
+[Einleitung ins Projekt, Allgemeines]
+
+\vspace*{1cm}
+
+Zuerst wurde geprüft, ob das Projekt mit JavaScript und einer Game Framework wie quintus oder ??? als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen (sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen Leistung sehr gut ist. Das fertige Programm wird so eine ausführbare Datei sein.
+
+
+\vspace*{1cm} 
+
+
+\begin{compactitem}
+\item PGU: Library für Slider und Textfelder, etc.
+\item Optimierung: Anzahl Partikel; Speicherbedarf
+\item Klassendiagramme und Mockups (von Hand) zeichnen
+\item Zwei Modi (mehrere Render-Möglichkeiten des Algorithmus)
+\item Anfangs: 2D; trotzdem 3D-Koordinaten einbauen (dafür: WebGL als weiterer Renderer)
+\item Einbau von Hindernissen
+\end{compactitem}
+
+
+Links, etc. dokumentieren
+
+
+\vspace*{1cm}
+
+
+\section{Methodisches}
+
+
+\subsection*{Planung:}
+
+\begin{compactitem}
+\item Drei Meilensteine geplant (erster à vier Wochen, zweite à je fünf Wochen)
+\item Reserve von zwei Wochen am Ende eingeplant (insgesamt stehen 16 KW zur Verfügung)
+\item Abgabe: 30.05.2014
+\end{compactitem}
+
+
+\vspace*{1cm}
+
+
+\subsection*{Tools/Hilfsmittel}
+
+\begin{compactitem}
+\item Repository auf Github: https://github.com/jajadinimueter/antz (Einbinden von Libraries, z.B. für die Vererbung in JavaScript)
+\item [Dort einen Ordner «Docs» einrichten (für Latex-History; Bilder), etc.]
+\item Planungstool: TargetProcess (http://jajadinimueter.tpondemand.com)
+\item Für die gemeinsame Erarbeitung der Projektarbeit haben wir uns für http://sharelatex.com entschieden.
+\end{compactitem}
+
+
+
+
+\end{document}
