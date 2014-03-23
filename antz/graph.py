@@ -1,11 +1,19 @@
+import sets
+import collections
+
+
 class Node(object):
     def __init__(self):
-        """
-        """
+        self._graph = None
 
     @property
     def edges(self):
-        pass
+        """
+        This function returns the edges for this node.
+        Will be patched by the graph.
+        """
+        if self._graph:
+            return self._graph.get_edges(self)
 
     def distance_to(self, other):
         return self._calculate_distance_to(other)
@@ -24,7 +32,7 @@ class Edge(object):
     Represents the connection between two nodes
     """
 
-    def __init__(self, node_from, node_to, bidirectional=True, cost=())):
+    def __init__(self, node_from, node_to, bidirectional=True, cost=()):
         self._node_from = node_from
         self._node_to = node_to
         self._bidirectional = bidirectional
@@ -78,16 +86,21 @@ class Graph(object):
     def __init__(self):
         self._nodes = set()
         self._edges = set()
-        self._node_edges = collections.defaultdict(list)
+        self._node_edges = collections.defaultdict(dict)
+
+    def get_edges(self, node):
+        conns = self._node_edges[node]
+        return conns.values()         
 
     def add_node(self, node):
         """
         Add a new node to the graph
         """
         if node not in self._nodes:
+            node._graph = self
             self._nodes.add(node)
 
-    def add_edge(edge):
+    def add_edge(self, edge):
         nodes = self._nodes
         node_edges = self._node_edges
 
@@ -100,7 +113,7 @@ class Graph(object):
         if edge.bidirectional:
             node_edges[edge.node_to][edge.node_from] = edge
 
-    def remove_edge(*params):
+    def remove_edge(self, params):
         """
         Either pass one param: an edge or pass two params
         which will delete the edge between those nodes
@@ -118,7 +131,7 @@ class Graph(object):
         if edge.bidirectional:
             del node_edges[n2][n1]
 
-    def remove_node(node):
+    def remove_node(self, node):
         # clean edges
         # remove from nodes first
         self._nodes.remove(node)

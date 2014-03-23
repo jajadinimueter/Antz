@@ -3,31 +3,12 @@
 
 
 import sets
-import .graph
 import bisect
 import itertools
 import collections
 
-
-class Environment(object):
-    """
-    Holds the environment. Ants are able to receive information
-    about the environment especially the next possible moves 
-    through the environment.
-    """
-
-    def __init__(self, graph):
-        """
-        :param graph: The whole environment graph
-        """
-        self._graph = graph
-
-    def get_edges(self, node):
-        """
-        Returns the edges given a node
-        """
-        return self._graph[node]
-
+from antz import graph
+from antz.util import *
 
 class AntBehavior(object):
     """
@@ -47,28 +28,35 @@ class AntBehavior(object):
 
     TYPE = None  # should be set by the implementation
 
-    def choose_edge(self, edges):
+    def init_ant(self, ant):
+        """
+        Initialize the ant
+        """
+
+    def choose_edge(self, ant, edges):
         """
         Function should choose an edge among the passed 
         edges and return it. 
         """
 
-    def visit_edge(self, edge):
+    def visit_edge(self, ant, edge):
         """
         Called when the ant moves over the edge to another node.
         """
 
-    def leave_edge(self, edge):
+    def leave_edge(self, ant, edge):
+        """
+        Called when the ant leaves an edge
         """
 
+    def visit_node(self, ant, node):
+        """
+        Called when the ant visits a node
         """
 
-    def visit_node(self, node):
+    def leave_node(self, ant, node):
         """
-        """
-
-    def leave_node(self, node):
-        """
+        Called when the ant leaves a node
         """
 
     def __repr__(self):
@@ -84,30 +72,70 @@ class ShortestPathBehavior(AntBehavior):
     """
     Makes the ant behave in a way which leads to a shortest 
     path solution.
+
+    Behaviour is stateless.
     """
 
     TYPE = 'shortest_path'
 
-    def __init__(self):
-        """
-        """
+    class AntState(object):
+        def __init__(self):
+            self.way_home = False
+            self.edges = []
 
-    def choose_edge(self, ant, edges):
+    def __init__(self):
+        self._pheromone_increase = 10
+
+    def init_ant(self, ant):
+        if not ant._state:
+            ant._state = ShortestPathBehavior.AntState()
+
+    def choose_edge(self, ant, node):
         """
         Function should choose an edge among the passed 
         edges and return it. 
         """
 
-        colony = ant.colony
-        pkind = colony.pheromone_kind('default')
-        # choose the random edge giving edges with
-        # more pheromones a higher chance
-        weighted_edges = [(e.pheromone_level(pkind), e) for e in edges]
-        choices, weights = zip(*weighted_edges)
-        cumdist = list(itertools.accumulate(weights))
-        x = random.random() * cumdist[-1]
+        edges = node.edges
 
-        return choices[bisect.bisect(cumdist, x)]
+        if ant._state.way_home:
+            # just return the reversed path
+            return ant._state.edges.pop()
+        else:
+            colony = ant.colony
+            pkind = colony.pheromone_kind('default')
+            # choose the random edge giving edges with
+            # more pheromones a higher chance
+            weighted_edges = [(e.pheromone_level(pkind), e) for e in edges]
+           
+            return max(weighted_edges, key=lambda x: x[0])[1]
+
+    def visit_edge(self, ant, edge):
+        """
+        Just drop some pheromone on the edge
+        """
+
+        ant._state.edges.append(edge)
+
+        # todo: pheromone increase should not be static
+        edge.increase_pheromone(
+            ant.create_pheromone(
+                'default', self._pheromone_increase))
+
+    def visit_node(self, ant, node):
+        """
+        Called when a node is visited
+        """
+
+        if node_is_food(node):
+            ant._state.way_home = True
+            ant._state.path = ant.path[0:]
+        elif node_is_nest(node):
+            ant._state.way_home = False
+        
+        if node in ant._path:
+            ant._path.remove(node)
+        ant._path.append(node)
 
 
 class AntColony(object):
@@ -121,6 +149,10 @@ class AntColony(object):
         return self._pheromone_kinds[kind]
 
 
+class NoNextStepError(Exception):
+    pass
+
+   
 class Ant(object):
     def __init__(self, colony, initial_node, behavior):
         """
@@ -138,6 +170,20 @@ class Ant(object):
         self._behavior = behavior
         self._colony = colony
 
+        # store your state here
+        self._state = None
+
+        self._behavior.init_ant(self)
+
+    def create_pheromone(self, kind, amount):
+        colony = self._colony
+        kind = colony.pheromone_kind(kind)
+        return Pheromone(kind, amount)
+
+    @property
+    def path(self):
+        return self._path
+
     @property
     def colony(self):
         return self._colony
@@ -149,15 +195,18 @@ class Ant(object):
         """
         return self._current_node
 
+    def _with_set_state(self, state):
+        if state:
+            self._state = state
+
     def move(self):
         """
         Move to the next node
         """
         
         current_node = self.current_node
-        edges = current_node.edges
-
-        edge = self._behavior.choose_edge(edges)
+        
+        edge = self._behavior.choose_edge(self, current_node)
         if not edge:
             # check this here for implementations
             raise ValueError('Behavior %s did not return an edge on `choose_edge` '
@@ -169,18 +218,24 @@ class Ant(object):
 
         # if the edge is unidirectional
         if next_node:
-            self._behavior.leave_node()
+            self._with_set_state(
+                self._behavior.leave_node(
+                    self, current_node))
 
-            self._behavior.visit_edge(edge)
-            self._behavior.leave_edge(edge)
+            self._with_set_state(
+                self._behavior.visit_edge(
+                    self, edge))
+            self._with_set_state(
+                self._behavior.leave_edge(
+                    self, edge))
 
-            self._behavior.visit_node(next_node)
+            self._with_set_state(
+                self._behavior.visit_node(
+                    self, next_node))
 
             self._current_node = next_node
-
-
-def edge_has_pheromones(edge):
-    return 
+        else:
+            raise NoNextStepError()
 
 
 def node_is_food(node):
@@ -193,10 +248,16 @@ def node_is_nest(node):
     return node.TYPE == 'nest'
 
 
+def node_is_waypoint(node):
+    """ Check whether a node is a nest """
+    return node.TYPE == 'waypoint'
+
+
 class Waypoint(graph.Node):
     TYPE = 'waypoint'
 
-    def __init__(self, x, y):
+    def __init__(self, x=None, y=None):
+        graph.Node.__init__(self)
         self._x = x
         self._y = y
 
@@ -209,6 +270,9 @@ class Waypoint(graph.Node):
         return self._y
 
     def _calculate_distance_to(self, other):
+        if not all([self.x, self.y]):
+            return None
+
         x1, y1, x2, y2 = self.x, self.y, other.x, other.y
         x = abs(abs(x1) - abs(x2))
         y = abs(abs(y1) - abs(y2))
@@ -236,20 +300,21 @@ class WaypointEdge(graph.Edge):
     Our edge implementation with pheromones
     """
 
-    def __init__(self, pheromone_store):
-        self._ps = pheromone_store
+    def __init__(self, node1, node2, pheromone_store=None, **kwargs):
+        graph.Edge.__init__(self, node1, node2, **kwargs)
+        self._ps = pheromone_store or PheromoneStore()
 
     def pheromone_level(self, kind):
         return self._ps.get_amount(kind)
 
-    def increase_pheromones(self, pheromone):
+    def increase_pheromone(self, pheromone):
         self._ps.increase(pheromone)
 
-    def decrease_pheromones(self, pheromone):
+    def decrease_pheromone(self, pheromone):
         self._ps.decreases(pheromone)
 
-    def evaporate_pheromones(self):
-        self._ps.evaporate()
+    def evaporate_pheromone(self, kind=None):
+        self._ps.evaporate(kind)
 
 
 class EvaporationStrategy(object):
@@ -276,8 +341,15 @@ class PheromoneStore(object):
     def decrease(self, pheromone):
         self._level[pheromone.kind] -= pheromone.amount
 
-    def evaporate(self, kind):
+    def _evaporate(self, kind):
         self._level[kind] = self._es.evaporate(self._level[kind])
+    
+    def evaporate(self, kind=None):
+        kind = aslist(kind)   
+        if not kind:
+            kind = self._level.keys()
+        for k in kind:
+            self._evaporate(k)
 
 
 class Pheromone(object):
@@ -287,7 +359,7 @@ class Pheromone(object):
 
     @property
     def kind(self):
-        reutrn self._kind
+        return self._kind
 
     @property
     def amount(self):
@@ -309,7 +381,7 @@ def main():
     a different thread.
     """
 
-    graph = graph.Graph()
+    g = graph.Graph()
 
     nest = Nest()
     wp1 = Waypoint()
@@ -319,16 +391,25 @@ def main():
     wp5 = Waypoint()
     food = Food()
 
-    graph.add_edge(nest, wp1)
-    graph.add_edge(nest, wp2)
-    graph.add_edge(wp1, wp2)
-    graph.add_edge(wp1, wp3)
-    graph.add_edge(wp2, wp3)
-    graph.add_edge(wp3, wp4)
-    graph.add_edge(wp3, wp5)
-    graph.add_edge(wp3, food)
-    graph.add_edge(wp5, food)
+    g.add_edge(WaypointEdge(nest, wp1))
+    g.add_edge(WaypointEdge(nest, wp2))
+    g.add_edge(WaypointEdge(wp1, wp2))
+    g.add_edge(WaypointEdge(wp1, wp3))
+    g.add_edge(WaypointEdge(wp2, wp3))
+    g.add_edge(WaypointEdge(wp3, wp4))
+    g.add_edge(WaypointEdge(wp3, wp5))
+    g.add_edge(WaypointEdge(wp3, food))
+    g.add_edge(WaypointEdge(wp5, food))
 
+    colony = AntColony('colony-1')
+    shortest_path_behavior = ShortestPathBehavior()
+    ant = Ant(colony, nest, shortest_path_behavior)    
+
+    while True:
+        ant.move()
+        for edge in g.edges:
+            edge.evaporate_pheromone()
+        print('Current path: %s' % ant.path)
 
 if __name__ == '__main__':
     main()
