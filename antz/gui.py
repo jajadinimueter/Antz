@@ -317,7 +317,7 @@ app = gui.App()
 
 c = gui.Container(width=screen_width,height=screen_height)
 
-e = gui.Button('Color')
+e = gui.Button('Ant Color')
 e.connect(gui.CLICK,dialog.open,None)
 c.add(e, screen_width-100, 13)
 
