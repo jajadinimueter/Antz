@@ -5,6 +5,7 @@ import sys
 import time
 import sets
 import bisect
+import random
 import itertools
 import collections
 
@@ -138,10 +139,19 @@ class ShortestPathBehavior(AntBehavior):
                 pkind = colony.pheromone_kind('default')
                 # choose the random edge giving edges with
                 # more pheromones a higher chance
-                weighted_edges = [(e.pheromone_level(pkind), e) for e in edges]
-               
-                return max(weighted_edges, key=lambda x: x[0])[1]
 
+                choice_list = []
+                num = random.random()
+                if num > 0.9:
+                    # choose randomly
+                    next_edge = random.choice(edges)
+                else:
+                    # choose amont 5 best edges
+                    next_edge = random.choice(list(reversed(sorted(edges, 
+                        key=lambda e: e.pheromone_level(pkind))))[0:5])
+
+                return next_edge
+                
     def visit_edge(self, ant, edge):
         """
         Just drop some pheromone on the edge
@@ -275,7 +285,7 @@ class Ant(object):
         
         edge = self._behavior.choose_edge(self, current_node)
         if not edge:
-            raise NoNextStep()
+            return
 
         # returns the node which is not the current nod
         next_node = edge.other_node(current_node)
@@ -298,9 +308,7 @@ class Ant(object):
                     self, next_node))
 
             self._current_node = next_node
-        else:
-            raise NoNextStep()
-
+        
 
 def node_is_food(node):
     """ Check whether a node is food """
@@ -519,8 +527,6 @@ def main():
         if shortest_path_behavior.best_path:
             print('Shortest path length: %s' % shortest_path_behavior.best_path_length)
             print('Shortest path: %s' % format_path(shortest_path_behavior.best_path))
-
-        time.sleep(0.5)
 
 if __name__ == '__main__':
     main()
