@@ -137,7 +137,7 @@ class ShortestPathBehavior(AntBehavior):
 
             choice_list = []
             num = random.random()
-            if num > 0.7:
+            if num > 0.6:
                 # choose randomly
                 next_edge = random.choice(edges)
             else:
@@ -163,10 +163,11 @@ class ShortestPathBehavior(AntBehavior):
             state.add_edge(edge)
             ant._path_length = state.pathlen
 
-        # todo: pheromone increase should not be static
-        edge.increase_pheromone(
-            ant.create_pheromone(
-                'default', self._pheromone_increase))
+        if state.way_home:
+            # todo: pheromone increase should not be static
+            edge.increase_pheromone(
+                ant.create_pheromone(
+                    'default', self._pheromone_increase))
 
     def visit_node(self, ant, node):
         """

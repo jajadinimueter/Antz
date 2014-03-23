@@ -141,7 +141,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 1000
+ANT_COUNT = 10000
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
