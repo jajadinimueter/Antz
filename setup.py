@@ -1,17 +1,26 @@
 import os
-from glob import glob
-from setuptools import setup
+import py2exe
+import glob
+from distutils.core import setup
+
+share_target = os.path.join('share','pgu','themes')
+share = os.path.join(os.path.dirname(py2exe.__file__), '..', '..', '..', 'share', 'pgu', 'themes')
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
+	
 installdatafiles = []
 for name in ('default', 'gray', 'tools'):
-    installdatafiles.append(
-        (os.path.join('share', 'pgu', 'themes', name), 
-            glob(os.path.join('data', 'themes', name, '*')))
-    )
-
+	installdatafiles.append((os.path.join(share_target, name),
+							 glob.glob(os.path.join(share, name, '*'))))
+	
+origIsSystemDLL = py2exe.build_exe.isSystemDLL
+def isSystemDLL(pathname):
+       if os.path.basename(pathname).lower() in ["sdl_ttf.dll"]:
+               return 0
+       return origIsSystemDLL(pathname)
+py2exe.build_exe.isSystemDLL = isSystemDLL
+	
 setup(
     name = 'antz',
     version = '0.1',
@@ -29,5 +38,6 @@ setup(
         'Topic :: Utilities',
         'License :: OSI Approved :: BSD License',
     ],
-    data_files=installdatafiles
+    data_files=installdatafiles,
+	console=['antz/gui.py']
 )

@@ -33,16 +33,11 @@ class ColorDialog(gui.Dialog):
         self.color = gui.Color(self.value,width=64,height=64)
         main.td(self.color,rowspan=3,colspan=1)
         
-        ##The sliders CHANGE events are connected to the adjust method.  The 
-        ##adjust method updates the proper color component based on the value
-        ##passed to the method.
-        ##::
         main.td(gui.Label(' Red: '),1,0)
         e = gui.HSlider(value=self.value[0],min=0,max=255,size=32,width=128,height=16)
         e.connect(gui.CHANGE,self.adjust,(0,e))
         main.td(e,2,0)
-        ##
-
+        
         main.td(gui.Label(' Green: '),1,1)
         e = gui.HSlider(value=self.value[1],min=0,max=255,size=32,width=128,height=16)
         e.connect(gui.CHANGE,self.adjust,(1,e))
@@ -59,8 +54,6 @@ class ColorDialog(gui.Dialog):
     def rgb(self):
         return self.value
 
-    ##The custom adjust handler.
-    ##::
     def adjust(self,value):
         (num, slider) = value
         self.value[num] = slider.value
@@ -81,11 +74,11 @@ class AntSprite(pygame.sprite.Sprite):
         # Call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self) 
  
-        self.color = dialog.rgb
+        self.color = color #dialog.rgb
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
         self.image = pygame.Surface([width, height])
-        self.image.fill(self.color)
+        self.image.fill(dialog.rgb)
 
         # Fetch the rectangle object that has the dimensions of the image
         # image.
@@ -101,7 +94,7 @@ class AntSprite(pygame.sprite.Sprite):
             # Move the block down one pixel
             self.rect.y = node.y - self.rect.height / 2.0
             self.rect.x = node.x - self.rect.width / 2.0
-        self.image.fill(self.color)
+        self.image.fill(dialog.rgb)
 
 
 class FoodSprite(pygame.sprite.Sprite):
@@ -373,7 +366,7 @@ while done == False:
     # as a list of two numbers.
     pos = pygame.mouse.get_pos()
      
-    ant_sprites.color = dialog.rgb 
+    # ant_sprites.color = dialog.rgb 
     ant_sprites.update()
 
     # Draw all the spites

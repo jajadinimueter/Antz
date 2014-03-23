@@ -84,3 +84,5 @@
 *.xdy
 *.pyc
 antz.egg-info
+build 
+dist 
