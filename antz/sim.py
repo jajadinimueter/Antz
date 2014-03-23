@@ -217,11 +217,11 @@ class ShortestPathBehavior(AntBehavior):
 
         rand = random.random()
         if not ant._state.way_home:
-            if rand > 0.9 and turns > 100:
+            if rand > 0.99 and turns > 100:
                 ant._reset()
-            elif rand > 0.6 and turns > 150:
+            elif rand > 0.95 and turns > 150:
                 ant._reset()
-            elif rand > 0.5 and turns > 200:
+            elif rand > 0.8 and turns > 500:
                 ant._reset()
 
 
@@ -427,7 +427,7 @@ class EvaporationStrategy(object):
         self._amount = amount
 
     def amount(self, current_amount):
-        return self._amount
+        return current_amount - self._amount
 
 
 DEFAULT_EVAPORATION_STRATEGY = EvaporationStrategy()
@@ -447,16 +447,18 @@ class PheromoneStore(object):
         self._level[pheromone.kind] += pheromone.amount
 
     def _decrease(self, kind, amount):
-        new_value = self._level[kind] - amount
-        if new_value < 0:
-            new_value = 0
-        self._level[kind] = new_value
+        self._set(kind, self._level[kind] - amount)
+
+    def _set(self, kind, amount):
+        if amount < 0:
+            amount = 0
+        self._level[kind] = amount
 
     def decrease(self, pheromone):
         self._decrease(pheromone.kind, pheromone.amount)
 
     def _evaporate(self, kind):
-        self._decrease(kind, self._es.amount(self._level[kind]))
+        self._set(kind, self._es.amount(self._level[kind]))
     
     def evaporate(self, kind=None):
         kind = aslist(kind)   

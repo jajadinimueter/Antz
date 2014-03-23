@@ -147,7 +147,12 @@ ANT_COUNT = 2000
 colony = sim.AntColony('colony-1')
 pkind = colony.pheromone_kind('default')
 shortest_path_behavior = sim.ShortestPathBehavior()
-evaporate_strategy = sim.EvaporationStrategy(2)
+
+class MyStrategy(object):
+    def amount(self, current_amount):
+        return current_amount - 0.01
+
+evaporate_strategy = MyStrategy()
 ants = sim.AntCollection()
 
 def create_sprite(node):
@@ -226,7 +231,7 @@ def replace_random_node(nodes, cb):
     return p
 
 # setup the graph
-grid_nodes = create_grid_nodes(screen_width, screen_height, 15)
+grid_nodes = create_grid_nodes(screen_width, screen_height, 10)
 print('nodes created!')
 nest = replace_random_node(grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
@@ -273,7 +278,7 @@ while done == False:
                 level = 255
             color = (100, 100, level)
             pygame.draw.lines(screen, color, False,
-                lines, 10)
+                lines, 15)
         else:
             pygame.draw.lines(screen, (240, 240, 240), False,
                 lines, 1)
