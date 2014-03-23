@@ -194,14 +194,20 @@ def create_grid_graph(nodes):
         l = len(xlist)
         for j, a in enumerate(xlist):
             sprite = create_sprite(a)
+            ylist = None
+            if i+1 < yl:
+                ylist = nodes[i+1]
             if sprite:
                 all_sprites.add(sprite)
             if j+1 < l:
-                b = xlist[j+1]
                 # create the wayfucker
-                if a and b:
-                    create_waypoint(a, b)
-            if i+1 < yl:
+                create_waypoint(a, xlist[j+1])
+                if ylist:
+                    # diagonal
+                    create_waypoint(a, ylist[j+1])
+                    if j-1 >= 0:
+                        create_waypoint(a, ylist[j-1])
+            if ylist:
                 ylist = nodes[i+1]
                 b = ylist[j]
                 if a and b:
