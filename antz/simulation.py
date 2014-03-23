@@ -528,6 +528,7 @@ def main():
             print('Shortest path length: %s' % shortest_path_behavior.best_path_length)
             print('Shortest path: %s' % format_path(shortest_path_behavior.best_path))
 
+
 if __name__ == '__main__':
     main()
 
