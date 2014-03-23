@@ -67,9 +67,9 @@ class AntBehavior(object):
         """
         Default repr implementation for convienience 
         """
-        return ('%s(TYPE=%s)' 
+        return ('%s(TYPE=%s, <%s>)' 
                     % (self.__class__.__name__,
-                        self.TYPE))
+                        self.TYPE, id(self)))
 
 
 class ShortestPathBehavior(AntBehavior):
@@ -91,8 +91,6 @@ class ShortestPathBehavior(AntBehavior):
             self.best_pathlen = sys.float_info.max
 
         def add_edge(self, edge):
-            if edge in self.edges:
-                self.edges.remove(edge)
             self.edges.append(edge)
             self.last_edge = edge
             self.pathlen += edge.cost
@@ -122,33 +120,33 @@ class ShortestPathBehavior(AntBehavior):
         edges and return it. 
         """
 
-        last_edge = ant._state.last_edge
-        visited_edges = ant._state.edges
+        state = ant._state
 
-        if ant._state.way_home:
-            if ant._state.edges:
-                # just return the reversed path
-                return ant._state.edges.pop()
+        if state.way_home:
+            next_edge = state.edges.pop()
+            if node not in next_edge.nodes:
+                raise Exception('%s not in next_edge.nodes %s %s' 
+                    % (node, next_edge, next_edge.nodes))
+            return next_edge
         else:
             edges = node.edges
-            if edges:
-                colony = ant.colony
-                pkind = colony.pheromone_kind('default')
-                # choose the random edge giving edges with
-                # more pheromones a higher chance
+            colony = ant.colony
+            pkind = colony.pheromone_kind('default')
+            # choose the random edge giving edges with
+            # more pheromones a higher chance
 
-                choice_list = []
-                num = random.random()
-                if num > 0.9:
-                    # choose randomly
-                    next_edge = random.choice(edges)
-                else:
-                    # choose amont 5 best edges
-                    next_edge = random.choice(list(reversed(sorted(edges, 
-                        key=lambda e: e.pheromone_level(pkind))))[0:5])
+            choice_list = []
+            num = random.random()
+            if num > 0.9:
+                # choose randomly
+                next_edge = random.choice(edges)
+            else:
+                # choose amont 5 best edges
+                next_edge = random.choice(list(reversed(sorted(edges, 
+                    key=lambda e: e.pheromone_level(pkind))))[0:5])
 
-                return next_edge
-                
+            return next_edge
+            
     def visit_edge(self, ant, edge):
         """
         Just drop some pheromone on the edge
@@ -157,13 +155,12 @@ class ShortestPathBehavior(AntBehavior):
         state = ant._state
         if not state.way_home:
             state.add_edge(edge)
-
-            # todo: pheromone increase should not be static
-            edge.increase_pheromone(
-                ant.create_pheromone(
-                    'default', self._pheromone_increase))
-
             ant._path_length = state.pathlen
+
+        # todo: pheromone increase should not be static
+        edge.increase_pheromone(
+            ant.create_pheromone(
+                'default', self._pheromone_increase))
 
     def visit_node(self, ant, node):
         """
@@ -173,11 +170,10 @@ class ShortestPathBehavior(AntBehavior):
         state = ant._state
 
         if not state.way_home:
-            if node in ant._path:
-                ant._path.remove(node)
             ant._path.append(node)
 
         if node_is_food(node):
+            # handle the thing when it's food
             state.way_home = True
 
             if state.pathlen < state.best_pathlen:
@@ -188,14 +184,12 @@ class ShortestPathBehavior(AntBehavior):
             if state.best_pathlen < self._best_path_length:
                 self._best_path_length = state.best_pathlen 
                 self._best_path = ant._best_path
-
-            # set the new best path on the ant
-            ant._path = [node]
         elif node_is_nest(node):
-            state.way_home = False
-            state.pathlen = 0
-            ant._path_length = 0
-        
+            # when it's a nest and we are on our way
+            # back -> reset the ant
+            if state.way_home:
+                ant._reset()
+
 
 class AntColony(object):
     def __init__(self, name):
@@ -224,6 +218,7 @@ class Ant(object):
 
         # already setup the path with the 
         # initial node as its only element
+        self._initial_node = initial_node
         self._current_node = initial_node
         self._path = [initial_node]
         self._behavior = behavior
@@ -235,6 +230,13 @@ class Ant(object):
         # store your state here
         self._state = None
 
+        self._behavior.init_ant(self)
+
+    def _reset(self):
+        self._current_node = self._initial_node
+        self._path = [self._initial_node]
+        self._path_length = 0
+        self._state = None
         self._behavior.init_ant(self)
 
     def create_pheromone(self, kind, amount):
@@ -281,14 +283,14 @@ class Ant(object):
         current_node = self.current_node
         
         edge = self._behavior.choose_edge(self, current_node)
-        if not edge:
-            return
 
         # returns the node which is not the current nod
         next_node = edge.other_node(current_node)
-
+        
         # if the edge is unidirectional
         if next_node:
+            self._current_node = next_node
+
             self._with_set_state(
                 self._behavior.leave_node(
                     self, current_node))
@@ -303,8 +305,9 @@ class Ant(object):
             self._with_set_state(
                 self._behavior.visit_node(
                     self, next_node))
-
-            self._current_node = next_node
+        else:
+            # reset the ant
+            self._reset()
         
 
 def node_is_food(node):

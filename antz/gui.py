@@ -153,7 +153,7 @@ all_sprites.add(WpSprite(wp3, black, 5, 5))
 all_sprites.add(WpSprite(wp4, black, 5, 5))
 all_sprites.add(WpSprite(wp5, black, 5, 5))
 
-evaporate_strategy = sim.EvaporationStrategy(amount=2)
+evaporate_strategy = sim.EvaporationStrategy(amount=10)
 
 def create_waypoint(n1, n2):
     wp = sim.WaypointEdge(n1, n2, 
@@ -191,7 +191,7 @@ pkind = colony.pheromone_kind('default')
 edge_lines = []
 for edge in g.edges:
     n1, n2 = edge.node_from, edge.node_to
-    edge_lines.append([(n1.x, n1.y), (n2.x, n2.y)])
+    edge_lines.append((edge, [(n1.x, n1.y), (n2.x, n2.y)]))
 
 while done == False:
     for event in pygame.event.get(): # User did something
@@ -208,14 +208,19 @@ while done == False:
     best_path = shortest_path_behavior.best_path
     best_length = shortest_path_behavior.best_path_length
 
-    for line in edge_lines:
-        pygame.draw.lines(screen, (200, 200, 200), False,
-            line, 1)
+    for edge, lines in edge_lines:
+        color = (200, 200, 200)
+        plevel = edge.pheromone_level(pkind)
+        if plevel:
+            blueness = min([plevel, 255])
+            color = (20, 20, blueness)
+        pygame.draw.lines(screen, color, False,
+            lines, 4)
 
     if best_path:
         # draw a lsine
         pygame.draw.lines(screen, black, False, 
-            [(n.x, n.y) for n in best_path], 1)
+            [(n.x, n.y) for n in best_path], 3)
         
         myfont = pygame.font.SysFont('monospace', 15)
 
@@ -233,7 +238,7 @@ while done == False:
     ant_sprites.update()
      
     # Limit to 20 frames per second
-    clock.tick(20)
+    # clock.tick(20)
 
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()

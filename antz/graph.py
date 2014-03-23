@@ -82,6 +82,10 @@ class Edge(object):
                 return None
         return (self._nodes - {current_node}).pop()
 
+    @property
+    def nodes(self):
+        return self._nodes
+        
 
 class Graph(object):
     """
