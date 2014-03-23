@@ -97,6 +97,18 @@ class ShortestPathBehavior(AntBehavior):
 
     def __init__(self):
         self._pheromone_increase = 10
+        self._best_path_length = sys.float_info.max
+        self._best_path = None
+
+    @property
+    def best_path_length(self):
+        if self._best_path_length == sys.float_info.max:
+            return 0
+        return self._best_path_length
+
+    @property
+    def best_path(self):
+        return self._best_path
 
     def init_ant(self, ant):
         if not ant._state:
@@ -166,6 +178,10 @@ class ShortestPathBehavior(AntBehavior):
                 ant._best_path = ant._path
                 ant._best_path_length = state.best_pathlen
 
+            if state.best_pathlen < self._best_path_length:
+                self._best_path_length = state.best_pathlen 
+                self._best_path = ant._best_path
+
             # set the new best path on the ant
             ant._path = [node]
         elif node_is_nest(node):
@@ -173,8 +189,6 @@ class ShortestPathBehavior(AntBehavior):
             state.pathlen = 0
             ant._path_length = 0
         
-        print('Visiting node %s' % node)
-
 
 class AntColony(object):
     def __init__(self, name):
@@ -451,6 +465,13 @@ def format_path(path):
     return ' -> '.join([p.name for p in path])
 
 
+class AntCollection(set):
+    def move(self):
+        start = time.time()
+        for ant in self:
+            ant.move()
+        print('Moving all the ants took %.2f' % (time.time() - start))
+
 def main():
     """
     Main loop for the problem solver. This can be executed in 
@@ -482,23 +503,23 @@ def main():
 
     colony = AntColony('colony-1')
     shortest_path_behavior = ShortestPathBehavior()
-    ant = Ant(colony, nest, shortest_path_behavior)    
+    
+    ants = AntCollection()
+
+    for i in range(0, 100):
+        ants.add(Ant(colony, nest, shortest_path_behavior))
+    
     pkind = colony.pheromone_kind('default')
 
     while True:
-        ant.move()
+        ants.move()
         for edge in g.edges:
-            # print('%s -> %s pheromone level %s' 
-            #     % (edge.node_from.name, edge.node_to.name, 
-            #         edge.pheromone_level(pkind)))
             edge.evaporate_pheromone()
-            # print('\t<<< %s -> %s pheromone level %s' 
-            #     % (edge.node_from.name, edge.node_to.name, 
-            #         edge.pheromone_level(pkind)))
-        print('Current path: %s' % format_path(ant.path))
-        print('Current path length: %s' % ant.path_length)
-        print('Best path: %s' % format_path(ant.best_path))
-        print('Best path length: %s' % ant.best_path_length)
+
+        if shortest_path_behavior.best_path:
+            print('Shortest path length: %s' % shortest_path_behavior.best_path_length)
+            print('Shortest path: %s' % format_path(shortest_path_behavior.best_path))
+
         time.sleep(0.5)
 
 if __name__ == '__main__':
