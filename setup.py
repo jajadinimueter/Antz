@@ -15,6 +15,7 @@ setup(
     url = 'git@github.com:jajadinimueter/Antz.git',
     packages=['antz'],
     long_description=read('README.md'),
+    install_requires=['pygame'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Utilities',

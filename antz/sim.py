@@ -4,6 +4,7 @@
 import sys
 import time
 import sets
+import math
 import bisect
 import random
 import itertools
@@ -121,20 +122,16 @@ class ShortestPathBehavior(AntBehavior):
         edges and return it. 
         """
 
-        edges = node.edges
-
         last_edge = ant._state.last_edge
         visited_edges = ant._state.edges
 
-        # filter out the edge we already were
-        edges = [e for e in edges 
-                    if e not in visited_edges]
-
-        if edges:
-            if ant._state.way_home:
+        if ant._state.way_home:
+            if ant._state.edges:
                 # just return the reversed path
                 return ant._state.edges.pop()
-            else:
+        else:
+            edges = node.edges
+            if edges:
                 colony = ant.colony
                 pkind = colony.pheromone_kind('default')
                 # choose the random edge giving edges with
@@ -342,13 +339,14 @@ class Waypoint(graph.Node):
         return self._y
 
     def _calculate_distance_to(self, other):
-        if not all([self.x, self.y]):
+        if self.x is None or self.y is None:
             return None
 
         x1, y1, x2, y2 = self.x, self.y, other.x, other.y
         x = abs(abs(x1) - abs(x2))
         y = abs(abs(y1) - abs(y2))
-        distance = sqrt(x**2 + y**2)
+        distance = math.sqrt(x**2 + y**2)
+
         return distance
 
     def __repr__(self):
@@ -467,18 +465,12 @@ class PheromoneKind(object):
         return self._name
 
 
-def format_path(path):
-    if path is None:
-        return '-'
-    return ' -> '.join([p.name for p in path])
-
-
 class AntCollection(set):
     def move(self):
         start = time.time()
         for ant in self:
             ant.move()
-        print('Moving all the ants took %.2f' % (time.time() - start))
+
 
 def main():
     """
@@ -499,7 +491,6 @@ def main():
     evaporate_strategy = EvaporationStrategy(amount=2)
 
     # we need to create a waypoint factory
-
     g.add_edge(WaypointEdge(nest, wp1, evaporation_strategy=evaporate_strategy, cost=100))
     g.add_edge(WaypointEdge(nest, wp2, evaporation_strategy=evaporate_strategy, cost=20))
     g.add_edge(WaypointEdge(wp1, wp3, evaporation_strategy=evaporate_strategy, cost=200))
@@ -531,5 +522,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

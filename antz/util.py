@@ -1,7 +1,14 @@
 import random
 
 
-__all__ = ('aslist', 'probability_choice')
+__all__ = ('aslist', 'probability_choice',
+           'format_path')
+
+
+def format_path(path):
+    if path is None:
+        return '-'
+    return ' -> '.join([p.name for p in path])
 
 
 def probability_choice(l):
