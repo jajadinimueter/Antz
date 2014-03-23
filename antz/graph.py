@@ -38,6 +38,8 @@ class Edge(object):
     """
 
     def __init__(self, node_from, node_to, bidirectional=True, cost=()):
+        if not node_from or not node_to:
+            raise ValueError('Both nodes must be set')
         self._node_from = node_from
         self._node_to = node_to
         self._bidirectional = bidirectional
@@ -45,8 +47,8 @@ class Edge(object):
             cost = node_to - node_from
         cost = cost or 0
         self._cost = cost
-        self._nodes = {node_from, node_to}
-
+        self._nodes = [node_from, node_to]
+        
     @property
     def node_from(self):
         return self._node_from
@@ -80,12 +82,16 @@ class Edge(object):
         if not self.bidirectional:
             if not current_node == self._node_from:
                 return None
-        return (self._nodes - {current_node}).pop()
+
+        if current_node == self.node_from:
+            return self.node_to
+        if current_node == self.node_to:
+            return self.node_from
 
     @property
     def nodes(self):
-        return self._nodes
-        
+        return sets.ImmutableSet(self._nodes)
+
 
 class Graph(object):
     """

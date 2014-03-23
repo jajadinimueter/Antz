@@ -1,3 +1,6 @@
+import time
+import random
+
 import pygame
 import pygame.draw
 
@@ -11,6 +14,7 @@ white    = ( 255, 255, 255)
 red      = ( 255,   0,   0)
 blue     = ( 0,   0,   255)
 green    = ( 0,   255,   0)
+gray    = ( 220,   220,   220)
 
 # This class represents the ball        
 # It derives from the 'Sprite' class in Pygame
@@ -137,61 +141,114 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-g = graph.Graph()
+ANT_COUNT = 1000
 
-nest = sim.Nest(name='nest', x=200, y=100)
-wp1 = sim.Waypoint(name='wp-1', x=10, y=50)
-wp2 = sim.Waypoint(name='wp-2', x=6, y=120)
-wp3 = sim.Waypoint(name='wp-3', x=300, y=300)
-wp4 = sim.Waypoint(name='wp-4', x=34, y=45)
-wp5 = sim.Waypoint(name='wp-5', x=78, y=44)
-food = sim.Food(name='food', x=100, y=150)
-
-all_sprites.add(WpSprite(wp1, black, 5, 5))
-all_sprites.add(WpSprite(wp2, black, 5, 5))
-all_sprites.add(WpSprite(wp3, black, 5, 5))
-all_sprites.add(WpSprite(wp4, black, 5, 5))
-all_sprites.add(WpSprite(wp5, black, 5, 5))
-
-evaporate_strategy = sim.EvaporationStrategy(amount=10)
-
-def create_waypoint(n1, n2):
-    wp = sim.WaypointEdge(n1, n2, 
-        evaporation_strategy=evaporate_strategy)
-    g.add_edge(wp)
-    return wp
-
-# we need to create a waypoint factory
-create_waypoint(nest, wp1)
-create_waypoint(nest, wp2)
-create_waypoint(wp1, wp3)
-create_waypoint(wp2, wp3)
-create_waypoint(wp3, wp4)
-create_waypoint(wp3, wp5)
-create_waypoint(wp3, food)
-create_waypoint(wp5, food)
-
+# CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
+pkind = colony.pheromone_kind('default')
 shortest_path_behavior = sim.ShortestPathBehavior()
-
+evaporate_strategy = sim.EvaporationStrategy(2)
 ants = sim.AntCollection()
 
-for i in range(0, 100):
+def create_sprite(node):
+    if node.TYPE == 'waypoint':
+        return WpSprite(node, gray, 5, 5)
+    elif node.TYPE == 'food':
+        return FoodSprite(node, blue, 10, 10)
+    elif node.TYPE == 'nest':
+        return NestSprite(node, green, 10, 10)
+
+def create_grid_nodes(width, height, square_size):
+    # creates a graph which is a grid
+    ss = square_size
+    x, y = 0, 0
+
+    nodes = []
+
+    cur_nodes = []
+
+    while True:
+        while True:
+            node = sim.Waypoint(x=x, y=y)
+            cur_nodes.append(node)
+            if x > width:
+                break
+            x += square_size
+        
+        nodes.append(cur_nodes)
+        cur_nodes = []
+
+        if y > height:
+            break
+
+        x = 0
+        y += square_size
+
+    return nodes
+
+def create_grid_graph(nodes):
+    g = graph.Graph()
+    def create_waypoint(n1, n2):
+        wp = sim.WaypointEdge(n1, n2, 
+            evaporation_strategy=evaporate_strategy)
+        g.add_edge(wp)
+        return wp
+    yl = len(nodes)
+    for i, xlist in enumerate(nodes):
+        # make connections from left to right and
+        # from top to bottom
+        l = len(xlist)
+        for j, a in enumerate(xlist):
+            all_sprites.add(create_sprite(a))
+            if j+1 < l:
+                b = xlist[j+1]
+                # create the wayfucker
+                if a and b:
+                    create_waypoint(a, b)
+            if i+1 < yl:
+                ylist = nodes[i+1]
+                b = ylist[j]
+                if a and b:
+                    create_waypoint(a, b)
+    return g
+
+def random_grid_location(nodes):
+    xlen = len(nodes[0])
+    i = random.randrange(2, len(nodes)-2)
+    j = random.randrange(2, xlen-2)
+    return i, j
+
+def replace_random_node(nodes, cb):
+    i, j = random_grid_location(nodes)    
+    x = nodes[i][j]
+    p = cb(x)
+    nodes[i][j] = p
+    return p
+
+# setup the graph
+grid_nodes = create_grid_nodes(screen_width, screen_height, 15)
+print('nodes created!')
+nest = replace_random_node(grid_nodes, (lambda old: 
+    sim.Nest(name='nest', x=old.x, y=old.y)))
+food = replace_random_node(grid_nodes, (lambda old: 
+    sim.Food(name='food', x=old.x, y=old.y)))
+print('create graph')
+g = create_grid_graph(grid_nodes)
+
+# CREATE THE ANTS
+for i in range(0, ANT_COUNT):
     ant = sim.Ant(colony, nest, shortest_path_behavior)
-    sprite = AntSprite(ant, green, 3, 3)
-    ants.add(ant)
+    sprite = AntSprite(ant, black, 7, 7)
     ant_sprites.add(sprite)
     all_sprites.add(sprite)
+    ants.add(ant)
 
-all_sprites.add(NestSprite(nest, blue, 10, 10))
-all_sprites.add(FoodSprite(food, red, 10, 10))
-
-pkind = colony.pheromone_kind('default')
-
+# precalculate lines between edges
 edge_lines = []
 for edge in g.edges:
     n1, n2 = edge.node_from, edge.node_to
     edge_lines.append((edge, [(n1.x, n1.y), (n2.x, n2.y)]))
+
 
 while done == False:
     for event in pygame.event.get(): # User did something
@@ -209,18 +266,22 @@ while done == False:
     best_length = shortest_path_behavior.best_path_length
 
     for edge, lines in edge_lines:
-        color = (200, 200, 200)
         plevel = edge.pheromone_level(pkind)
         if plevel:
-            blueness = min([plevel, 255])
-            color = (20, 20, blueness)
-        pygame.draw.lines(screen, color, False,
-            lines, 4)
+            level = 200 + plevel
+            if level > 255:
+                level = 255
+            color = (100, 100, level)
+            pygame.draw.lines(screen, color, False,
+                lines, 10)
+        else:
+            pygame.draw.lines(screen, (240, 240, 240), False,
+                lines, 1)
 
     if best_path:
         # draw a lsine
         pygame.draw.lines(screen, black, False, 
-            [(n.x, n.y) for n in best_path], 3)
+            [(n.x, n.y) for n in best_path], 6)
         
         myfont = pygame.font.SysFont('monospace', 15)
 

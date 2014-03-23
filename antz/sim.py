@@ -137,13 +137,19 @@ class ShortestPathBehavior(AntBehavior):
 
             choice_list = []
             num = random.random()
-            if num > 0.9:
+            if num > 0.7:
                 # choose randomly
                 next_edge = random.choice(edges)
             else:
-                # choose amont 5 best edges
-                next_edge = random.choice(list(reversed(sorted(edges, 
-                    key=lambda e: e.pheromone_level(pkind))))[0:5])
+                next_edge = max(edges, key=lambda e: e.pheromone_level(pkind))
+                # sorted_edges = sorted(edges, key=lambda e: e.pheromone_level(pkind))
+                # to_choose = list(reversed(sorted_edges))[0:5]
+                # if to_choose:
+                #     # choose amont 5 best edges
+                #     next_edge = random.choice(to_choose)
+
+            if not next_edge:
+                next_edge = random.choice(edges)
 
             return next_edge
             
