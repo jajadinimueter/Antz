@@ -141,7 +141,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 10000
+ANT_COUNT = 2000
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
@@ -268,7 +268,7 @@ while done == False:
     for edge, lines in edge_lines:
         plevel = edge.pheromone_level(pkind)
         if plevel:
-            level = 200 + plevel
+            level = 100 + plevel
             if level > 255:
                 level = 255
             color = (100, 100, level)

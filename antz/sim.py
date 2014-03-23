@@ -63,6 +63,11 @@ class AntBehavior(object):
         Called when the ant leaves a node
         """
 
+    def end_turn(self, ant):
+        """
+        Called after one turn
+        """
+
     def __repr__(self):
         """
         Default repr implementation for convienience 
@@ -88,6 +93,7 @@ class ShortestPathBehavior(AntBehavior):
             self.edges = []
             self.last_edge = None
             self.pathlen = 0
+            self.turns = 0
             self.best_pathlen = sys.float_info.max
 
         def add_edge(self, edge):
@@ -132,21 +138,29 @@ class ShortestPathBehavior(AntBehavior):
             edges = node.edges
             colony = ant.colony
             pkind = colony.pheromone_kind('default')
-            # choose the random edge giving edges with
-            # more pheromones a higher chance
+
+            the_edges = [e for e in edges if e not in state.edges]
+            if the_edges:
+                edges = the_edges
+            phero_edges = random.shuffle(
+                [e for e in edges if e.pheromone_level(pkind)])
 
             choice_list = []
-            num = random.random()
-            if num > 0.6:
-                # choose randomly
+
+            if not phero_edges:
                 next_edge = random.choice(edges)
             else:
-                next_edge = max(edges, key=lambda e: e.pheromone_level(pkind))
-                # sorted_edges = sorted(edges, key=lambda e: e.pheromone_level(pkind))
-                # to_choose = list(reversed(sorted_edges))[0:5]
-                # if to_choose:
-                #     # choose amont 5 best edges
-                #     next_edge = random.choice(to_choose)
+                num = random.random()
+                if num > 0.8:
+                    # choose randomly
+                    next_edge = random.choice(edges)
+                else:
+                    next_edge = max(edges, key=lambda e: e.pheromone_level(pkind))
+                    # sorted_edges = sorted(edges, key=lambda e: e.pheromone_level(pkind))
+                    # to_choose = list(reversed(sorted_edges))[0:5]
+                    # if to_choose:
+                    #     # choose amont 5 best edges
+                    #     next_edge = random.choice(to_choose)
 
             if not next_edge:
                 next_edge = random.choice(edges)
@@ -195,6 +209,19 @@ class ShortestPathBehavior(AntBehavior):
             # when it's a nest and we are on our way
             # back -> reset the ant
             if state.way_home:
+                ant._reset()
+
+    def end_turn(self, ant):
+        ant._state.turns += 1
+        turns = ant._state.turns
+
+        rand = random.random()
+        if not ant._state.way_home:
+            if rand > 0.9 and turns > 100:
+                ant._reset()
+            elif rand > 0.6 and turns > 150:
+                ant._reset()
+            elif rand > 0.5 and turns > 200:
                 ant._reset()
 
 
@@ -278,10 +305,6 @@ class Ant(object):
         """
         return self._current_node
 
-    def _with_set_state(self, state):
-        if state:
-            self._state = state
-
     def move(self):
         """
         Move to the next node
@@ -297,25 +320,16 @@ class Ant(object):
         # if the edge is unidirectional
         if next_node:
             self._current_node = next_node
-
-            self._with_set_state(
-                self._behavior.leave_node(
-                    self, current_node))
-
-            self._with_set_state(
-                self._behavior.visit_edge(
-                    self, edge))
-            self._with_set_state(
-                self._behavior.leave_edge(
-                    self, edge))
-
-            self._with_set_state(
-                self._behavior.visit_node(
-                    self, next_node))
+            self._behavior.leave_node(self, current_node)
+            self._behavior.visit_edge(self, edge)
+            self._behavior.leave_edge(self, edge)
+            self._behavior.visit_node(self, next_node)
         else:
             # reset the ant
             self._reset()
         
+        self._behavior.end_turn(self)
+
 
 def node_is_food(node):
     """ Check whether a node is food """
