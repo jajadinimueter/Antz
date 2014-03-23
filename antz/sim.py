@@ -151,7 +151,7 @@ class ShortestPathBehavior(AntBehavior):
                 next_edge = random.choice(edges)
             else:
                 num = random.random()
-                if num > 0.8:
+                if num > 0.98:
                     # choose randomly
                     next_edge = random.choice(edges)
                 else:
@@ -217,12 +217,9 @@ class ShortestPathBehavior(AntBehavior):
 
         rand = random.random()
         if not ant._state.way_home:
-            if rand > 0.99 and turns > 100:
-                ant._reset()
-            elif rand > 0.95 and turns > 150:
-                ant._reset()
-            elif rand > 0.8 and turns > 500:
-                ant._reset()
+            if self.best_path:
+                if rand > 0.8 and turns > random.randrange(200, 400):
+                    ant._reset()
 
 
 class AntColony(object):

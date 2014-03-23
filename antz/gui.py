@@ -30,7 +30,7 @@ class AntSprite(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
- 
+
         # Fetch the rectangle object that has the dimensions of the image
         # image.
         # Update the position of this object by setting the values 
@@ -43,8 +43,8 @@ class AntSprite(pygame.sprite.Sprite):
         node = self.ant.current_node
         if node:
             # Move the block down one pixel
-            self.rect.y = node.y - self.rect.height / 2
-            self.rect.x = node.x - self.rect.width / 2
+            self.rect.y = node.y - self.rect.height / 2.0
+            self.rect.x = node.x - self.rect.width / 2.0
 
 
 class FoodSprite(pygame.sprite.Sprite):
@@ -66,12 +66,8 @@ class FoodSprite(pygame.sprite.Sprite):
         # of rect.x and rect.y
         self.rect = self.image.get_rect()
         self.food = food
-        self.update()
-
-    def update(self):
-        # Move the block down one pixel
-        self.rect.y = self.food.y - self.rect.height / 2
-        self.rect.x = self.food.x - self.rect.width / 2
+        self.rect.y = self.food.y - self.rect.height / 2.0
+        self.rect.x = self.food.x - self.rect.width / 2.0
 
 
 class NestSprite(pygame.sprite.Sprite):
@@ -93,12 +89,8 @@ class NestSprite(pygame.sprite.Sprite):
         # of rect.x and rect.y
         self.rect = self.image.get_rect()
         self.nest = nest
-        self.update()
-
-    def update(self):
-        # Move the block down one pixel
-        self.rect.y = self.nest.y - self.rect.height / 2
-        self.rect.x = self.nest.x - self.rect.width / 2
+        self.rect.y = self.nest.y - self.rect.height / 2.0
+        self.rect.x = self.nest.x - self.rect.width / 2.0
 
 
 class WpSprite(pygame.sprite.Sprite):
@@ -121,11 +113,8 @@ class WpSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.wp = wp
         self.update()
-
-    def update(self):
-        # Move the block down one pixel
-        self.rect.y = self.wp.y - self.rect.height / 2
-        self.rect.x = self.wp.x - self.rect.width / 2
+        self.rect.y = self.wp.y - self.rect.height / 2.0
+        self.rect.x = self.wp.x - self.rect.width / 2.0
 
 
 pygame.init()
@@ -141,7 +130,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 2000
+ANT_COUNT = 1000
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
@@ -150,18 +139,18 @@ shortest_path_behavior = sim.ShortestPathBehavior()
 
 class MyStrategy(object):
     def amount(self, current_amount):
-        return current_amount - 0.01
+        return float(current_amount) - 0.2
 
 evaporate_strategy = MyStrategy()
 ants = sim.AntCollection()
 
 def create_sprite(node):
-    if node.TYPE == 'waypoint':
-        return WpSprite(node, gray, 5, 5)
-    elif node.TYPE == 'food':
-        return FoodSprite(node, blue, 10, 10)
+#     if node.TYPE == 'waypoint':
+#         return WpSprite(node, gray, 5.0, 5.0)
+    if node.TYPE == 'food':
+        return FoodSprite(node, blue, 10.0, 10.0)
     elif node.TYPE == 'nest':
-        return NestSprite(node, green, 10, 10)
+        return NestSprite(node, green, 10.0, 10.0)
 
 def create_grid_nodes(width, height, square_size):
     # creates a graph which is a grid
@@ -204,7 +193,9 @@ def create_grid_graph(nodes):
         # from top to bottom
         l = len(xlist)
         for j, a in enumerate(xlist):
-            all_sprites.add(create_sprite(a))
+            sprite = create_sprite(a)
+            if sprite:
+                all_sprites.add(sprite)
             if j+1 < l:
                 b = xlist[j+1]
                 # create the wayfucker
@@ -231,7 +222,7 @@ def replace_random_node(nodes, cb):
     return p
 
 # setup the graph
-grid_nodes = create_grid_nodes(screen_width, screen_height, 10)
+grid_nodes = create_grid_nodes(screen_width, screen_height, 15)
 print('nodes created!')
 nest = replace_random_node(grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
@@ -243,7 +234,7 @@ g = create_grid_graph(grid_nodes)
 # CREATE THE ANTS
 for i in range(0, ANT_COUNT):
     ant = sim.Ant(colony, nest, shortest_path_behavior)
-    sprite = AntSprite(ant, black, 7, 7)
+    sprite = AntSprite(ant, (89, 54, 99), 7, 7)
     ant_sprites.add(sprite)
     all_sprites.add(sprite)
     ants.add(ant)
@@ -253,6 +244,8 @@ edge_lines = []
 for edge in g.edges:
     n1, n2 = edge.node_from, edge.node_to
     edge_lines.append((edge, [(n1.x, n1.y), (n2.x, n2.y)]))
+
+MIN_BLUE = 70
 
 
 while done == False:
@@ -273,19 +266,20 @@ while done == False:
     for edge, lines in edge_lines:
         plevel = edge.pheromone_level(pkind)
         if plevel:
-            level = 100 + plevel
-            if level > 255:
-                level = 255
-            color = (100, 100, level)
+            level = 255 - plevel ** 2
+            if level < MIN_BLUE:
+                level = MIN_BLUE
+
+            color = (0, 0, level)
             pygame.draw.lines(screen, color, False,
                 lines, 15)
-        else:
-            pygame.draw.lines(screen, (240, 240, 240), False,
-                lines, 1)
+        # else:
+        #     pygame.draw.lines(screen, (240, 240, 240), False,
+        #         lines, 1)
 
     if best_path:
         # draw a lsine
-        pygame.draw.lines(screen, black, False, 
+        pygame.draw.lines(screen, (255,69,0), False, 
             [(n.x, n.y) for n in best_path], 6)
         
         myfont = pygame.font.SysFont('monospace', 15)
@@ -298,13 +292,13 @@ while done == False:
     # as a list of two numbers.
     pos = pygame.mouse.get_pos()
      
+    ant_sprites.update()
+
     # Draw all the spites
     all_sprites.draw(screen)
-
-    ant_sprites.update()
      
     # Limit to 20 frames per second
-    # clock.tick(20)
+    clock.tick(60)
 
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
