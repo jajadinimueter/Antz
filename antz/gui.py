@@ -3,6 +3,9 @@ import random
 
 import pygame
 import pygame.draw
+from pygame.locals import *
+
+from pgu import gui
 
 from antz import sim
 from antz import graph
@@ -16,6 +19,58 @@ blue     = ( 0,   0,   255)
 green    = ( 0,   255,   0)
 gray    = ( 220,   220,   220)
 
+
+class ColorDialog(gui.Dialog):
+    def __init__(self,value,**params):
+        self.value = list(gui.parse_color(value))
+        
+        title = gui.Label('Color Picker')
+        
+        main = gui.Table()
+        
+        main.tr()
+        
+        self.color = gui.Color(self.value,width=64,height=64)
+        main.td(self.color,rowspan=3,colspan=1)
+        
+        ##The sliders CHANGE events are connected to the adjust method.  The 
+        ##adjust method updates the proper color component based on the value
+        ##passed to the method.
+        ##::
+        main.td(gui.Label(' Red: '),1,0)
+        e = gui.HSlider(value=self.value[0],min=0,max=255,size=32,width=128,height=16)
+        e.connect(gui.CHANGE,self.adjust,(0,e))
+        main.td(e,2,0)
+        ##
+
+        main.td(gui.Label(' Green: '),1,1)
+        e = gui.HSlider(value=self.value[1],min=0,max=255,size=32,width=128,height=16)
+        e.connect(gui.CHANGE,self.adjust,(1,e))
+        main.td(e,2,1)
+
+        main.td(gui.Label(' Blue: '),1,2)
+        e = gui.HSlider(value=self.value[2],min=0,max=255,size=32,width=128,height=16)
+        e.connect(gui.CHANGE,self.adjust,(2,e))
+        main.td(e,2,2)
+                        
+        gui.Dialog.__init__(self,title,main)
+        
+    @property
+    def rgb(self):
+        return self.value
+
+    ##The custom adjust handler.
+    ##::
+    def adjust(self,value):
+        (num, slider) = value
+        self.value[num] = slider.value
+        self.color.repaint()
+        self.send(gui.CHANGE)
+    
+
+dialog = ColorDialog('#000000')
+        
+
 # This class represents the ball        
 # It derives from the 'Sprite' class in Pygame
 class AntSprite(pygame.sprite.Sprite):
@@ -26,10 +81,11 @@ class AntSprite(pygame.sprite.Sprite):
         # Call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self) 
  
+        self.color = dialog.rgb
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
         self.image = pygame.Surface([width, height])
-        self.image.fill(color)
+        self.image.fill(self.color)
 
         # Fetch the rectangle object that has the dimensions of the image
         # image.
@@ -45,6 +101,7 @@ class AntSprite(pygame.sprite.Sprite):
             # Move the block down one pixel
             self.rect.y = node.y - self.rect.height / 2.0
             self.rect.x = node.x - self.rect.width / 2.0
+        self.image.fill(self.color)
 
 
 class FoodSprite(pygame.sprite.Sprite):
@@ -255,10 +312,25 @@ turn = 0
 
 myfont = pygame.font.SysFont('monospace', 15)
 
+# for ui controls
+app = gui.App()
+
+c = gui.Container(width=screen_width,height=screen_height)
+
+e = gui.Button('Color')
+e.connect(gui.CLICK,dialog.open,None)
+c.add(e, screen_width-100, 13)
+
+app.init(c)
+
 while done == False:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
+        elif event.type is KEYDOWN and event.key == K_ESCAPE: 
+            done = True
+        else:
+            app.event(event)
  
     ants.move()
     for edge in g.edges:
@@ -301,6 +373,7 @@ while done == False:
     # as a list of two numbers.
     pos = pygame.mouse.get_pos()
      
+    ant_sprites.color = dialog.rgb 
     ant_sprites.update()
 
     # Draw all the spites
@@ -309,9 +382,12 @@ while done == False:
     # Limit to 20 frames per second
     # clock.tick(60)
 
+    app.paint()
+
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
     turn += 1
 
 pygame.quit()
+

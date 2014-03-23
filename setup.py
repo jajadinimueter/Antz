@@ -1,8 +1,16 @@
 import os
+from glob import glob
 from setuptools import setup
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+installdatafiles = []
+for name in ('default', 'gray', 'tools'):
+    installdatafiles.append(
+        (os.path.join('share', 'pgu', 'themes', name), 
+            glob(os.path.join('data', 'themes', name, '*')))
+    )
 
 setup(
     name = 'antz',
@@ -15,10 +23,11 @@ setup(
     url = 'git@github.com:jajadinimueter/Antz.git',
     packages=['antz'],
     long_description=read('README.md'),
-    install_requires=['pygame'],
+    install_requires=['pygame', 'pgu'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Utilities',
         'License :: OSI Approved :: BSD License',
     ],
+    data_files=installdatafiles
 )
