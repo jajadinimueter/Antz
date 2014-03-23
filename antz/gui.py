@@ -131,7 +131,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 200
+ANT_COUNT = 500
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
@@ -146,8 +146,8 @@ evaporate_strategy = MyStrategy()
 ants = sim.AntCollection()
 
 def create_sprite(node):
-#     if node.TYPE == 'waypoint':
-#         return WpSprite(node, gray, 5.0, 5.0)
+    # if node.TYPE == 'waypoint':
+    #     return WpSprite(node, gray, 5.0, 5.0)
     if node.TYPE == 'food':
         return FoodSprite(node, blue, 10.0, 10.0)
     elif node.TYPE == 'nest':
@@ -229,7 +229,7 @@ def replace_random_node(nodes, cb):
 
 # setup the graph
 grid_nodes = create_grid_nodes(
-    screen_width, screen_height-top_offset, 10, y=top_offset)
+    screen_width, screen_height-top_offset, 15, y=top_offset)
 nest = replace_random_node(grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
 food = replace_random_node(grid_nodes, (lambda old: 
@@ -279,7 +279,7 @@ while done == False:
 
             color = (0, 0, level)
             pygame.draw.lines(screen, color, False,
-                lines, 15)
+                lines, 10)
         # else:
         #     pygame.draw.lines(screen, (240, 240, 240), False,
         #         lines, 1)
