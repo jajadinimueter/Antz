@@ -119,8 +119,8 @@ class WpSprite(pygame.sprite.Sprite):
 
 pygame.init()
 
-screen_width=700
-screen_height=500
+screen_width=1024
+screen_height=600
 
 screen=pygame.display.set_mode([screen_width,screen_height])
 

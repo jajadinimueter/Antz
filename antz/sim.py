@@ -177,11 +177,11 @@ class ShortestPathBehavior(AntBehavior):
             state.add_edge(edge)
             ant._path_length = state.pathlen
 
-        if state.way_home:
-            # todo: pheromone increase should not be static
-            edge.increase_pheromone(
-                ant.create_pheromone(
-                    'default', self._pheromone_increase))
+        # if state.way_home:
+        # todo: pheromone increase should not be static
+        edge.increase_pheromone(
+            ant.create_pheromone(
+                'default', self._pheromone_increase))
 
     def visit_node(self, ant, node):
         """
