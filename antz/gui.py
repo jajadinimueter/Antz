@@ -121,6 +121,7 @@ pygame.init()
 
 screen_width=1024
 screen_height=600
+top_offset = 60
 
 screen=pygame.display.set_mode([screen_width,screen_height])
 
@@ -130,7 +131,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 1000
+ANT_COUNT = 200
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
@@ -152,10 +153,9 @@ def create_sprite(node):
     elif node.TYPE == 'nest':
         return NestSprite(node, green, 10.0, 10.0)
 
-def create_grid_nodes(width, height, square_size):
+def create_grid_nodes(width, height, square_size, x=0, y=0):
     # creates a graph which is a grid
     ss = square_size
-    x, y = 0, 0
 
     nodes = []
 
@@ -228,13 +228,12 @@ def replace_random_node(nodes, cb):
     return p
 
 # setup the graph
-grid_nodes = create_grid_nodes(screen_width, screen_height, 15)
-print('nodes created!')
+grid_nodes = create_grid_nodes(
+    screen_width, screen_height-top_offset, 10, y=top_offset)
 nest = replace_random_node(grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
 food = replace_random_node(grid_nodes, (lambda old: 
     sim.Food(name='food', x=old.x, y=old.y)))
-print('create graph')
 g = create_grid_graph(grid_nodes)
 
 # CREATE THE ANTS
@@ -252,7 +251,9 @@ for edge in g.edges:
     edge_lines.append((edge, [(n1.x, n1.y), (n2.x, n2.y)]))
 
 MIN_BLUE = 70
+turn = 0
 
+myfont = pygame.font.SysFont('monospace', 15)
 
 while done == False:
     for event in pygame.event.get(): # User did something
@@ -288,11 +289,13 @@ while done == False:
         pygame.draw.lines(screen, (255,69,0), False, 
             [(n.x, n.y) for n in best_path], 6)
         
-        myfont = pygame.font.SysFont('monospace', 15)
 
         # render text
         label = myfont.render('Best Length: %.2f' % best_length, 5, black)
         screen.blit(label, (400, 20))
+
+    label = myfont.render('Turn %d' % turn, 5, black)
+    screen.blit(label, (100, 20))
 
     # Get the current mouse position. This returns the position
     # as a list of two numbers.
@@ -304,9 +307,11 @@ while done == False:
     all_sprites.draw(screen)
      
     # Limit to 20 frames per second
-    clock.tick(60)
+    # clock.tick(60)
 
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
+    turn += 1
+
 pygame.quit()
