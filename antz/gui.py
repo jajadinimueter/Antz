@@ -350,7 +350,7 @@ while done == False:
         #         lines, 1)
 
     if best_path:
-        # draw a lsine
+        # draw a line
         pygame.draw.lines(screen, (255,69,0), False, 
             [(n.x, n.y) for n in best_path], 6)
         

@@ -159,15 +159,15 @@ class Graph(object):
     @property
     def nodes(self):
         """
-        Retunrns an immutable set. Maybe we can add mutable
-        properties if we really need it. But don't think so.
+        Returns an immutable set. Maybe we can add mutable
+        properties if we really need it. But I don't think so.
         """
         return sets.ImmutableSet(self._nodes)
 
     @property
     def edges(self):
         """
-        Retunrns an immutable set. Maybe we can add mutable
-        properties if we really need it. But don't think so.
+        Returns an immutable set. Maybe we can add mutable
+        properties if we really need it. But I don't think so.
         """
         return sets.ImmutableSet(self._edges)
