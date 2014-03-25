@@ -139,9 +139,18 @@ class ShortestPathBehavior(AntBehavior):
             return next_edge
         else:
             edges = node.edges[:]
+            random_choice = random.random()
             edges = [e for e in edges
                 if e not in state.edges]
+            
             random.shuffle(edges)
+
+            if not edges:
+                return None
+
+            if random_choice > 0.8:
+                return random.choice(edges)
+
             propabilities = []
             colony = ant.colony
             pkind = colony.pheromone_kind('default')
