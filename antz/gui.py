@@ -192,7 +192,7 @@ class MyStrategy(object):
         return current_amount / 1.01
 
 evaporate_strategy = MyStrategy()
-ants = sim.AntCollection()
+ants = sim.AntCollection(shortest_path_behavior)
 
 def create_sprite(node):
     # if node.TYPE == 'waypoint':
@@ -325,7 +325,8 @@ while done == False:
             app.event(event)
  
     ants.move()
-    for edge in g.edges:
+    edges_in_turn = shortest_path_behavior.edges_in_turn
+    for edge in edges_in_turn:
         edge.evaporate_pheromone()
 
     # Clear the screen

@@ -34,6 +34,15 @@ class AntBehavior(object):
 
     TYPE = None  # should be set by the implementation
 
+    def begin_round(self):
+        """
+        Begin a new round
+        """
+    def end_round(self):
+        """
+        Begin a new round
+        """
+
     def init_ant(self, ant):
         """
         Initialize the ant
@@ -108,6 +117,11 @@ class ShortestPathBehavior(AntBehavior):
         self._pheromone_increase = 1
         self._best_path_length = sys.float_info.max
         self._best_path = None
+        self._edges_in_turn = set()
+
+    @property
+    def edges_in_turn(self):
+        return self._edges_in_turn
 
     @property
     def best_path_length(self):
@@ -179,6 +193,8 @@ class ShortestPathBehavior(AntBehavior):
         Just drop some pheromone on the edge
         """
 
+        self._edges_in_turn.add(edge)
+
         colony = ant.colony
         pkind = colony.pheromone_kind('default')
 
@@ -201,6 +217,9 @@ class ShortestPathBehavior(AntBehavior):
                 state.hit_pheromone = 0
             else:
                 state.hit_pheromone -= 1
+
+    def leave_edge(self, ant, edge):
+        self._edges_in_turn.add(edge)
 
     def visit_node(self, ant, node):
         """
@@ -245,6 +264,9 @@ class ShortestPathBehavior(AntBehavior):
             if state.hit_pheromone < -100:
                 ant._reset()
             
+    def begin_round(self):
+        self._edges_in_turn = set()
+
 
 class AntColony(object):
     def __init__(self, name):
@@ -275,6 +297,7 @@ class Ant(object):
         # initial node as its only element
         self._initial_node = initial_node
         self._current_node = initial_node
+        self._current_edge = None
         self._path = [initial_node]
         self._behavior = behavior
         self._colony = colony
@@ -289,6 +312,8 @@ class Ant(object):
 
     def _reset(self):
         self._current_node = self._initial_node
+        self._current_edge = None
+
         self._path = [self._initial_node]
         self._path_length = 0
         self._state = None
@@ -320,6 +345,13 @@ class Ant(object):
         return self._colony
 
     @property
+    def current_edge(self):
+        """
+        Returns the current edge the ant stays on
+        """
+        return self._current_edge
+
+    @property
     def current_node(self):
         """
         Returns the current node the ant stays on
@@ -336,15 +368,21 @@ class Ant(object):
         edge = self._behavior.choose_edge(self, current_node)
 
         if edge:
+            self._current_edge = edge
+            
             # returns the node which is not the current nod
             next_node = edge.other_node(current_node)
             
             # if the edge is unidirectional
             if next_node:
+                if self._current_edge:
+                    self._behavior.leave_edge(
+                        self, self._current_edge)
+
                 self._current_node = next_node
+
                 self._behavior.leave_node(self, current_node)
                 self._behavior.visit_edge(self, edge)
-                self._behavior.leave_edge(self, edge)
                 self._behavior.visit_node(self, next_node)
             else:
                 # reset the ant
@@ -521,10 +559,15 @@ class PheromoneKind(object):
 
 
 class AntCollection(set):
+    def __init__(self, behavior):
+        self._behavior = behavior
+
     def move(self):
+        self._behavior.begin_round()
         start = time.time()
         for ant in self:
             ant.move()
+        self._behavior.end_round()
 
 
 def main():
