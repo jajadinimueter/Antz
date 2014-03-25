@@ -325,8 +325,7 @@ while done == False:
             app.event(event)
  
     ants.move()
-    edges_in_turn = shortest_path_behavior.edges_in_turn
-    for edge in edges_in_turn:
+    for edge in g.edges:
         edge.evaporate_pheromone()
 
     # Clear the screen
