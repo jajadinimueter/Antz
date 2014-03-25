@@ -148,9 +148,6 @@ class ShortestPathBehavior(AntBehavior):
             if not edges:
                 return None
 
-            if random_choice > 0.8:
-                return random.choice(edges)
-
             propabilities = []
             colony = ant.colony
             pkind = colony.pheromone_kind('default')
