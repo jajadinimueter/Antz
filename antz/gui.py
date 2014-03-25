@@ -181,7 +181,7 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 500
+ANT_COUNT = 1000
 
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
@@ -190,7 +190,7 @@ shortest_path_behavior = sim.ShortestPathBehavior()
 
 class MyStrategy(object):
     def amount(self, current_amount):
-        return float(current_amount) - 0.2
+        return float(current_amount) / 1.01
 
 evaporate_strategy = MyStrategy()
 ants = sim.AntCollection()
@@ -199,9 +199,9 @@ def create_sprite(node):
     # if node.TYPE == 'waypoint':
     #     return WpSprite(node, gray, 5.0, 5.0)
     if node.TYPE == 'food':
-        return FoodSprite(node, blue, 10.0, 10.0)
+        return FoodSprite(node, green, 30.0, 30.0)
     elif node.TYPE == 'nest':
-        return NestSprite(node, green, 10.0, 10.0)
+        return NestSprite(node, gray, 30.0, 30.0)
 
 def create_grid_nodes(width, height, square_size, x=0, y=0):
     # creates a graph which is a grid
@@ -338,7 +338,7 @@ while done == False:
     for edge, lines in edge_lines:
         plevel = edge.pheromone_level(pkind)
         if plevel:
-            level = 255 - plevel ** 2
+            level = 255 - (plevel * 6)**1.2
             if level < MIN_BLUE:
                 level = MIN_BLUE
 

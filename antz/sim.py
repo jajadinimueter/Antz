@@ -10,6 +10,8 @@ import random
 import itertools
 import collections
 
+from decimal import Decimal
+
 from antz import graph
 from antz.util import *
 
@@ -94,6 +96,7 @@ class ShortestPathBehavior(AntBehavior):
             self.last_edge = None
             self.pathlen = 0
             self.turns = 0
+            self.hit_pheromone = 0
             self.best_pathlen = sys.float_info.max
 
         def add_edge(self, edge):
@@ -102,7 +105,7 @@ class ShortestPathBehavior(AntBehavior):
             self.pathlen += edge.cost
 
     def __init__(self):
-        self._pheromone_increase = 10
+        self._pheromone_increase = 1
         self._best_path_length = sys.float_info.max
         self._best_path = None
 
@@ -135,43 +138,46 @@ class ShortestPathBehavior(AntBehavior):
                     % (node, next_edge, next_edge.nodes))
             return next_edge
         else:
-            edges = node.edges
+            edges = node.edges[:]
+            edges = [e for e in edges
+                if e not in state.edges]
+            random.shuffle(edges)
+            propabilities = []
             colony = ant.colony
             pkind = colony.pheromone_kind('default')
 
-            the_edges = [e for e in edges if e not in state.edges]
-            if the_edges:
-                edges = the_edges
-            phero_edges = random.shuffle(
-                [e for e in edges if e.pheromone_level(pkind)])
+            prop_sum = sum(e.pheromone_level(pkind)**2.0
+                for e in edges)
 
-            choice_list = []
-
-            if not phero_edges:
-                next_edge = random.choice(edges)
-            else:
-                num = random.random()
-                if num > 0.98:
-                    # choose randomly
-                    next_edge = random.choice(edges)
+            for edge in edges:
+                if prop_sum == 0:
+                    prop = 1.0/len(edges)
                 else:
-                    next_edge = max(edges, key=lambda e: e.pheromone_level(pkind))
-                    # sorted_edges = sorted(edges, key=lambda e: e.pheromone_level(pkind))
-                    # to_choose = list(reversed(sorted_edges))[0:5]
-                    # if to_choose:
-                    #     # choose amont 5 best edges
-                    #     next_edge = random.choice(to_choose)
+                    prop = edge.pheromone_level(pkind)**2/prop_sum
+                
+                propabilities.append((prop, edge))
 
-            if not next_edge:
-                next_edge = random.choice(edges)
+            propabilities = list(reversed(sorted(propabilities,
+                key=lambda x: x[0])))
 
-            return next_edge
+            if propabilities:
+                cdf = [propabilities[0]]
+                for i in range(1, len(propabilities)):
+                    cdf.append(cdf[i-1] + propabilities[i])
+
+                ind = bisect.bisect(cdf, random.random())
+                return propabilities[ind][1]
             
     def visit_edge(self, ant, edge):
         """
         Just drop some pheromone on the edge
         """
 
+        colony = ant.colony
+        pkind = colony.pheromone_kind('default')
+
+        plevel = edge.pheromone_level(pkind)
+    
         state = ant._state
         if not state.way_home:
             state.add_edge(edge)
@@ -179,9 +185,16 @@ class ShortestPathBehavior(AntBehavior):
 
         # if state.way_home:
         # todo: pheromone increase should not be static
-        edge.increase_pheromone(
-            ant.create_pheromone(
-                'default', self._pheromone_increase))
+        if state.way_home:
+            edge.increase_pheromone(
+                ant.create_pheromone(
+                    'default', self._pheromone_increase))
+       
+        if self.best_path:
+            if plevel or state.way_home:
+                state.hit_pheromone = 0
+            else:
+                state.hit_pheromone -= 1
 
     def visit_node(self, ant, node):
         """
@@ -212,15 +225,20 @@ class ShortestPathBehavior(AntBehavior):
                 ant._reset()
 
     def end_turn(self, ant):
-        ant._state.turns += 1
-        turns = ant._state.turns
+        state = ant._state
+        state.turns += 1
+        turns = state.turns
 
         rand = random.random()
-        if not ant._state.way_home:
+        if not state.way_home:
             if self.best_path:
                 if rand > 0.8 and turns > random.randrange(200, 400):
                     ant._reset()
 
+        if self.best_path:
+            if state.hit_pheromone < -100:
+                ant._reset()
+            
 
 class AntColony(object):
     def __init__(self, name):
@@ -311,21 +329,24 @@ class Ant(object):
         
         edge = self._behavior.choose_edge(self, current_node)
 
-        # returns the node which is not the current nod
-        next_node = edge.other_node(current_node)
-        
-        # if the edge is unidirectional
-        if next_node:
-            self._current_node = next_node
-            self._behavior.leave_node(self, current_node)
-            self._behavior.visit_edge(self, edge)
-            self._behavior.leave_edge(self, edge)
-            self._behavior.visit_node(self, next_node)
+        if edge:
+            # returns the node which is not the current nod
+            next_node = edge.other_node(current_node)
+            
+            # if the edge is unidirectional
+            if next_node:
+                self._current_node = next_node
+                self._behavior.leave_node(self, current_node)
+                self._behavior.visit_edge(self, edge)
+                self._behavior.leave_edge(self, edge)
+                self._behavior.visit_node(self, next_node)
+            else:
+                # reset the ant
+                self._reset()
+            
+            self._behavior.end_turn(self)
         else:
-            # reset the ant
             self._reset()
-        
-        self._behavior.end_turn(self)
 
 
 def node_is_food(node):
@@ -431,31 +452,36 @@ DEFAULT_EVAPORATION_STRATEGY = EvaporationStrategy()
 
 
 class PheromoneStore(object):
-    def __init__(self, level=0, evaporation_strategy=None):
-        level = level or 0
+    def __init__(self, evaporation_strategy=None):
         evaporation_strategy = evaporation_strategy or DEFAULT_EVAPORATION_STRATEGY
-        self._level = collections.defaultdict(int)
+        self._level = {}
         self._es = evaporation_strategy
 
     def get_amount(self, kind):
-        return self._level[kind] 
+        return self._get(kind) 
 
     def increase(self, pheromone):
-        self._level[pheromone.kind] += pheromone.amount
+        k = pheromone.kind
+        self._set(k, self._get(k) + pheromone.amount)
 
     def _decrease(self, kind, amount):
-        self._set(kind, self._level[kind] - amount)
+        self._set(kind, self._get(
+            pheromone.kind) - amount)
+
+    def _get(self, kind):
+        level = self._level.get(kind, 0.0)
+        #print(level)
+        return level
 
     def _set(self, kind, amount):
-        if amount < 0:
-            amount = 0
         self._level[kind] = amount
 
     def decrease(self, pheromone):
         self._decrease(pheromone.kind, pheromone.amount)
 
     def _evaporate(self, kind):
-        self._set(kind, self._es.amount(self._level[kind]))
+        self._set(kind, self._es.amount(
+            self._level[kind]))
     
     def evaporate(self, kind=None):
         kind = aslist(kind)   
