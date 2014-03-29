@@ -4,6 +4,9 @@
 \chapter{Applikation/Entwurf???}
 
 
+
+Vorsichtsmassnahme, dass gewisse Ameisen sterben (weil z.B. 500 Ameisen, die sich auf einer Seite des Displays befinden, nicht zurück können, da sie den Weg zurück nicht nehmen können; sobald ein bester Pfad gefunden ist, sterben gewisse Ameisen nach einer gewissen Zeit, wenn sie nicht mehr mit Pheromon in Verbindung kommen) \\
+
 \section{Mockups}
 
 ???
@@ -13,3 +16,28 @@
 
 
 \section{Klassendiagramme}
+
+
+
+\section*{Ausbau}
+
+\subsubsection*{Iteration 1}
+
+Noch nicht implementiert, dass die Wegfindung abhängig von der Anzahl Ameisen, die durchlaufen, ist. \\
+
+Evtl. noch eine Multi-Threaded-Lösung integrieren (sehr gut zu parallelisieren) \\
+
+Ausserdem: schnellere Python-Interpreter wie pypy (oder für numerische Berechnungen); für z.B . 10'000 Nodes! \\
+
+Idee: vielleicht noch Rauschen integrieren? Random von 20\,\% konvergiert überhaupt nicht mehr.
+
+\vspace*{3cm}
+
+
+Inputs von Syrus: \\
+
+\begin{itemize}
+\item Interessant wäre, das Maximum der Verlangsamung bei mehr Ameisen zu messen
+\item Eventuell in Richtung Programming Tuning gehen? (Performance-Messungen: wie viel fällt auf welchen Bereich?) 
+\item Für die Iterationen 2 und 3: Einsatz der Ressourcen planen (Andere Algorithmen; Optimierung; Vergleich mit Djikstra: Statistiken; vgl. Optimierungspotential bezüglich Zeit und Speicheraufwand, etc.); z.B. eher TSP (weil visuell für die Mitstudierenden ansprechender?) 
+\end{itemize}
