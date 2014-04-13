@@ -27,11 +27,11 @@
 % --------------------------------
 \titleformat{\chapter}[display]               % {command}[shape]
   {\usekomafont{chapter}\Large \color{black}} % format
-  {\LARGE\MakeUppercase{\chaptertitlename}%   % label
+  {\LARGE\MakeUppercase{}%   % label % entfernt: \chaptertitlename
    \Huge~\thechapter \filright}%  
   {1pt}										  % sep (from chapternumber)
   {%
-   \titlerule \vspace{0.9pc} % 
+   \titlerule \vspace{0.9pc} % [entfernt]
    \filright 
    \IfColorDefined{sectioncolor}{\color{sectioncolor}}{}   
   }                                           % (before chaptertitle and after)
