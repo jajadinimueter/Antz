@@ -347,6 +347,19 @@ e = gui.Button('Ant Color')
 e.connect(gui.CLICK,dialog.open,None)
 c.add(e, screen_width-100, 13)
 
+show_only_shortest = False
+
+def change_only_shortest_state(arg):
+    global show_only_shortest
+    btn, text = arg
+    show_only_shortest = btn.value
+
+lshorest_only = gui.Label('Shortest Only')
+shortest_only = gui.Switch()
+shortest_only.connect(gui.CHANGE, change_only_shortest_state, (shortest_only, 'Shortest Only'))
+c.add(shortest_only, 400, 15)
+c.add(lshorest_only, 270, 15)
+
 sel = gui.Select(value='---')
 sel.add('Draw Obstacles', 'draw_obstacles')
 c.add(sel, screen_width-400, 13)
@@ -392,24 +405,18 @@ while done == False:
     best_path = shortest_path_behavior.best_path
     best_length = shortest_path_behavior.best_path_length
 
-    for edge, lines in edge_lines:
-        plevel = edge.pheromone_level(pkind)
-        if plevel:
-            # print(plevel)
-            level = 255 - (plevel * 10000)**2
-            if level < MIN_BLUE:
-                level = MIN_BLUE
+    if not show_only_shortest:
+        for edge, lines in edge_lines:
+            plevel = edge.pheromone_level(pkind)
+            if plevel:
+                # print(plevel)
+                level = 255 - (plevel * 10000)**2
+                if level < MIN_BLUE:
+                    level = MIN_BLUE
 
-            color = (0, 0, level)
-            pygame.draw.lines(screen, color, False,
-                lines, 30)
-        # else:
-        #     pygame.draw.lines(screen, (240, 240, 240), False,
-        #         lines, 1)
-
-    # for path, _ in shortest_path_behavior.top_solutions:
-    #     pygame.draw.lines(screen, (230,230,230), False, 
-    #         [(n.x, n.y) for n in path], 6)
+                color = (0, 0, level)
+                pygame.draw.lines(screen, color, False,
+                    lines, 30)
     
     if best_path:
         # draw a line
@@ -418,7 +425,7 @@ while done == False:
 
         # render text
         label = myfont.render('Best Length: %.2f' % best_length, 5, black)
-        screen.blit(label, (400, 20))
+        screen.blit(label, (400, screen_height - 20))
 
     label = myfont.render('Turn %d' % turn, 5, black)
     screen.blit(label, (100, 20))
@@ -429,7 +436,9 @@ while done == False:
     # Draw all the spites
     wp_sprites.draw(screen)
     all_sprites.draw(screen)
-    ant_sprites.draw(screen)
+
+    if not show_only_shortest:
+        ant_sprites.draw(screen)
      
     # Limit to 20 frames per second
     # clock.tick(60)
