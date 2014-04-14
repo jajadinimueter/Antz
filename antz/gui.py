@@ -51,6 +51,15 @@ class ColorDialog(gui.Dialog):
                         
         gui.Dialog.__init__(self,title,main)
         
+    def open(self, *args, **kw):
+        super(ColorDialog, self).open(*args, **kw)
+        self._sel_val = sel.value
+        sel.value = '---'
+
+    def close(self, *args, **kw):
+        super(ColorDialog, self).close(*args, **kw)
+        sel.value = self._sel_val
+
     @property
     def rgb(self):
         return self.value
@@ -59,7 +68,7 @@ class ColorDialog(gui.Dialog):
         (num, slider) = value
         self.value[num] = slider.value
         self.color.repaint()
-        self.send(gui.CHANGE)
+        self.send(gui.CHANGE)            
     
 
 dialog = ColorDialog('#000000')
@@ -393,8 +402,6 @@ def change_num_ants(arg):
             else:
                 break
 
-            
-
 lshorest_only = gui.Label('Shortest Only')
 shortest_only = gui.Switch()
 shortest_only.connect(gui.CHANGE, change_only_shortest_state, (shortest_only, 'Shortest Only'))
@@ -413,7 +420,8 @@ text_num_ants.connect(gui.CHANGE, change_num_ants, (text_num_ants, 'Num Ants'))
 c.add(text_num_ants, 700, 50)
 c.add(l_num_ants, 600, 52)
 
-sel = gui.Select(value='---')
+sel = gui.Select(value='draw_obstacles')
+sel.add('---', '---')
 sel.add('Draw Obstacles', 'draw_obstacles')
 c.add(sel, screen_width-400, 13)
 
@@ -421,13 +429,24 @@ app.init(c)
 
 paint = False
 paint_erase = False
+app_events_dispatch = True
 
 while done == False:
     for event in pygame.event.get(): # User did something
+        app.event(event)
+        
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
         elif event.type is KEYDOWN and event.key == K_ESCAPE: 
             done = True
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
+            paint = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:
+            paint = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
+            paint_erase = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == RIGHT:
+            paint_erase = False
         elif event.type == pygame.MOUSEMOTION:
             if sel.value == 'draw_obstacles':
                 if paint:
@@ -440,16 +459,7 @@ while done == False:
                     for s in wp_sprites.sprites():
                         if s.rect.collidepoint(event.pos):
                             s.set_obstacle(False)
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
-            paint = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:
-            paint = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
-            paint_erase = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == RIGHT:
-            paint_erase = False
-        app.event(event)
- 
+
     ants.move()
 
     # Clear the screen
