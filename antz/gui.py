@@ -321,7 +321,7 @@ g = create_grid_graph(grid_nodes)
 
 LEFT = 1
 RIGHT = 3
-ANT_COUNT = 500
+ANT_COUNT = 1000
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
 pkind = colony.pheromone_kind('default')
