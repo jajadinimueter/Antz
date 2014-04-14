@@ -185,7 +185,7 @@ pygame.init()
 screen_width=1300
 screen_height=700
 top_offset = 100
-bottom_offset = 100
+bottom_offset = 30
 
 screen=pygame.display.set_mode([screen_width,screen_height])
 
@@ -320,13 +320,16 @@ shortest_path_behavior = sim.ShortestPathAlgorithm(g)
 
 ants = sim.AntCollection(shortest_path_behavior)
 
-# CREATE THE ANTS
-for i in range(0, ANT_COUNT):
+def add_ant():
     ant = sim.Ant(colony, nest, shortest_path_behavior)
     sprite = AntSprite(ant, (89, 54, 99), 7, 7)
     ant_sprites.add(sprite)
     # all_sprites.add(sprite)
     ants.add(ant)
+
+# CREATE THE ANTS
+for i in range(0, ANT_COUNT):
+    add_ant()
 
 # precalculate lines between edges
 edge_lines = []
@@ -362,6 +365,36 @@ def change_phero_dec(arg):
     except:
         pass
 
+def change_num_ants(arg):
+    inp, text = arg
+    num = ANT_COUNT
+    val = inp.value.strip()
+    try:
+        if not val:
+            num = 0
+        else:
+            num = int(val)
+    except:
+        pass
+
+    cur = len(ants)
+    diff = cur - num
+    if diff < 0:
+        for i in range(0, -1 * diff):
+            # we want more
+            add_ant()
+    elif diff > 0:
+        removed = 0
+        for ant_sprite in ant_sprites.sprites():
+            if removed <= diff:
+                ant_sprites.remove(ant_sprite)
+                ants.remove(ant_sprite.ant)
+                removed += 1
+            else:
+                break
+
+            
+
 lshorest_only = gui.Label('Shortest Only')
 shortest_only = gui.Switch()
 shortest_only.connect(gui.CHANGE, change_only_shortest_state, (shortest_only, 'Shortest Only'))
@@ -372,7 +405,13 @@ l_phero_dec = gui.Label('Phero Decrease')
 text_phero_dec = gui.Input(value=shortest_path_behavior.phero_dec, size=10)
 text_phero_dec.connect(gui.CHANGE, change_phero_dec, (text_phero_dec, 'Phero Dec'))
 c.add(text_phero_dec, 400, 50)
-c.add(l_phero_dec, 270, 50)
+c.add(l_phero_dec, 270, 52)
+
+l_num_ants = gui.Label('Num Ants')
+text_num_ants = gui.Input(value=ANT_COUNT, size=10)
+text_num_ants.connect(gui.CHANGE, change_num_ants, (text_num_ants, 'Num Ants'))
+c.add(text_num_ants, 700, 50)
+c.add(l_num_ants, 600, 52)
 
 sel = gui.Select(value='---')
 sel.add('Draw Obstacles', 'draw_obstacles')
