@@ -102,6 +102,8 @@ class Graph(object):
         self._nodes = set()
         self._edges = set()
         self._node_edges = collections.defaultdict(dict)
+        self._min_cost = float('inf')
+        self._max_cost = float('-inf')
 
     def get_edges(self, node):
         conns = self._node_edges[node]
@@ -127,6 +129,19 @@ class Graph(object):
         node_edges[edge.node_from][edge.node_to] = edge
         if edge.bidirectional:
             node_edges[edge.node_to][edge.node_from] = edge
+
+        if edge.cost > self._max_cost:
+            self._max_cost = edge.cost
+        if edge.cost < self._min_cost:
+            self._min_cost = edge.cost
+
+    @property
+    def min_cost(self):
+        return self._min_cost
+
+    @property
+    def max_cost(self):
+        return self._max_cost
 
     def remove_edge(self, params):
         """

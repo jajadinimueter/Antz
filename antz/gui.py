@@ -167,6 +167,7 @@ class WpSprite(pygame.sprite.Sprite):
         self.rect.x = self.wp.x - self.rect.width / 2.0
 
 
+# INIT PYGAME
 pygame.init()
 
 screen_width=1024
@@ -181,26 +182,13 @@ all_sprites = pygame.sprite.Group()
 done = False
 clock = pygame.time.Clock()
 
-ANT_COUNT = 1000
-# CREATE THE ANT COLONY
-colony = sim.AntColony('colony-1')
-pkind = colony.pheromone_kind('default')
-shortest_path_behavior = sim.ShortestPathBehavior()
-
-class MyStrategy(object):
-    def amount(self, current_amount):
-        return current_amount / 1.01
-
-evaporate_strategy = MyStrategy()
-ants = sim.AntCollection(shortest_path_behavior)
-
 def create_sprite(node):
     # if node.TYPE == 'waypoint':
     #     return WpSprite(node, gray, 5.0, 5.0)
     if node.TYPE == 'food':
-        return FoodSprite(node, green, 25.0, 25.0)
+        return FoodSprite(node, green, 15.0, 15.0)
     elif node.TYPE == 'nest':
-        return NestSprite(node, gray, 25.0, 25.0)
+        return NestSprite(node, gray, 15.0, 15.0)
 
 def create_grid_nodes(width, height, square_size, x=0, y=0):
     # creates a graph which is a grid
@@ -232,8 +220,7 @@ def create_grid_nodes(width, height, square_size, x=0, y=0):
 def create_grid_graph(nodes):
     g = graph.Graph()
     def create_waypoint(n1, n2):
-        wp = sim.WaypointEdge(n1, n2, 
-            evaporation_strategy=evaporate_strategy)
+        wp = sim.WaypointEdge(n1, n2)
         g.add_edge(wp)
         return wp
     yl = len(nodes)
@@ -269,28 +256,57 @@ def random_grid_location(nodes):
     j = random.randrange(2, xlen-2)
     return i, j
 
-def replace_random_node(nodes, cb):
-    i, j = random_grid_location(nodes)    
+def replace_node(i, j, nodes, cb):
     x = nodes[i][j]
     p = cb(x)
     nodes[i][j] = p
     return p
 
+def replace_random_node(nodes, cb):
+    i, j = random_grid_location(nodes)    
+    return replace_node(i,j,nodes,cb)
+
+OFFSET = 10
+
+def replace_food_node(i, j, nodes, cb):
+    l = len(nodes)
+    if i + OFFSET < l:
+        i = i + OFFSET
+    elif i - OFFSET > 0:
+        i = i - OFFSET
+
+    l  = len(nodes[i])
+    if j + OFFSET < l:
+        j += OFFSET
+    elif j - OFFSET > 0:
+        j -= OFFSET
+
+    return replace_node(i,j,nodes,cb)
+
 # setup the graph
 grid_nodes = create_grid_nodes(
     screen_width, screen_height-top_offset, 15, y=top_offset)
-nest = replace_random_node(grid_nodes, (lambda old: 
+nest_i, nest_j = random_grid_location(grid_nodes)
+nest = replace_node(nest_i, nest_j, grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
-food = replace_random_node(grid_nodes, (lambda old: 
+food = replace_food_node(nest_i, nest_j, grid_nodes, (lambda old: 
     sim.Food(name='food', x=old.x, y=old.y)))
 g = create_grid_graph(grid_nodes)
+
+ANT_COUNT = 1000
+# CREATE THE ANT COLONY
+colony = sim.AntColony('colony-1')
+pkind = colony.pheromone_kind('default')
+shortest_path_behavior = sim.ShortestPathAlgorithm(g)
+
+ants = sim.AntCollection(shortest_path_behavior)
 
 # CREATE THE ANTS
 for i in range(0, ANT_COUNT):
     ant = sim.Ant(colony, nest, shortest_path_behavior)
     sprite = AntSprite(ant, (89, 54, 99), 7, 7)
     ant_sprites.add(sprite)
-    all_sprites.add(sprite)
+    # all_sprites.add(sprite)
     ants.add(ant)
 
 # precalculate lines between edges
@@ -325,8 +341,6 @@ while done == False:
             app.event(event)
  
     ants.move()
-    for edge in g.edges:
-        edge.evaporate_pheromone()
 
     # Clear the screen
     screen.fill(white) 
@@ -337,22 +351,26 @@ while done == False:
     for edge, lines in edge_lines:
         plevel = edge.pheromone_level(pkind)
         if plevel:
-            level = 255 - (plevel * 6)**1.2
+            # print(plevel)
+            level = 255 - (plevel * 10000)**2
             if level < MIN_BLUE:
                 level = MIN_BLUE
 
             color = (0, 0, level)
             pygame.draw.lines(screen, color, False,
-                lines, 20)
+                lines, 30)
         # else:
         #     pygame.draw.lines(screen, (240, 240, 240), False,
         #         lines, 1)
+
+    # for path, _ in shortest_path_behavior.top_solutions:
+    #     pygame.draw.lines(screen, (230,230,230), False, 
+    #         [(n.x, n.y) for n in path], 6)
 
     if best_path:
         # draw a line
         pygame.draw.lines(screen, (255,69,0), False, 
             [(n.x, n.y) for n in best_path], 6)
-        
 
         # render text
         label = myfont.render('Best Length: %.2f' % best_length, 5, black)
@@ -370,6 +388,7 @@ while done == False:
 
     # Draw all the spites
     all_sprites.draw(screen)
+    ant_sprites.draw(screen)
      
     # Limit to 20 frames per second
     # clock.tick(60)
