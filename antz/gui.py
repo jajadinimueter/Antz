@@ -175,8 +175,8 @@ class WpSprite(pygame.sprite.Sprite):
         # of rect.x and rect.y
         self.rect = self.image.get_rect()
 
-        self.rect.y = self.wp.y
-        self.rect.x = self.wp.x
+        self.rect.y = self.wp.y - self.rect.height / 2.0
+        self.rect.x = self.wp.x - self.rect.width / 2.0
 
     def set_obstacle(self, obstacle):
         self.wp.obstacle = obstacle
