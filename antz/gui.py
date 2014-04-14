@@ -6,6 +6,7 @@ import pygame.draw
 from pygame.locals import *
 
 from pgu import gui
+from pgu.gui import button
 
 from antz import sim
 from antz import graph
@@ -150,21 +151,32 @@ class WpSprite(pygame.sprite.Sprite):
     def __init__(self, wp, color, width, height):
         # Call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self) 
+
+        self.wp = wp
  
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
         self.image = pygame.Surface([width, height])
-        self.image.fill(color)
- 
+        self.image.set_alpha(0)
+        self.image.fill((255,255,255))  
+
         # Fetch the rectangle object that has the dimensions of the image
         # image.
         # Update the position of this object by setting the values 
         # of rect.x and rect.y
         self.rect = self.image.get_rect()
-        self.wp = wp
-        self.update()
-        self.rect.y = self.wp.y - self.rect.height / 2.0
-        self.rect.x = self.wp.x - self.rect.width / 2.0
+
+        self.rect.y = self.wp.y
+        self.rect.x = self.wp.x
+
+    def set_obstacle(self, obstacle):
+        self.wp.obstacle = obstacle
+        if obstacle:
+            self.image.fill(green)
+            self.image.set_alpha(255)
+        else:
+            self.image.set_alpha(0)
+            self.image.fill((255,255,255))  
 
 
 # INIT PYGAME
@@ -178,13 +190,14 @@ screen=pygame.display.set_mode([screen_width,screen_height])
 
 ant_sprites = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
+wp_sprites = pygame.sprite.Group()
 
 done = False
 clock = pygame.time.Clock()
 
 def create_sprite(node):
-    # if node.TYPE == 'waypoint':
-    #     return WpSprite(node, gray, 5.0, 5.0)
+    if node.TYPE == 'waypoint':
+        return WpSprite(node, None, 20.0, 20.0)
     if node.TYPE == 'food':
         return FoodSprite(node, green, 15.0, 15.0)
     elif node.TYPE == 'nest':
@@ -234,7 +247,10 @@ def create_grid_graph(nodes):
             if i+1 < yl:
                 ylist = nodes[i+1]
             if sprite:
-                all_sprites.add(sprite)
+                if isinstance(sprite, WpSprite):
+                    wp_sprites.add(sprite)
+                else:
+                    all_sprites.add(sprite)
             if j+1 < l:
                 # create the wayfucker
                 create_waypoint(a, xlist[j+1])
@@ -293,7 +309,9 @@ food = replace_food_node(nest_i, nest_j, grid_nodes, (lambda old:
     sim.Food(name='food', x=old.x, y=old.y)))
 g = create_grid_graph(grid_nodes)
 
-ANT_COUNT = 1000
+LEFT = 1
+RIGHT = 3
+ANT_COUNT = 500
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
 pkind = colony.pheromone_kind('default')
@@ -329,7 +347,14 @@ e = gui.Button('Ant Color')
 e.connect(gui.CLICK,dialog.open,None)
 c.add(e, screen_width-100, 13)
 
+sel = gui.Select(value='---')
+sel.add('Draw Obstacles', 'draw_obstacles')
+c.add(sel, screen_width-400, 13)
+
 app.init(c)
+
+paint = False
+paint_erase = False
 
 while done == False:
     for event in pygame.event.get(): # User did something
@@ -337,8 +362,26 @@ while done == False:
             done = True # Flag that we are done so we exit this loop
         elif event.type is KEYDOWN and event.key == K_ESCAPE: 
             done = True
-        else:
-            app.event(event)
+        elif event.type == pygame.MOUSEMOTION:
+            if paint:
+                # replace nodes with obstacle nodes
+                for s in wp_sprites.sprites():
+                    if s.rect.collidepoint(event.pos):
+                        s.set_obstacle(True)
+            if paint_erase:
+                # replace nodes with obstacle nodes
+                for s in wp_sprites.sprites():
+                    if s.rect.collidepoint(event.pos):
+                        s.set_obstacle(False)
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
+            paint = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:
+            paint = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
+            paint_erase = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == RIGHT:
+            paint_erase = False
+        app.event(event)
  
     ants.move()
 
@@ -366,7 +409,7 @@ while done == False:
     # for path, _ in shortest_path_behavior.top_solutions:
     #     pygame.draw.lines(screen, (230,230,230), False, 
     #         [(n.x, n.y) for n in path], 6)
-
+    
     if best_path:
         # draw a line
         pygame.draw.lines(screen, (255,69,0), False, 
@@ -379,14 +422,11 @@ while done == False:
     label = myfont.render('Turn %d' % turn, 5, black)
     screen.blit(label, (100, 20))
 
-    # Get the current mouse position. This returns the position
-    # as a list of two numbers.
-    pos = pygame.mouse.get_pos()
-     
     # ant_sprites.color = dialog.rgb 
     ant_sprites.update()
 
     # Draw all the spites
+    wp_sprites.draw(screen)
     all_sprites.draw(screen)
     ant_sprites.draw(screen)
      

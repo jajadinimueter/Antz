@@ -153,6 +153,12 @@ class ShortestPathAlgorithm(Algorithm):
 
     @property
     def best_path(self):
+        if self._best_path:
+            for n in self._best_path:
+                if not self._can_pass(n):
+                    self._best_path = []
+                    self._best_path_length = sys.float_info.max
+
         return self._best_path
 
     @property
@@ -178,10 +184,11 @@ class ShortestPathAlgorithm(Algorithm):
                     % (node, next_edge, next_edge.nodes))
             return next_edge
         else:
-            probabilities = self._edge_probs.get(node, [])
+            probabilities = []
 
             if not probabilities:
-                edges = node.edges
+                edges = [e for e in node.edges
+                            if self._can_pass(e.other_node(node))]
                 edges = [e for e in edges
                          if e not in state.edges]
 
@@ -249,10 +256,10 @@ class ShortestPathAlgorithm(Algorithm):
             plevel = edge.pheromone_level(pkind)
         
             edge_ant_count = self._edge_counts[edge]
-            phero_inc = (1.0/state.pathlen)
+            phero_inc = 1.0/state.pathlen
             # phero_inc *= 1/edge.cost
             # print('before %s' % phero_inc)
-            # phero_inc *= (1.0/float(edge_ant_count))
+            phero_inc *= 1.0/edge_ant_count
             # print('>> after phero_inc %s' % phero_inc)
 
             edge.increase_pheromone(
@@ -264,6 +271,9 @@ class ShortestPathAlgorithm(Algorithm):
     def leave_edge(self, ant, edge):
         pass
 
+    def _can_pass(self, node):
+        return not node_is_obstacle(node)
+
     def visit_node(self, ant, node):
         """
         Called when a node is visited
@@ -271,8 +281,17 @@ class ShortestPathAlgorithm(Algorithm):
 
         state = ant._state
 
+        for n in ant._path:
+            if not self._can_pass(n):
+                ant._reset()
+
         if not state.way_home:
             ant._path.append(node)
+
+        if state.way_home:
+            if not self._can_pass(node):
+                ant._reset()
+                return
 
         if node_is_food(node):
             # handle the thing when it's food
@@ -286,7 +305,6 @@ class ShortestPathAlgorithm(Algorithm):
             if state.best_pathlen <= self._best_path_length:
                 self._best_path_length = state.best_pathlen 
                 self._best_path = ant._best_path
-
         elif node_is_nest(node):
             # when it's a nest and we are on our way
             # back -> reset the ant
@@ -456,6 +474,11 @@ def node_is_waypoint(node):
     return node.TYPE == 'waypoint'
 
 
+def node_is_obstacle(node):
+    """ Check whether a node is a nest """
+    return node.obstacle
+
+
 class Waypoint(graph.Node):
     TYPE = 'waypoint'
 
@@ -463,6 +486,15 @@ class Waypoint(graph.Node):
         graph.Node.__init__(self, name=name)
         self._x = x
         self._y = y
+        self._obstacle = False
+
+    @property
+    def obstacle(self):
+        return self._obstacle
+
+    @obstacle.setter
+    def obstacle(self, obstacle):
+        self._obstacle = obstacle
 
     @property
     def x(self):
@@ -623,6 +655,10 @@ class PheromoneKind(object):
 class AntCollection(set):
     def __init__(self, behavior):
         self._behavior = behavior
+
+    def reset(self):
+        for ant in self:
+            ant._reset()
 
     def move(self):
         self._behavior.begin_round()
