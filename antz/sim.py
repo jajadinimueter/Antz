@@ -132,6 +132,15 @@ class ShortestPathAlgorithm(Algorithm):
         self._rounds = 1
         self._edge_counts = collections.defaultdict(int)
         self._edge_probs = {}
+        self._phero_dec = 0.01
+
+    @property
+    def phero_dec(self):
+        return self._phero_dec
+
+    @phero_dec.setter
+    def phero_dec(self, d):
+        self._phero_dec = d
 
     @property
     def solutions(self):
@@ -236,7 +245,7 @@ class ShortestPathAlgorithm(Algorithm):
             kinds = store.kinds
             for k in kinds:
                 level = store.get_amount(k)
-                store.set(k, (1.0 - self._p) * level)
+                store.set(k, (1.0 - self._phero_dec) * level)
 
     def visit_edge(self, ant, edge):
         """

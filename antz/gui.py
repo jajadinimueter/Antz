@@ -182,9 +182,10 @@ class WpSprite(pygame.sprite.Sprite):
 # INIT PYGAME
 pygame.init()
 
-screen_width=1024
-screen_height=600
-top_offset = 60
+screen_width=1300
+screen_height=700
+top_offset = 100
+bottom_offset = 100
 
 screen=pygame.display.set_mode([screen_width,screen_height])
 
@@ -301,7 +302,7 @@ def replace_food_node(i, j, nodes, cb):
 
 # setup the graph
 grid_nodes = create_grid_nodes(
-    screen_width, screen_height-top_offset, 15, y=top_offset)
+    screen_width, screen_height-top_offset-bottom_offset, 15, y=top_offset)
 nest_i, nest_j = random_grid_location(grid_nodes)
 nest = replace_node(nest_i, nest_j, grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
@@ -354,11 +355,24 @@ def change_only_shortest_state(arg):
     btn, text = arg
     show_only_shortest = btn.value
 
+def change_phero_dec(arg):
+    inp, text = arg
+    try:
+        shortest_path_behavior.phero_dec = float(inp.value)
+    except:
+        pass
+
 lshorest_only = gui.Label('Shortest Only')
 shortest_only = gui.Switch()
 shortest_only.connect(gui.CHANGE, change_only_shortest_state, (shortest_only, 'Shortest Only'))
 c.add(shortest_only, 400, 15)
 c.add(lshorest_only, 270, 15)
+
+l_phero_dec = gui.Label('Phero Decrease')
+text_phero_dec = gui.Input(value=shortest_path_behavior.phero_dec, size=10)
+text_phero_dec.connect(gui.CHANGE, change_phero_dec, (text_phero_dec, 'Phero Dec'))
+c.add(text_phero_dec, 400, 50)
+c.add(l_phero_dec, 270, 50)
 
 sel = gui.Select(value='---')
 sel.add('Draw Obstacles', 'draw_obstacles')
