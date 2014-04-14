@@ -363,16 +363,17 @@ while done == False:
         elif event.type is KEYDOWN and event.key == K_ESCAPE: 
             done = True
         elif event.type == pygame.MOUSEMOTION:
-            if paint:
-                # replace nodes with obstacle nodes
-                for s in wp_sprites.sprites():
-                    if s.rect.collidepoint(event.pos):
-                        s.set_obstacle(True)
-            if paint_erase:
-                # replace nodes with obstacle nodes
-                for s in wp_sprites.sprites():
-                    if s.rect.collidepoint(event.pos):
-                        s.set_obstacle(False)
+            if sel.value == 'draw_obstacles':
+                if paint:
+                    # replace nodes with obstacle nodes
+                    for s in wp_sprites.sprites():
+                        if s.rect.collidepoint(event.pos):
+                            s.set_obstacle(True)
+                if paint_erase:
+                    # replace nodes with obstacle nodes
+                    for s in wp_sprites.sprites():
+                        if s.rect.collidepoint(event.pos):
+                            s.set_obstacle(False)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
             paint = True
         elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:

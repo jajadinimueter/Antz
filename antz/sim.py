@@ -284,14 +284,10 @@ class ShortestPathAlgorithm(Algorithm):
         for n in ant._path:
             if not self._can_pass(n):
                 ant._reset()
+                return
 
         if not state.way_home:
             ant._path.append(node)
-
-        if state.way_home:
-            if not self._can_pass(node):
-                ant._reset()
-                return
 
         if node_is_food(node):
             # handle the thing when it's food
