@@ -25,17 +25,17 @@
 
 %--> chapter with 'chapter' + number + rule + name + rule
 % --------------------------------
-\titleformat{\chapter}[display]               % {command}[shape]
-  {\usekomafont{chapter}\Large \color{black}} % format
-  {\LARGE\MakeUppercase{}%   % label % entfernt: \chaptertitlename
+\titleformat{\chapter}[display]% {command}[shape]
+  {\usekomafont{chapter}\Large \color{black}}% format
+  {\LARGE\MakeUppercase{}% label % entfernt: \chaptertitlename
    \Huge~\thechapter \filright}%  
-  {1pt}										  % sep (from chapternumber)
+  {1pt}% sep (from chapternumber) %
   {%
-   \titlerule \vspace{0.9pc} % [entfernt]
-   \filright 
-   \IfColorDefined{sectioncolor}{\color{sectioncolor}}{}   
-  }                                           % (before chaptertitle and after)
-  [\color{black} \vspace{0.9pc} \filright {\titlerule}] %
+   %\titlerule \vspace{0.9pc} % [entfernt]
+   \filright% 
+   \IfColorDefined{sectioncolor}{\color{sectioncolor}}{}%   
+  }% (before chaptertitle and after)
+  [\color{black} \vspace{0.9pc} \filright]% {\titlerule}]% [entfernt]
 % --------------------------------
 
 %--> part with 'PART' + number at frame and name inside frame
