@@ -30,7 +30,7 @@ class Algorithm(object):
         - Solve the TSP
         - Do war
 
-    The behavior should be an attribte of the ant, like a part
+    The behavior should be an attribute of the ant, like a part
     of the brain. We don't want subclasses here because those would
     be too static.
     """
@@ -64,17 +64,17 @@ class Algorithm(object):
 
     def leave_edge(self, ant, edge):
         """
-        Called when the ant leaves an edge
+        Called when the ant leaves an edge.
         """
 
     def visit_node(self, ant, node):
         """
-        Called when the ant visits a node
+        Called when the ant visits a node.
         """
 
     def leave_node(self, ant, node):
         """
-        Called when the ant leaves a node
+        Called when the ant leaves a node.
         """
 
     def end_turn(self, ant):
@@ -84,7 +84,7 @@ class Algorithm(object):
 
     def __repr__(self):
         """
-        Default repr implementation for convienience 
+        Default repr implementation for convenience 
         """
         return ('%s(TYPE=%s, <%s>)' 
                     % (self.__class__.__name__,
@@ -355,7 +355,7 @@ class NoNextStep(Exception):
 
    
 class Ant(object):
-    def __init__(self, colony, initial_node, algorightm):
+    def __init__(self, colony, initial_node, algorithm):
         """
         The ant is in fact a small wrapper around :cls:`.AntBehavior`.
 
@@ -370,7 +370,7 @@ class Ant(object):
         self._current_node = initial_node
         self._current_edge = None
         self._path = [initial_node]
-        self._algorightm = algorightm
+        self._algorithm = algorithm
         self._colony = colony
         self._best_path = None
         self._path_length = 0
@@ -379,7 +379,7 @@ class Ant(object):
         # store your state here
         self._state = None
 
-        self._algorightm.init_ant(self)
+        self._algorithm.init_ant(self)
 
     def _reset(self):
         self._current_node = self._initial_node
@@ -388,7 +388,7 @@ class Ant(object):
         self._path = [self._initial_node]
         self._path_length = 0
         self._state = None
-        self._algorightm.init_ant(self)
+        self._algorithm.init_ant(self)
 
     def create_pheromone(self, kind, amount):
         colony = self._colony
@@ -436,7 +436,7 @@ class Ant(object):
         
         current_node = self.current_node
         
-        edge = self._algorightm.choose_edge(self, current_node)
+        edge = self._algorithm.choose_edge(self, current_node)
 
         if edge:
             self._current_edge = edge
@@ -447,19 +447,19 @@ class Ant(object):
             # if the edge is unidirectional
             if next_node:
                 if self._current_edge:
-                    self._algorightm.leave_edge(
+                    self._algorithm.leave_edge(
                         self, self._current_edge)
 
                 self._current_node = next_node
 
-                self._algorightm.leave_node(self, current_node)
-                self._algorightm.visit_edge(self, edge)
-                self._algorightm.visit_node(self, next_node)
+                self._algorithm.leave_node(self, current_node)
+                self._algorithm.visit_edge(self, edge)
+                self._algorithm.visit_node(self, next_node)
             else:
                 # reset the ant
                 self._reset()
             
-            self._algorightm.end_turn(self)
+            self._algorithm.end_turn(self)
         else:
             self._reset()
 
@@ -475,12 +475,12 @@ def node_is_nest(node):
 
 
 def node_is_waypoint(node):
-    """ Check whether a node is a nest """
+    """ Check whether a node is a waypoint """
     return node.TYPE == 'waypoint'
 
 
 def node_is_obstacle(node):
-    """ Check whether a node is a nest """
+    """ Check whether a node is an obstacle """
     return node.obstacle
 
 
@@ -528,7 +528,7 @@ class Waypoint(graph.Node):
 class Food(Waypoint):
     """
     Where the ants like to go to. When food is 
-    reached, ants go back to nest
+    reached, ants go back to the nest.
     """
     TYPE = 'food'
 
@@ -691,7 +691,7 @@ def main():
 
     evaporate_strategy = EvaporationStrategy(amount=2)
 
-    # we need to create a waypoint factory
+    # We need to create a waypoint factory
     g.add_edge(WaypointEdge(nest, wp1, evaporation_strategy=evaporate_strategy, cost=100))
     g.add_edge(WaypointEdge(nest, wp2, evaporation_strategy=evaporate_strategy, cost=20))
     g.add_edge(WaypointEdge(wp1, wp3, evaporation_strategy=evaporate_strategy, cost=200))

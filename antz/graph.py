@@ -77,7 +77,7 @@ class Edge(object):
         """
         Returns the other node excluding current one. Does
         take bidirectional into account. If you may not move
-        in the direction of other node, None will be returned
+        in the direction of other node, None will be returned.
         """
         if not self.bidirectional:
             if not current_node == self._node_from:
@@ -146,7 +146,7 @@ class Graph(object):
     def remove_edge(self, params):
         """
         Either pass one param: an edge or pass two params
-        which will delete the edge between those nodes
+        which will delete the edge between those nodes.
         """
         edge = None
         if len(params) == 1:
@@ -154,7 +154,7 @@ class Graph(object):
         elif len(params) == 2:
             edge = node_edges[params[0]][params[1]]
         else:
-            raise TypeError('Provide either one or two parameters')
+            raise TypeError('Provide either one or two parameters.')
         self._edges.remove(edge)
         n1, n2 = edge.node_from, edge.node_to
         del node_edges[n1][n2]
