@@ -356,9 +356,21 @@ app = gui.App()
 
 c = gui.Container(width=screen_width,height=screen_height)
 
-e = gui.Button('Ant Color')
-e.connect(gui.CLICK,dialog.open,None)
-c.add(e, screen_width-100, 13)
+e1 = gui.Button('Start')
+#e1.connect(gui.CLICK,,None)
+c.add(e1, screen_width-180, 13)
+
+e2 = gui.Button('Stop')
+#e2.connect(gui.CLICK,,None)
+c.add(e2, screen_width-100, 13)
+
+e3 = gui.Button('Reset')
+#e3.connect(gui.CLICK,,None)
+c.add(e3, screen_width-180, 48)
+
+e4 = gui.Button('Ant Color')
+e4.connect(gui.CLICK,dialog.open,None)
+c.add(e4, screen_width-100, 48)
 
 show_only_shortest = False
 
