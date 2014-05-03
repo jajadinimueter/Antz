@@ -20,6 +20,15 @@ blue     = ( 0,   0,   255)
 green    = ( 0,   255,   0)
 gray    = ( 220,   220,   220)
 
+stop_pressed = True
+
+def start(self):
+    global stop_pressed
+    stop_pressed = False
+
+def stop(self):
+    global stop_pressed
+    stop_pressed = True
 
 class ColorDialog(gui.Dialog):
     def __init__(self,value,**params):
@@ -357,11 +366,11 @@ app = gui.App()
 c = gui.Container(width=screen_width,height=screen_height)
 
 e1 = gui.Button('Start')
-#e1.connect(gui.CLICK,,None)
+e1.connect(gui.CLICK,start,None)
 c.add(e1, screen_width-180, 13)
 
 e2 = gui.Button('Stop')
-#e2.connect(gui.CLICK,,None)
+e2.connect(gui.CLICK,stop,None)
 c.add(e2, screen_width-100, 13)
 
 e3 = gui.Button('Reset')
@@ -472,7 +481,8 @@ while done == False:
                         if s.rect.collidepoint(event.pos):
                             s.set_obstacle(False)
 
-    ants.move()
+    if not stop_pressed:
+        ants.move()
 
     # Clear the screen
     screen.fill(white) 
@@ -522,8 +532,9 @@ while done == False:
 
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
- 
-    turn += 1
+    
+    if not stop_pressed:
+        turn += 1
 
 pygame.quit()
 
