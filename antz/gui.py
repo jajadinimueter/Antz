@@ -216,11 +216,11 @@ clock = pygame.time.Clock()
 
 def create_sprite(node):
     if node.TYPE == 'waypoint':
-        return WpSprite(node, None, 20.0, 20.0)
+        return WpSprite(node, None, 5.0, 5.0)
     if node.TYPE == 'food':
-        return FoodSprite(node, green, 15.0, 15.0)
+        return FoodSprite(node, green, 5.0, 5.0)
     elif node.TYPE == 'nest':
-        return NestSprite(node, gray, 15.0, 15.0)
+        return NestSprite(node, gray, 5.0, 5.0)
 
 def create_grid_nodes(width, height, square_size, x=0, y=0):
     # creates a graph which is a grid
@@ -320,7 +320,7 @@ def replace_food_node(i, j, nodes, cb):
 
 # setup the graph
 grid_nodes = create_grid_nodes(
-    screen_width, screen_height-top_offset-bottom_offset, 15, y=top_offset)
+    screen_width, screen_height-top_offset-bottom_offset, 8, y=top_offset)
 nest_i, nest_j = random_grid_location(grid_nodes)
 nest = replace_node(nest_i, nest_j, grid_nodes, (lambda old: 
     sim.Nest(name='nest', x=old.x, y=old.y)))
@@ -330,10 +330,11 @@ g = create_grid_graph(grid_nodes)
 
 LEFT = 1
 RIGHT = 3
-ANT_COUNT = 1000
+ANT_COUNT = 100
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
 pkind = colony.pheromone_kind('default')
+
 shortest_path_behavior = sim.ShortestPathAlgorithm(g)
 
 ants = sim.AntCollection(shortest_path_behavior)
@@ -350,10 +351,10 @@ for i in range(0, ANT_COUNT):
     add_ant()
 
 # precalculate lines between edges
-edge_lines = []
+edge_lines = {}
 for edge in g.edges:
     n1, n2 = edge.node_from, edge.node_to
-    edge_lines.append((edge, [(n1.x, n1.y), (n2.x, n2.y)]))
+    edge_lines[edge] = [(n1.x, n1.y), (n2.x, n2.y)]
 
 MIN_BLUE = 70
 turn = 0
@@ -423,23 +424,52 @@ def change_num_ants(arg):
             else:
                 break
 
+def change_alpha(arg):
+    try:
+        val = float(arg.value.strip())
+        shortest_path_behavior.alpha = val
+    except:
+        pass
+        
+
+def change_beta(arg):
+    try:
+        val = float(arg.value.strip())
+        shortest_path_behavior.beta = val
+    except:
+        pass
+        
+
 lshorest_only = gui.Label('Shortest Only')
 shortest_only = gui.Switch()
 shortest_only.connect(gui.CHANGE, change_only_shortest_state, (shortest_only, 'Shortest Only'))
 c.add(shortest_only, 400, 15)
 c.add(lshorest_only, 270, 15)
 
-l_phero_dec = gui.Label('Phero Decrease')
-text_phero_dec = gui.Input(value=shortest_path_behavior.phero_dec, size=10)
-text_phero_dec.connect(gui.CHANGE, change_phero_dec, (text_phero_dec, 'Phero Dec'))
-c.add(text_phero_dec, 400, 50)
-c.add(l_phero_dec, 270, 52)
+alpha_label = gui.Label('Alpha')
+alpha_field = gui.Input(value=shortest_path_behavior.alpha, size=10)
+alpha_field.connect(gui.CHANGE, change_alpha, alpha_label)
+c.add(alpha_field, 100, 50)
+c.add(alpha_label, 0, 52)
+
+beta_label = gui.Label('Beta')
+beta_field = gui.Input(value=shortest_path_behavior.beta, size=10)
+beta_field.connect(gui.CHANGE, change_beta, beta_label)
+c.add(beta_field, 350, 50)
+c.add(beta_label, 250, 52)
 
 l_num_ants = gui.Label('Num Ants')
 text_num_ants = gui.Input(value=ANT_COUNT, size=10)
 text_num_ants.connect(gui.CHANGE, change_num_ants, (text_num_ants, 'Num Ants'))
-c.add(text_num_ants, 700, 50)
-c.add(l_num_ants, 600, 52)
+c.add(text_num_ants, 600, 50)
+c.add(l_num_ants, 500, 52)
+
+l_phero_dec = gui.Label('Phero Decrease')
+text_phero_dec = gui.Input(value=shortest_path_behavior.phero_dec, size=10)
+text_phero_dec.connect(gui.CHANGE, change_phero_dec, (text_phero_dec, 'Phero Dec'))
+c.add(text_phero_dec, 900, 50)
+c.add(l_phero_dec, 750, 52)
+
 
 sel = gui.Select(value='draw_obstacles')
 sel.add('---', '---')
@@ -452,7 +482,7 @@ paint = False
 paint_erase = False
 app_events_dispatch = True
 
-while done == False:
+while done is False:
     for event in pygame.event.get(): # User did something
         app.event(event)
         
@@ -491,7 +521,8 @@ while done == False:
     best_length = shortest_path_behavior.best_path_length
 
     if not show_only_shortest:
-        for edge, lines in edge_lines:
+        for edge in shortest_path_behavior.pheromone_edges:
+            lines = edge_lines[edge]
             plevel = edge.pheromone_level(pkind)
             if plevel:
                 # print(plevel)
@@ -526,7 +557,7 @@ while done == False:
         ant_sprites.draw(screen)
      
     # Limit to 20 frames per second
-    # clock.tick(60)
+    clock.tick(60)
 
     app.paint()
 

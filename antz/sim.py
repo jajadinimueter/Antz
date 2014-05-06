@@ -15,7 +15,6 @@ from decimal import Decimal
 from antz import graph
 from antz.util import *
 
-
 DEBUG = True
 
 
@@ -99,8 +98,8 @@ class ShortestPathAlgorithm(Algorithm):
 
     TYPE = 'shortest_path'
     PROB_NO_PHEROMONE = 0.05
-    ALPHA = -11.0
-    BETA = -17.5
+    ALPHA = 2
+    BETA = 1
     P = 0.01
     NUM_TOP_SOLUTIONS = 10
 
@@ -133,6 +132,24 @@ class ShortestPathAlgorithm(Algorithm):
         self._edge_counts = collections.defaultdict(int)
         self._edge_probs = {}
         self._phero_dec = 0.01
+        self._alpha = alpha or self.ALPHA
+        self._beta = beta or self.BETA
+
+    @property
+    def alpha(self):
+        return self._alpha
+
+    @alpha.setter
+    def alpha(self, alpha):
+        self._alpha = alpha
+
+    @property
+    def beta(self):
+        return self._beta
+
+    @beta.setter
+    def beta(self, beta):
+        self._beta = beta
 
     @property
     def phero_dec(self):
@@ -174,6 +191,10 @@ class ShortestPathAlgorithm(Algorithm):
     def g(self):
         return self._g
 
+    @property
+    def pheromone_edges(self):
+        return self._pheromone_edges
+
     def init_ant(self, ant):
         if not ant._state:
             ant._state = ShortestPathAlgorithm.AntState()
@@ -193,7 +214,7 @@ class ShortestPathAlgorithm(Algorithm):
                     % (node, next_edge, next_edge.nodes))
             return next_edge
         else:
-            probabilities = []
+            probabilities = self._edge_probs.get(node)
 
             if not probabilities:
                 edges = [e for e in node.edges
@@ -210,12 +231,11 @@ class ShortestPathAlgorithm(Algorithm):
 
                 def prob(edge):
                     level_prob = edge.pheromone_level(pkind)
-                    # level_prob = level_prob or self.PROB_NO_PHEROMONE
                     if not level_prob:
                         return 0
-                    level_prob = (1/level_prob) ** self._alpha
-                    cost_prob = level_prob * ((1/edge.cost) ** self._beta)
-                    return level_prob
+                    level_prob = level_prob ** self._alpha
+                    level_prob *= (1/edge.cost) ** self._beta
+                    return level_prob 
 
                 probs = {e: prob(e) for e in edges}
 
@@ -240,12 +260,18 @@ class ShortestPathAlgorithm(Algorithm):
                 return probabilities[ind][1]
             
     def evaporate(self):
+        to_remove = set()
         for edge in self._pheromone_edges:
             store = edge.pheromone_store
             kinds = store.kinds
             for k in kinds:
                 level = store.get_amount(k)
                 store.set(k, (1.0 - self._phero_dec) * level)
+                if level < 0.001:
+                    to_remove.add(edge)
+
+        for edge in to_remove:
+            self._pheromone_edges.remove(edge)
 
     def visit_edge(self, ant, edge):
         """
@@ -266,10 +292,7 @@ class ShortestPathAlgorithm(Algorithm):
         
             edge_ant_count = self._edge_counts[edge]
             phero_inc = 1.0/state.pathlen
-            # phero_inc *= 1/edge.cost
-            # print('before %s' % phero_inc)
-            phero_inc *= 1.0/edge_ant_count
-            # print('>> after phero_inc %s' % phero_inc)
+            phero_inc *= 1.0/(edge_ant_count**6)
 
             edge.increase_pheromone(
                 ant.create_pheromone(
