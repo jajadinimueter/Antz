@@ -1,0 +1,73 @@
+
+To do for documentation
+=======================
+
+
+(BF) 1. Einführung/Allgemeines [mittelgross]
+
+	(BF) 1.1 Vorwort (Überblick, Überlegungen, Schwierigkeiten)
+
+
+			-> Funktionsweise gut beschreiben
+
+
+			Konvergenz: grosse Anzahl Ameisen nehmen den kürzesten Weg (vgl. zweidimensionales Problem)
+
+	(BF) 1.2 Anforderungen
+
+	(BF) 1.3 Theorie/geschichtlicher Hintergrund
+
+
+
+2. Projekt [kleines Kapitel]
+
+	(BF) 2.1 Fokus (Animation, Multi-Purpose [kein spezifisches Problem effizient gelöst, sondern mehrere Probleme rasch lösen können]; nicht effiziente Berechnung)
+
+	(BF) 2.2 Hilfsmittel: GitHub, TargetProcess; E-Mail-Kommunikation; regelmässige Treffen
+
+		TargetProcess, Reporte: Tabellen mit allen Tasks und geplanter/real benötigter Zeit
+
+	(FM) 2.3 Technologien: 
+
+
+
+3. Applikation [Hauptteil]
+
+
+	(FM) 3.1 Aufbau/Überblick (Struktur des Programms beschreiben)
+
+		3.1.1 Pygame (Sprites)
+		3.1.2 Graph: Datenstruktur (Gründe für deren Verwendung)
+
+
+	{(BF) 3.2 Mockups (?)		[ca. 1 S.]}
+
+
+	(FM) 3.3 Klassendiagramme: Graph, Pygame, Algorithmus/Simulation (inkl. Erklärungen und Begründungen) 	[ca. 3–4 S.]
+
+
+	(FM) 3.4 Screenshots aus dem Programms 	[3 S.]
+
+
+	(FM) 3.5 Auswertungen: Konvergenz, Parameter (u.a. Alpha/Beta, mit Normierung), etc. (einfacher Setup mit z.B. 20 Nodes verwenden: Auswertung mit verschiedenstern Parametern, wie gut die Konvergenz ist)		[ca. 5–6 S.]
+
+
+	(FM) 3.6 Algorithmus/Performance, gewichtete Wahrscheinlichkeiten
+
+		(Beseitigung der Performance-Probleme mit einem vernünftigeren Setup, d.h. mit z.B. weniger Nodes)
+
+
+
+(BF/FM) 4. Schlusswort/Fazit/Ausblick [kleines Kapitel: ca. 1 S.]
+
+
+
+(BF/FM) 5. Zusammenfassung/Abstract
+
+
+
+(BF) Literatur
+
+
+(alle verwendete, aber nicht zwingend zitierte Literatur)
+
