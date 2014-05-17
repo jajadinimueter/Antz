@@ -133,11 +133,11 @@
 \includeonly{
  content/0-title,
  content/0-Abstract,
- content/0-Einfuehrung,
- content/1-Theory,
- content/2-Experiments,
- content/3-Results,
- content/4-Summery,
+ content/1-Einfuehrung,
+ content/2-Projekt,
+ content/3-Applikation,
+ content/4-Fazit,
+ content/5-Zusammenfassung,
  content/Z-Appendix,
  content/Z-Publications,
 } % end includeonly
@@ -156,11 +156,11 @@
 
 % -- abstract --
 % (only in phd thesis)
-\include{content/0-Abstract} 
-\cleardoublepage
+%\include{content/0-Abstract} 	% auskommentiert (17.05.2014)
+%\cleardoublepage	% auskommentiert (17.05.2014)
 % -- declaration --
 % (only in bachelor/master thesis)
-\input{content/Z-Declaration.tex}
+%\input{content/Z-Declaration.tex}	% auskommentiert (17.05.2014)
 
 \frontmatter
 \IfPackageLoaded{scrpage2}{\pagestyle{scrheadings}}
@@ -188,25 +188,33 @@
 %
 % (files loaded with include must not have the prefix .tex)
 %
-\include{content/0-Einfuehrung}
-\include{content/1-Projekt}
-\include{content/2-Experiments}
-\include{content/3-Results}
-\include{content/4-Summery}
+\include{content/1-Einfuehrung}
+\include{content/2-Projekt}
+\include{content/3-Applikation}
+\include{content/4-Fazit}
+\include{content/5-Zusammenfassung}
 
 %%% -- end of main content
 
+
+% set title
+\renewcommand\bibname{Bibliographie}
+
 % -- bibliography --
 % (must be placed _before_ appendix)
+
 \IfPackageLoaded{biblatex}{
   \cleardoublepage
   \IfDefined{phantomsection}{\phantomsection}\label{sec:bibliography}
+  
+  % show all biblatex entries
+  \nocite{*}
   \printbibliography[%
-    heading=bibintoc, % (bibintoc, bibnumbered)
-  ]	
+    %heading=bibintoc, % (bibintoc, bibnumbered)
+  ]
+
 }% end of bibliography
 
-\nocite{*}
 
 %% -- list of figures and tables --
 \cleardoublepage\IfDefined{phantomsection}{\phantomsection}\label{sec:lof}
