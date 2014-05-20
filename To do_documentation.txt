@@ -27,7 +27,7 @@ To do for documentation
 
 		TargetProcess, Reporte: Tabellen mit allen Tasks und geplanter/real benötigter Zeit
 
-	(FM) 2.3 Technologien: 
+	(FM) 2.3 Technologien
 
 
 
