@@ -186,3 +186,8 @@ class Graph(object):
         properties if we really need it. But I don't think so.
         """
         return sets.ImmutableSet(self._edges)
+
+
+def generate_connected_graph(num_nodes):
+    """
+    """

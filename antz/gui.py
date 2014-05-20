@@ -93,6 +93,8 @@ class AntSprite(pygame.sprite.Sprite):
         # Call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self) 
  
+        self.modulus = 150
+        self.add = True
         self.color = color #dialog.rgb
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
@@ -109,11 +111,24 @@ class AntSprite(pygame.sprite.Sprite):
 
     def update(self):
         node = self.ant.current_node
+        def bound(k):
+            if k < 0:
+                return 0
+            elif k > 255:
+                return 255
+            return k
+
         if node:
             # Move the block down one pixel
             self.rect.y = node.y - self.rect.height / 2.0
             self.rect.x = node.x - self.rect.width / 2.0
-        self.image.fill(dialog.rgb)
+        x = dialog.rgb
+        # if not self.add:
+        #     x = tuple(bound(p - self.modulus) for p in x)
+        # else:
+        #     x = tuple(bound(p + self.modulus) for p in x)
+        # self.add = not self.add
+        self.image.fill(x)
 
 
 class FoodSprite(pygame.sprite.Sprite):
@@ -216,7 +231,7 @@ clock = pygame.time.Clock()
 
 def create_sprite(node):
     if node.TYPE == 'waypoint':
-        return WpSprite(node, None, 5.0, 5.0)
+        return WpSprite(node, None, 8.0, 8.0)
     if node.TYPE == 'food':
         return FoodSprite(node, green, 5.0, 5.0)
     elif node.TYPE == 'nest':
@@ -330,7 +345,7 @@ g = create_grid_graph(grid_nodes)
 
 LEFT = 1
 RIGHT = 3
-ANT_COUNT = 100
+ANT_COUNT = 1000
 # CREATE THE ANT COLONY
 colony = sim.AntColony('colony-1')
 pkind = colony.pheromone_kind('default')
@@ -428,16 +443,16 @@ def change_alpha(arg):
     try:
         val = float(arg.value.strip())
         shortest_path_behavior.alpha = val
-    except:
-        pass
+    except Exception as e:
+        print(e)
         
 
 def change_beta(arg):
     try:
         val = float(arg.value.strip())
         shortest_path_behavior.beta = val
-    except:
-        pass
+    except Exception as e:
+        print(e)
         
 
 lshorest_only = gui.Label('Shortest Only')
@@ -448,13 +463,13 @@ c.add(lshorest_only, 270, 15)
 
 alpha_label = gui.Label('Alpha')
 alpha_field = gui.Input(value=shortest_path_behavior.alpha, size=10)
-alpha_field.connect(gui.CHANGE, change_alpha, alpha_label)
+alpha_field.connect(gui.CHANGE, change_alpha, alpha_field)
 c.add(alpha_field, 100, 50)
 c.add(alpha_label, 0, 52)
 
 beta_label = gui.Label('Beta')
 beta_field = gui.Input(value=shortest_path_behavior.beta, size=10)
-beta_field.connect(gui.CHANGE, change_beta, beta_label)
+beta_field.connect(gui.CHANGE, change_beta, beta_field)
 c.add(beta_field, 350, 50)
 c.add(beta_label, 250, 52)
 
@@ -481,6 +496,21 @@ app.init(c)
 paint = False
 paint_erase = False
 app_events_dispatch = True
+
+line_cache = {}
+
+def calc_path_lines(path):
+    lines = line_cache.get(path, [])
+
+    if not lines:
+        l = len(path)
+        for i, n in enumerate(path):
+            lines.append((n.node_from.x, n.node_from.y))
+            if i == l - 1:
+                lines.append((n.node_to.x, n.node_to.y))
+        line_cache[path] = lines
+
+    return lines        
 
 while done is False:
     for event in pygame.event.get(): # User did something
@@ -532,30 +562,37 @@ while done is False:
 
                 color = (0, 0, level)
                 pygame.draw.lines(screen, color, False,
-                    lines, 30)
+                    lines, 10)
     
-    if best_path:
-        # draw a line
-        pygame.draw.lines(screen, (255,69,0), False, 
-            [(n.x, n.y) for n in best_path], 6)
-
-        # render text
-        label = myfont.render('Best Length: %.2f' % best_length, 5, black)
-        screen.blit(label, (400, screen_height - 20))
-
     label = myfont.render('Turn %d' % turn, 5, black)
     screen.blit(label, (100, 20))
 
     # ant_sprites.color = dialog.rgb 
     ant_sprites.update()
 
-    # Draw all the spites
-    wp_sprites.draw(screen)
-    all_sprites.draw(screen)
-
     if not show_only_shortest:
         ant_sprites.draw(screen)
      
+    # Draw all the spites
+    all_sprites.draw(screen)
+    wp_sprites.draw(screen)
+
+    for i, (sol, length) in enumerate(shortest_path_behavior.solutions):
+        lines = calc_path_lines(sol)
+
+        if i == 0:
+            color = (255, 69, 0)
+        else:
+            color = (200, 200, 200, 0.5)
+
+        # draw a line
+        pygame.draw.lines(screen, color, False, lines, 3)
+
+        if i == 0:
+            # render text
+            label = myfont.render('Best Length: %.2f' % best_length, 5, black)
+            screen.blit(label, (400, screen_height - 20))
+
     # Limit to 20 frames per second
     clock.tick(60)
 

@@ -97,11 +97,9 @@ class ShortestPathAlgorithm(Algorithm):
     """
 
     TYPE = 'shortest_path'
-    PROB_NO_PHEROMONE = 0.05
     ALPHA = 2
-    BETA = 1
+    BETA = 4
     P = 0.01
-    NUM_TOP_SOLUTIONS = 10
 
     class AntState(object):
         def __init__(self):
@@ -120,6 +118,8 @@ class ShortestPathAlgorithm(Algorithm):
 
     def __init__(self, g, alpha=None, beta=None, p=None):
         self._pheromone_increase = 1
+        self._new_solutions = set()
+        self._solutions = []
         self._pheromone_edges = set()
         self._alpha = alpha or self.ALPHA
         self._beta = beta or self.BETA
@@ -164,10 +164,6 @@ class ShortestPathAlgorithm(Algorithm):
         return self._solutions
 
     @property
-    def top_solutions(self):
-        return self._top_solutions
-
-    @property
     def edges_in_turn(self):
         return self._edges_in_turn
 
@@ -179,12 +175,6 @@ class ShortestPathAlgorithm(Algorithm):
 
     @property
     def best_path(self):
-        if self._best_path:
-            for n in self._best_path:
-                if not self._can_pass(n):
-                    self._best_path = []
-                    self._best_path_length = sys.float_info.max
-
         return self._best_path
 
     @property
@@ -231,10 +221,16 @@ class ShortestPathAlgorithm(Algorithm):
 
                 def prob(edge):
                     level_prob = edge.pheromone_level(pkind)
+
                     if not level_prob:
                         return 0
+                    
                     level_prob = level_prob ** self._alpha
-                    level_prob *= (1/edge.cost) ** self._beta
+                    edge_prob = (edge.cost * level_prob) ** self._beta
+
+                    # print('%s %s' % (level_prob, edge_prob))
+                    
+                    level_prob *= edge_prob
                     return level_prob 
 
                 probs = {e: prob(e) for e in edges}
@@ -266,9 +262,10 @@ class ShortestPathAlgorithm(Algorithm):
             kinds = store.kinds
             for k in kinds:
                 level = store.get_amount(k)
-                store.set(k, (1.0 - self._phero_dec) * level)
-                if level < 0.001:
+                if level < 10 ** -4:
+                    level = 0
                     to_remove.add(edge)
+                store.set(k, (1.0 - self._phero_dec) * level)
 
         for edge in to_remove:
             self._pheromone_edges.remove(edge)
@@ -278,21 +275,19 @@ class ShortestPathAlgorithm(Algorithm):
         Just drop some pheromone on the edge
         """
 
+        state = ant._state
         self._edge_counts[edge] += 1
 
-        state = ant._state
         if not state.way_home:
             state.add_edge(edge)
-            ant._path_length = state.pathlen
-
-        if state.way_home:
+        else:
             colony = ant.colony
             pkind = colony.pheromone_kind('default')
             plevel = edge.pheromone_level(pkind)
         
             edge_ant_count = self._edge_counts[edge]
             phero_inc = 1.0/state.pathlen
-            phero_inc *= 1.0/(edge_ant_count**6)
+            # phero_inc *= 1.0/(edge_ant_count**2)
 
             edge.increase_pheromone(
                 ant.create_pheromone(
@@ -313,30 +308,19 @@ class ShortestPathAlgorithm(Algorithm):
 
         state = ant._state
 
-        for n in ant._path:
-            if not self._can_pass(n):
-                ant._reset()
-                return
-
-        if not state.way_home:
-            ant._path.append(node)
-
         if node_is_food(node):
             # handle the thing when it's food
             state.way_home = True
-
-            if state.pathlen <= state.best_pathlen:
-                state.best_pathlen = state.pathlen
-                ant._best_path = ant._path
-                ant._best_path_length = state.best_pathlen
-
-            if state.best_pathlen <= self._best_path_length:
-                self._best_path_length = state.best_pathlen 
-                self._best_path = ant._best_path
+            solution = (tuple(state.edges), state.pathlen)
+            self._solution_counts[solution] += 1
+            if solution not in self._new_solutions:
+                self._new_solutions.add(solution)
         elif node_is_nest(node):
             # when it's a nest and we are on our way
             # back -> reset the ant
             if state.way_home:
+                solution = (tuple(state.edges), state.pathlen)
+                self._solution_counts[solution] -= 1
                 ant._reset()
 
     def end_turn(self, ant):
@@ -350,15 +334,37 @@ class ShortestPathAlgorithm(Algorithm):
                 if rand > 0.8 and turns > random.randrange(200, 400):
                     ant._reset()
             
+    def _is_path_accessible(self, path):
+        for edge in path:
+            n1 = edge.node_from
+            n2 = edge.node_to
+            if not self._can_pass(n1) or not self._can_pass(n2):
+                return False
+        return True
+
     def begin_round(self):
         self._edge_probs = {}
+        self._new_solutions = set()
         self._edge_counts = collections.defaultdict(int)
+        self._solution_counts = collections.defaultdict(int)
 
     def end_round(self):
         """
         Decrease pheromone level on the stuff
         """
         self._rounds += 1
+
+        for solution, length in self._new_solutions:
+            self._solutions.append((solution, length))        
+
+        for x, l in self._solutions:
+            # check whether best path is still accessible
+            if not self._is_path_accessible(x):
+                self._solutions.remove((x, l))
+
+        self._solutions = sorted(self._solutions, key=lambda x: x[1])
+        self._solutions = self._solutions[0:2]
+
         self.evaporate()
 
 
