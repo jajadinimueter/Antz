@@ -87,3 +87,7 @@ antz.egg-info
 build 
 dist 
 build
+
+/.idea
+/Antz-*.zip
+/Antz-*
