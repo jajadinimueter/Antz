@@ -46,7 +46,7 @@ To do for documentation
 	(FM) 3.3 Klassendiagramme: Graph, Pygame, Algorithmus/Simulation (inkl. Erklärungen und Begründungen) 	[ca. 3–4 S.]
 
 
-	(FM) 3.4 Screenshots aus dem Programms 	[3 S.]
+	(FM) 3.4 Screenshots aus dem Programm	[3 S.]
 
 
 	(FM) 3.5 Auswertungen: Konvergenz, Parameter (u.a. Alpha/Beta, mit Normierung), etc. (einfacher Setup mit z.B. 20 Nodes verwenden: Auswertung mit verschiedenstern Parametern, wie gut die Konvergenz ist)		[ca. 5–6 S.]
