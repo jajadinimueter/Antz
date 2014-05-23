@@ -1,5 +1,186 @@
-%\chapter{First chapter of appendix}
+
+
+\newpage
+
 %%\label{chap:Appendix:A}
 %
 %\section{Parameters}
 %%\label{sec:Appendix:Parameter}
+
+
+%\usepackage{paralist} % für kompakte Listen
+%\usepackage{multirow} % für mehrzeilige Tabellenspalten
+
+
+%\title{Softwareprojekt 2}
+%\author{Florian Müller, Bernhard Fuchs}
+%\date{24. März 2014}
+ 
+
+%\maketitle
+
+\makeatletter
+
+\renewcommand{\section}
+	{\@startsection{section}{1}{0mm}
+    {0.8cm}
+    {0.6cm}
+    {\Large\bfseries\sffamily}}
+
+\renewcommand{\subsection}
+	{\@startsection{subsection}{2}{0mm}
+    {0.8cm}
+    {0.4cm}
+    {\large\bfseries\sffamily}}
+
+\renewcommand{\subsubsection}
+	{\@startsection{subsubsection}{3}{0mm}
+    {1.4cm}
+    {0.3cm}
+    {\normalsize\bfseries\sffamily}}
+    
+\makeatother
+
+\vspace*{1cm}
+
+
+\section*{Abgabe 1 von Montag, 24.03.2014}
+
+
+\subsection*{Meilenstein 1: Arthur}
+
+\begin{itemize}[noitemsep]
+\item 12 User Stories
+\item Schätzung in Punkten, die Stunden entsprechen
+\item Totaler Aufwand: 38.5 Punkte (h) – effektiver Aufwand: 48 Punkte
+\item Erledigt: alle User Stories
+\item Aktueller Stand: Fortschritt gemäss Zeitplan erfolgt
+\end{itemize}
+
+
+
+\subsection*{Differenzen zwischen Schätzung und Realität}
+
+\begin{tabular}{| l | c | c | l |}
+  \hline
+  \bfseries{User Story} & \bfseries{Schätzung} & \bfseries{Effektiv} & \bfseries{Probleme}  \\
+  \hline
+  \multirow{2}{5.5cm}{As a user I want to see a surface \hspace*{0.25cm} with moving sprites on it} & 0.5\,pt & 6\,pt &   \multirow{2}{5.25cm}{Graph: Aufbau, API, Kanten mit integrierter Logik} \\ 
+  & & & \\ \hline
+  \multirow{2}{5.5cm}{As a user I want to see ants \hspace*{0.25cm} disassociate pheromones} & 3\,pt &4\,pt & \multirow{4}{5.25cm}{Geeignetes Verhältnis zwischen Pheromonproduktion und -ver- \\ breitung noch nicht gefunden (u.a. Richtung, Zeitpunkt)}  \\
+  & & & \\
+  & & & \\
+  & & & \\ \hline
+  \multirow{2}{5.5cm}{As a windows user I want to be \hspace*{0.25cm} provided with an EXE file} & 1\,pt & 4\,pt & \multirow{2}{5.25cm}{Umgebung, Schrift, GUI Control Panel} \\
+  & & & \\
+  \hline
+\end{tabular}
+
+
+
+\subsection*{Bemerkungen}
+
+\begin{small}
+
+\textbf{Hinweise:} Aufgrund des Charakters unserer User Stories haben wir zumindest für diesen ersten Meilenstein entscheiden, den User Stories keine Tasks zuzuordnen (wegen des geringen Umfangs der einzelnen Stories). \\[-0.25cm]
+
+\textbf{Schwierigkeiten:} Bezüglich der Technologie haben wir zuerst geprüft, ob sich die Applikation mit HTML5 und einer Game Engine wie quintus im Browser umsetzen liesse. Dabei hat sich gezeigt, dass die Geschwindigkeit der Darstellung bei 10'000 Sprites nicht akzeptabel wäre. Daher haben wir uns für Python mit pygame entschieden. Zu Beginn dieses ersten Meilensteins waren technologische Hürden bezüglich der Programmierumgebung zu meistern. \\ [-0.25cm]
+
+\textbf{Entscheid:} Da die Darstellung mit der Verwendung von 10'000 Sprites in einem Graphen zu wenig schnell läuft, haben wir uns entschieden, nur 1'000 Sprites zu verwenden. Eventuell können wir später andere Parameter optimieren oder anpassen, um mehr Sprites anzeigen zu können.
+
+\end{small}
+
+
+
+
+
+\newpage
+
+
+\vspace*{1cm}
+
+
+\section*{Abgabe 2 von Montag, 14.04.2014}
+
+
+\subsection*{Meilenstein 2: Cobannus}
+
+\begin{itemize}[noitemsep]
+\item 8 User Stories
+\item Totaler Aufwand: 25 Punkte (h) – effektiver Aufwand: 14 Punkte
+\item Erledigt: 7/8 User Stories (die Dokumentation wurde in die letzte Iteration verschoben)
+\item Aktueller Stand: Fortschritt gemäss Zeitplan erfolgt
+\end{itemize}
+
+
+
+\subsection*{Differenzen zwischen Schätzung und Realität}
+
+\begin{tabular}{| l | c | c | l |}
+  \hline
+  \bfseries{User Story} & \bfseries{Schätzung} & \bfseries{Effektiv} & \bfseries{Bemerkung}  \\
+  \hline
+  \multirow{2}{6.5cm}{As a user I want to be able to place obstacles in the way of the ants} & 5\,pt & 3\,pt &   \multirow{2}{4.5cm}{} \\ 
+  & & & \\ \hline
+  \multirow{2}{6.5cm}{As a user I want to influence the pheromone evaporation} & 1\,pt &0.5\,pt & \multirow{4}{4.5cm}{}  \\
+  & & & \\ \hline
+  \multirow{2}{6.5cm}{As a user I want to see ants searching the shortest path through n points} & 4\,pt & 6\,pt & \multirow{2}{4.5cm}{Aufgrund von Bug in Kantenselektionslogik} \\
+  & & & \\
+  \hline
+  \multirow{2}{6.5cm}{As a user I want to be able to define the number of ants available} & 2\,pt & 0.5\,pt & \multirow{2}{4.5cm}{} \\
+  & & & \\
+  \hline
+  \multirow{2}{6.5cm}{As a user I want to see the ants dynamically adjust their path when obstacles are added} & 1\,pt & 2\,pt & \multirow{2}{4.5cm}{Aufräumen von Ameisen- pfaden durch Hindernisse} \\
+  & & & \\
+  & & & \\
+  \hline
+\end{tabular}
+
+
+
+\subsection*{Bemerkungen}
+
+\begin{small}
+
+\textbf{Schwierigkeiten:} In dieser Iteration sind wir auf keine besonderen Schwierigkeiten gestossen. \\ [-0.25cm]
+
+\textbf{Entscheidungen:} Bezüglich der Dokumentation haben wir uns entschieden, dass wir diese hauptsächlich erst nach den vorgenommenen Refactorings in der letzten Iteration durchführen werden. \\ [-0.25cm]
+
+\textbf{Neu aufgetauchte Probleme:} Die Performance ist noch nicht besonders gut.
+
+\end{small}
+
+
+
+
+
+\newpage
+
+
+\vspace*{1cm}
+
+
+\section*{Abgabe 3 von Montag, 05.05.2014}
+
+
+\subsection*{Meilenstein 3: Tarvos – Zwischenstand}
+
+\begin{itemize}[noitemsep]
+\item Dieser Meilenstein dauert bis zum 21. Mai 2014 und umfasst 5 User Stories.
+\item Totaler Aufwand: 25 Punkte (h)
+\item Bis jetzt sind noch keine User Stories ganz erledigt, jedoch kleinere Verbesserungen vorgenommen worden (u.a. Start- und Stopp-Button integriert).
+\item Aktueller Stand: Grundsätzlich sind wir im Zeitplan des Projektes.
+\end{itemize}
+
+
+
+
+\subsection*{Bemerkungen}
+
+\begin{itemize}[noitemsep]
+\item Der Schwerpunkt dieser Iteration wird auf der Dokumentation unseres Softwareprojektes sowie in der Optimierung der Performance liegen. 
+\item Zudem wollen wir kleinere Verbesserungen am Programm vornehmen.
+\item Einen wichtigen Teil bildet ferner die Vorbereitung der Präsentation.
+\end{itemize}
+
+
