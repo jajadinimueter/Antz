@@ -125,8 +125,8 @@ class AntSprite(pygame.sprite.Sprite):
 
         if node:
             # Move the block down one pixel
-            self.rect.y = node.y - self.rect.height / 2.0
-            self.rect.x = node.x - self.rect.width / 2.0
+            self.rect.y = node.y - self.rect.height / 2.0 - random.random() * 4
+            self.rect.x = node.x - self.rect.width / 2.0 - random.random() * 4
         x = dialog.rgb
         # if not self.add:
         #     x = tuple(bound(p - self.modulus) for p in x)
@@ -371,7 +371,7 @@ ants = sim.AntCollection(shortest_path_solver)
 
 def add_ant():
     ant = sim.Ant(colony, nest, shortest_path_solver)
-    sprite = AntSprite(ant, (89, 54, 99), 3, 3)
+    sprite = AntSprite(ant, (89, 54, 99), 5, 5)
     ant_sprites.add(sprite)
     # all_sprites.add(sprite)
     ants.add(ant)
@@ -620,14 +620,14 @@ while done is False:
 
     if shortest_path_solver.best_solution:
         best_solution, best_solution_len = shortest_path_solver.best_solution
-
         lines = calc_path_lines(best_solution)
 
         color = (255, 69, 0)
-        thickness = 5
+        thickness = 8
 
-        # draw a line
-        pygame.draw.lines(screen, color, False, lines, thickness)
+        if lines:
+            # draw a line
+            pygame.draw.lines(screen, color, False, lines, thickness)
 
         # render text
         label = myfont.render('Best Length: %.2f, Number of different solutions: %.2f'

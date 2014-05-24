@@ -68,4 +68,4 @@ if has_py2exe:
 
 
 ## ACTUALLY RUN SETUP
-setup(, requires=['matplotlib']**setup_args)
+setup(**setup_args)

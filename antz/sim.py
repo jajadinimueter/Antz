@@ -9,11 +9,14 @@ import bisect
 import random
 import itertools
 import collections
+import operator
 
 from decimal import Decimal
 
 from antz import graph
 from antz.util import *
+
+from numpy import random as nrandom
 
 DEBUG = True
 
@@ -116,6 +119,7 @@ class ShortestPathAlgorithm(Algorithm):
             self.pathlen = 0
             self.turns = 0
             self.hit_pheromone = 0
+            self.solution = None
             self.best_pathlen = sys.float_info.max
 
         def add_edge(self, edge):
@@ -215,9 +219,10 @@ class ShortestPathAlgorithm(Algorithm):
 
             if not probabilities:
                 edges = [e for e in node.edges
-                         if self._can_pass(e.other_node(node))]
-                edges = [e for e in edges
                          if e not in state.edges]
+
+                edges = [e for e in edges
+                         if self._can_pass(e.other_node(node))]
 
                 if not edges:
                     return None
@@ -226,23 +231,8 @@ class ShortestPathAlgorithm(Algorithm):
                 pkind = colony.pheromone_kind('default')
 
                 def prob(edge):
-                    level_prob = edge.pheromone_level(pkind)
-
-                    if not level_prob > 0.0:
-                        return 0
-
-                    level_prob = abs((level_prob - self._min_phero) / (self._max_phero - self._min_phero))
-                    relacost = abs((relative_cost(self._g, edge) - 0.01) * level_prob)
-
-                    # print('Level %s, Cost: %s' % (level_prob, relacost))
-
-                    level_prob = level_prob ** self._alpha
-                    edge_prob = relacost ** self._beta
-
-                    # print('\tLevel %s, Cost: %s' % (level_prob, edge_prob))
-
-                    level_prob *= edge_prob
-                    return level_prob
+                    level = edge.pheromone_level(pkind)
+                    return level
 
                 probs = {e: prob(e) for e in edges}
 
@@ -261,7 +251,6 @@ class ShortestPathAlgorithm(Algorithm):
                 cdf = [probabilities[0][0]]
                 for i in range(1, len(probabilities)):
                     cdf.append(cdf[i - 1] + probabilities[i][0])
-
                 r = random.random()
                 ind = bisect.bisect(cdf, r)
                 return probabilities[ind][1]
@@ -293,7 +282,10 @@ class ShortestPathAlgorithm(Algorithm):
         else:
             colony = ant.colony
 
-            phero_inc = 1 / state.pathlen
+            phero_inc = 1 / state.solution[1]
+            # counts = self._solution_counts[state.solution]
+            # if counts:
+            #     phero_inc *= 1 / counts
 
             edge.increase_pheromone(
                 ant.create_pheromone(
@@ -328,27 +320,26 @@ class ShortestPathAlgorithm(Algorithm):
             if node_is_food(node):
                 # handle the thing when it's food
                 state.way_home = True
-                if solution not in self._new_solutions:
-                    self._new_solutions.add(solution)
+                state.solution = solution
             elif node_is_nest(node):
                 # when it's a nest and we are on our way
                 # back -> reset the ant
                 if state.way_home:
                     ant._reset()
 
-            if state.way_home:
-                self._solution_counts[solution] += 1
+            if state.solution:
+                self._solution_counts[state.solution] += 1
 
     def end_turn(self, ant):
         state = ant._state
         state.turns += 1
         turns = state.turns
 
-        rand = random.random()
-        if not state.way_home:
-            if self._best_solution:
-                if rand > 0.8 and turns > random.randrange(200, 400):
-                    ant._reset()
+        # rand = random.random()
+        # if not state.way_home:
+        #     if self._best_solution:
+        #         if rand > 0.8 and turns > random.randrange(200, 400):
+        #             ant._reset()
 
     def _is_path_accessible(self, path):
         for edge in path:
@@ -373,18 +364,14 @@ class ShortestPathAlgorithm(Algorithm):
         self._current_solutions = [x for x, i in self._solution_counts.items()
                                    if i > 0]
 
-        for solution, length in self._new_solutions:
-            if self._is_path_accessible(solution):
-                if not self._best_solution:
-                    self._best_solution = (solution, length)
-                else:
-                    best, best_len = self._best_solution
-                    if length <= best_len:
-                        self._best_solution = (solution, length)
+        if self._solution_counts:
+            self._best_solution = max(self._solution_counts.items(),
+                                      key=operator.itemgetter(1))[0]
 
-        if self._best_solution:
             if not self._is_path_accessible(self._best_solution[0]):
                 self._best_solution = None
+        else:
+            self._best_solution = None
 
         self.evaporate()
 
