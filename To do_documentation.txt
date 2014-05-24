@@ -23,11 +23,13 @@ To do for documentation
 
 	(BF) 2.1 Fokus (Animation, Multi-Purpose [kein spezifisches Problem effizient gelöst, sondern mehrere Probleme rasch lösen können]; nicht effiziente Berechnung)
 
-	(BF) 2.2 Hilfsmittel: GitHub, TargetProcess; E-Mail-Kommunikation; regelmässige Treffen
+	(BF) 2.2 Vorgehen: GitHub, TargetProcess; E-Mail-Kommunikation; regelmässige Treffen
+
+	(BF) 2.3. Projektplanung
 
 		TargetProcess, Reporte: Tabellen mit allen Tasks und geplanter/real benötigter Zeit
 
-	(FM) 2.3 Technologien
+	(FM) 2.4 Technologien
 
 
 
