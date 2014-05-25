@@ -10,7 +10,7 @@ from antz.chart import SolutionChartThread
 from antz.graph_gen import GridGraphGenerator
 from antz.gui_app import create_application, ApplicationContext
 from antz.gui_sprites import WpSprite, create_ant_sprite
-from antz.gui_util import get_color, draw_solution_line, draw_best_solution_text, ColorDialog
+from antz.gui_util import get_color, draw_solution_line, draw_best_solution_text, ColorDialog, default_font
 from antz.sim import Waypoint, WaypointEdge
 
 # general constants
@@ -166,9 +166,9 @@ def main():
 
                     pygame.draw.lines(screen, (0, 0, level), False,
                                       lines, 10)
-        #
-        # label = myfont.render('Turn %d' % solver.rounds, 5, black)
-        # screen.blit(label, (100, 20))
+
+        label = default_font().render('Round %d' % solver.rounds, 5, get_color('black'))
+        screen.blit(label, (100, 15))
 
         # ant_sprites.color = dialog.rgb
         ant_sprites.update()

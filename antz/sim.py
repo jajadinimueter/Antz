@@ -1,23 +1,16 @@
 """
 """
 
-import sys
 import threading
-import time
-import sets
 import math
 import bisect
 import random
-import itertools
 import collections
 import operator
-
-from decimal import Decimal
 
 from antz import graph
 from antz.util import *
 
-from numpy import random as nrandom
 
 DEBUG = True
 
@@ -127,8 +120,8 @@ class ShortestPathAlgorithm(Algorithm):
     through n nodes.
     """
 
-    ALPHA = 2
-    BETA = 4
+    ALPHA = 3
+    BETA = 1
     PHERO_DECREASE = 0.01
     PHERO_COST_DECREASE = False
     PHERO_COST_DECREASE_POW = 1
@@ -141,7 +134,7 @@ class ShortestPathAlgorithm(Algorithm):
     ATTRIBUTES = [
         Attribute('Alpha', 'alpha', float, default=ALPHA),
         Attribute('Beta', 'beta', float, default=BETA),
-        Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
+        # Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
         Attribute('Phero Cost Decrease', 'phero_cost_decrease', bool, default=PHERO_COST_DECREASE),
         Attribute('Phero Cost Decrease Pow', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),

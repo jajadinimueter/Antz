@@ -19,7 +19,7 @@ COLORS = {
 
 
 def default_font():
-    return pygame.font.SysFont('monospace', 12)
+    return pygame.font.SysFont('monospace', 15)
 
 
 def get_color(name):

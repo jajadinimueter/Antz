@@ -110,7 +110,7 @@ class Application(object):
     def _on_solver_change(self, field):
         value = field.value
         solver = self._get_solver(value)
-        self._solver_container.widget = self._build_solver_ui(self._ctx, solver)
+        self._solver_container.widget = self._build_solver_ui(solver)
 
     def _create_solver_select(self):
         select = gui.Select()
