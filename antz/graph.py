@@ -118,7 +118,6 @@ class Graph(object):
             self._nodes.add(node)
 
     def add_edge(self, edge):
-        nodes = self._nodes
         node_edges = self._node_edges
 
         self._edges.add(edge)
@@ -148,18 +147,17 @@ class Graph(object):
         Either pass one param: an edge or pass two params
         which will delete the edge between those nodes.
         """
-        edge = None
         if len(params) == 1:
             edge = params[0]
         elif len(params) == 2:
-            edge = node_edges[params[0]][params[1]]
+            edge = self._node_edges[params[0]][params[1]]
         else:
             raise TypeError('Provide either one or two parameters.')
         self._edges.remove(edge)
         n1, n2 = edge.node_from, edge.node_to
-        del node_edges[n1][n2]
+        del self._node_edges[n1][n2]
         if edge.bidirectional:
-            del node_edges[n2][n1]
+            del self._node_edges[n2][n1]
 
     def remove_node(self, node):
         # clean edges
@@ -173,11 +171,7 @@ class Graph(object):
     
     @property
     def nodes(self):
-        """
-        Returns an immutable set. Maybe we can add mutable
-        properties if we really need it. But I don't think so.
-        """
-        return sets.ImmutableSet(self._nodes)
+        return self._nodes
 
     @property
     def edges(self):
@@ -185,7 +179,7 @@ class Graph(object):
         Returns an immutable set. Maybe we can add mutable
         properties if we really need it. But I don't think so.
         """
-        return sets.ImmutableSet(self._edges)
+        return self._edges
 
 
 def generate_connected_graph(num_nodes):

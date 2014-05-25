@@ -63,7 +63,7 @@ if has_py2exe:
 
     setup_args.update(dict(
         data_files=installdatafiles,
-        console=['antz/gui.py']
+        console=['antz/main.py']
     ))
 
 

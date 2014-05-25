@@ -1,6 +1,7 @@
 """
 Adds some charts
 """
+import threading
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,7 +34,28 @@ def live_chart(data_gen):
 
         return line,
 
+    # noinspection PyUnusedLocal
     ani = animation.FuncAnimation(fig, run, data_gen, blit=True, interval=10,
                                   repeat=False)
 
     plt.show()
+
+
+class SolutionChartThread(threading.Thread):
+    def __init__(self, solver):
+        threading.Thread.__init__(self)
+        self._solver = solver
+
+    def run(self):
+        def data_gen():
+            t = data_gen.t
+            solver = data_gen.solver
+            while True:
+                sollen = len(solver.solutions)
+                yield t, sollen
+                t += 0.5
+
+        data_gen.t = 0
+        data_gen.solver = self._solver
+
+        live_chart(data_gen)
