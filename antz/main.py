@@ -3,14 +3,13 @@ import random
 import pygame
 import pygame.draw
 from pygame.locals import *
-from pgu import gui
 
 from antz import sim
 from antz.chart import SolutionChartThread
 from antz.graph_gen import GridGraphGenerator
 from antz.gui_app import create_application, ApplicationContext
-from antz.gui_sprites import WpSprite, create_ant_sprite
-from antz.gui_util import get_color, draw_solution_line, draw_best_solution_text, ColorDialog, default_font
+from antz.gui_sprites import AntSprite, WpSprite
+from antz.gui_util import get_color, draw_solution_line, ColorDialog, default_font
 from antz.sim import Waypoint, WaypointEdge
 
 # general constants
@@ -76,19 +75,13 @@ def main():
     nest_node, food_node, graph = graph_generator()
 
     # CREATE THE ANT COLONY
-    colony = sim.AntColony('colony-1')
-    pkind = colony.pheromone_kind('default')
+    colony = sim.AntColony()
+    algorithm = sim.ShortestPathAlgorithm()
+    runner = colony.create_runner(algorithm, graph, nest_node)
 
-    solver = sim.ShortestPathAlgorithm(graph)
-
-    ants = sim.AntCollection(solver)
-
-    # CREATE THE ANTS
-    for i in range(0, ANT_COUNT):
-        ant, sprite = create_ant_sprite(colony, nest_node, solver,
-                                        color_dialog=ant_color_dialog)
-        ant_sprites.add(sprite)
-        ants.add(ant)
+    for ant in runner.ants:
+        ant_sprites.add(AntSprite(ant, (89, 54, 99), 4, 4,
+                        color_dialog=ant_color_dialog))
 
     node_colors = {
         'nest': (get_color('green'), 255),
@@ -106,12 +99,12 @@ def main():
         n1, n2 = edge.node_from, edge.node_to
         edge_lines[edge] = [(n1.x, n1.y), (n2.x, n2.y)]
 
-    app_context = ApplicationContext(solvers, solver=solver)
+    app_context = ApplicationContext(solvers, solver=algorithm)
     application = create_application(app_context, screen_width, screen_height,
                                      gui_panel_x, gui_panel_y,
                                      gui_panel_width, gui_panel_height)
 
-    solution_chart_thread = SolutionChartThread(solver)
+    solution_chart_thread = SolutionChartThread(runner)
     solution_chart_thread.start()
 
     while done is False:
@@ -146,15 +139,16 @@ def main():
                 #                 if s.rect.collidepoint(event.pos):
                 #                     s.set_obstacle(False)
 
-        ants.move()
+        runner.move()
 
         # Clear the screen
         screen.fill(get_color('white'))
         #
         if not show_only_shortest:
-            for edge in solver.pheromone_edges:
+            for edge in runner.updated_edges:
                 lines = edge_lines[edge]
-                plevel = edge.pheromone_level(pkind)
+                plevel = edge.pheromone_level(
+                    colony.pheromone_kind('default'))
                 if plevel:
                     # print(plevel)
                     level = 255 - (plevel * 10000)
@@ -167,7 +161,7 @@ def main():
                     pygame.draw.lines(screen, (0, 0, level), False,
                                       lines, 10)
 
-        label = default_font().render('Round %d' % solver.rounds, 5, get_color('black'))
+        label = default_font().render('Round %d' % runner.rounds, 5, get_color('black'))
         screen.blit(label, (100, 15))
 
         # ant_sprites.color = dialog.rgb
@@ -175,9 +169,9 @@ def main():
 
         # Draw all the spites
         wp_sprites.draw(screen)
-        #
-        if solver.best_solution:
-            draw_solution_line(screen, solver.best_solution,
+
+        if runner.best_solution:
+            draw_solution_line(screen, runner.best_solution,
                                color=(255, 69, 0), thickness=8)
 
             # draw_best_solution_text(screen, solver.best_solution,

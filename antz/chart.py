@@ -41,20 +41,20 @@ def live_chart(data_gen):
 
 
 class SolutionChartThread(threading.Thread):
-    def __init__(self, solver):
+    def __init__(self, runner):
         threading.Thread.__init__(self)
-        self._solver = solver
+        self._runner = runner
 
     def run(self):
         def data_gen():
             t = data_gen.t
-            solver = data_gen.solver
+            runner = data_gen.runner
             while True:
-                sollen = len(solver.solutions)
+                sollen = len(runner.solutions)
                 yield t, sollen
                 t += 0.5
 
         data_gen.t = 0
-        data_gen.solver = self._solver
+        data_gen.runner = self._runner
 
         live_chart(data_gen)

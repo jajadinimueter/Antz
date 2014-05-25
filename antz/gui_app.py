@@ -117,6 +117,7 @@ class Application(object):
         label = gui.Label('Choose Solver')
         for _, solver in self._solvers.items():
             select.add(solver.NAME, solver.TYPE)
+        select.value = self._get_default_solver().TYPE
         select.connect(gui.CHANGE, self._on_solver_change, select)
         return label, select
 

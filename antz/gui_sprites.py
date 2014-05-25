@@ -15,6 +15,8 @@ class AntSprite(pygame.sprite.Sprite):
         self._ant = ant
         self._color = color
         self._color_dialog = color_dialog
+        self._x_offset = random.random() * 4
+        self._y_offset = random.random() * 4
 
         self.image = pygame.Surface([width, height])
         self.image.fill(self.get_color())
@@ -33,8 +35,8 @@ class AntSprite(pygame.sprite.Sprite):
 
         if node:
             # Move the block down one pixel
-            self.rect.y = node.y - self.rect.height / 2.0 - random.random() * 4
-            self.rect.x = node.x - self.rect.width / 2.0 - random.random() * 4
+            self.rect.y = node.y - self.rect.height / 2.0 - self._x_offset
+            self.rect.x = node.x - self.rect.width / 2.0 - self._y_offset
 
         self.image.fill(self.get_color())
 
@@ -60,10 +62,4 @@ class WpSprite(pygame.sprite.Sprite):
             else:
                 self.image.set_alpha(0)
                 self.image.fill((255, 255, 255))
-
-
-def create_ant_sprite(colony, nest, solver, color_dialog=None):
-    ant = sim.Ant(colony, nest, solver)
-    return ant, AntSprite(ant, (89, 54, 99), 4, 4,
-                          color_dialog=color_dialog)
 

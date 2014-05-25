@@ -1,18 +1,24 @@
 """
 """
 
-import threading
 import math
 import bisect
 import random
 import collections
 import operator
+from uuid import uuid4
 
-from antz import graph
+from antz import graph as antz_graph
 from antz.util import *
 
 
 DEBUG = True
+
+
+class AlgorithmContext(object):
+    def __init__(self, graph, state):
+        self.graph = graph
+        self.state = state
 
 
 class Algorithm(object):
@@ -33,48 +39,48 @@ class Algorithm(object):
 
     TYPE = None  # should be set by the implementation
 
-    def begin_round(self):
+    def begin_round(self, ctx):
         """
         Begin a new round
         """
 
-    def end_round(self):
+    def end_round(self, ctx):
         """
         Begin a new round
         """
 
-    def init_ant(self, ant):
+    def init_ant(self, ctx, ant):
         """
         Initialize the ant
         """
 
-    def choose_edge(self, ant, edges):
+    def choose_edge(self, ctx, ant, edges):
         """
         Function should choose an edge among the passed 
         edges and return it. 
         """
 
-    def visit_edge(self, ant, edge):
+    def visit_edge(self, ctx, ant, edge):
         """
         Called when the ant moves over the edge to another node.
         """
 
-    def leave_edge(self, ant, edge):
+    def leave_edge(self, ctx, ant, edge):
         """
         Called when the ant leaves an edge.
         """
 
-    def visit_node(self, ant, node):
+    def visit_node(self, ctx, ant, node):
         """
         Called when the ant visits a node.
         """
 
-    def leave_node(self, ant, node):
+    def leave_node(self, ctx, ant, node):
         """
         Called when the ant leaves a node.
         """
 
-    def end_turn(self, ant):
+    def end_turn(self, ctx, ant):
         """
         Called after one turn
         """
@@ -114,6 +120,10 @@ class Attribute(object):
         self.default = default
 
 
+class Reset(Exception):
+    pass
+
+
 class ShortestPathAlgorithm(Algorithm):
     """
     Makes the and behave in a way which leads to a shortes path solution
@@ -140,6 +150,30 @@ class ShortestPathAlgorithm(Algorithm):
         Attribute('Phero Cost Decrease Pow', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
     ]
 
+    class AlgorithmState(object):
+        def __init__(self):
+            self._solutions = []
+            self._pheromone_edges = set()
+            self._solution_counts = collections.defaultdict(int)
+            self._best_solution = None
+            self._rounds = 0
+
+        @property
+        def solutions(self):
+            return self._solutions
+
+        @property
+        def rounds(self):
+            return self._rounds
+
+        @property
+        def best_solution(self):
+            return self._best_solution
+
+        @property
+        def updated_edges(self):
+            return self._pheromone_edges
+
     class AntState(object):
         def __init__(self):
             self.edges = []
@@ -151,10 +185,20 @@ class ShortestPathAlgorithm(Algorithm):
             self.edges.append(edge)
             self.solution_length += edge.cost
 
-    def __init__(self, g):
-        self._solutions = []
-        self._pheromone_edges = set()
+    def create_state(self):
+        """
+        Returns a state object which has to be passed on every
+        method call.
+        """
+        return self.__class__.AlgorithmState()
 
+    def create_ant_state(self):
+        """
+        Returns a state object which should be attaced to an ant
+        """
+        return self.__class__.AntState()
+
+    def __init__(self):
         self.alpha = self.ALPHA
         self.beta = self.BETA
         self.phero_decrease = self.PHERO_DECREASE
@@ -162,51 +206,20 @@ class ShortestPathAlgorithm(Algorithm):
         self.phero_cost_decrease = self.PHERO_COST_DECREASE
         self.phero_cost_decrease_pow = self.PHERO_COST_DECREASE_POW
 
-        self._g = g
-        self._rounds = 0
-        self._best_solution = None
-
-    @property
-    def solutions(self):
-        return self._solutions[:]
-
-    @property
-    def best_solution(self):
-        return self._best_solution
-
-    @property
-    def g(self):
-        return self._g
-
-    @property
-    def pheromone_edges(self):
-        return self._pheromone_edges.copy()
-
-    @property
-    def rounds(self):
-        return self._rounds
-
-    def init_ant(self, ant):
-        """
-        Called by the ant
-        """
-        if not ant._state:
-            ant._state = ShortestPathAlgorithm.AntState()
-
-    def choose_edge(self, ant, node):
+    def choose_edge(self, ctx, ant, node):
         """
         Function should choose an edge among the passed 
         edges and return it. 
         """
 
-        state = ant._state
+        state = ant.state
 
         if state.solution:
             return state.edges.pop()
         else:
             edges = self._get_edges_to_consider(node, exclude_edges=state.edges)
             if edges:
-                probabilities = self._edge_probs.get(node)
+                probabilities = ctx.state._edge_probs.get(node)
                 if not probabilities:
                     pkind = self._get_default_pheromone_kind(ant)
 
@@ -224,7 +237,7 @@ class ShortestPathAlgorithm(Algorithm):
                     def calculate_probability(cost, level, min_level, max_level,
                                               min_cost, max_cost):
                         level = (level - min_level) / (max_level - min_level)
-                        cost = 1/((cost - min_cost) / (max_cost - min_cost))
+                        cost = 1 / ((cost - min_cost) / (max_cost - min_cost))
                         level **= self.alpha
                         if cost:
                             cost **= self.beta
@@ -241,13 +254,13 @@ class ShortestPathAlgorithm(Algorithm):
                     probabilities = [(edge, prob / probablity_sum)
                                      for edge, prob in probabilities]
 
-                    self._edge_probs[node] = probabilities
+                    ctx.state._edge_probs[node] = probabilities
 
                 return get_weighted_choice(probabilities)
 
-    def evaporate(self):
+    def evaporate(self, ctx):
         to_remove = set()
-        for edge in self._pheromone_edges:
+        for edge in ctx.state._pheromone_edges:
             store = edge.pheromone_store
             kinds = store.kinds
             for k in kinds:
@@ -258,20 +271,20 @@ class ShortestPathAlgorithm(Algorithm):
                 store.set(k, (1.0 - self.phero_decrease) * level)
 
         for edge in to_remove:
-            self._pheromone_edges.remove(edge)
+            ctx.state._pheromone_edges.remove(edge)
 
-    def visit_edge(self, ant, edge):
+    def visit_edge(self, ctx, ant, edge):
         """
         Just drop some pheromone on the edge
         """
 
-        state = ant._state
+        state = ant.state
 
         if not state.solution:
             state.add_edge(edge)
         else:
             min_cost = 0
-            max_cost = self.g.max_cost
+            max_cost = ctx.graph.max_cost
 
             cost_multiplicator = 1
             if self.phero_cost_decrease:
@@ -284,50 +297,48 @@ class ShortestPathAlgorithm(Algorithm):
                 ant.create_pheromone(
                     'default', phero_inc))
 
-            self._pheromone_edges.add(edge)
+            ctx.state._pheromone_edges.add(edge)
 
-    def visit_node(self, ant, node):
+    def visit_node(self, ctx, ant, node):
         """
         Called when a node is visited. We mainly check wether we
         hit a food or a nest node and react accordingly.
         """
 
-        state = ant._state
-
         if not self._can_pass(node):
             # if the ant hits an obstacle, kill it
-            ant.reset()
+            raise Reset()
         else:
-            solution = (tuple(state.edges), state.solution_length)
+            solution = (tuple(ant.state.edges), ant.state.solution_length)
 
             if node_is_food(node):
                 # the ant found a solution
-                state.solution = solution
+                ant.state.solution = solution
             elif node_is_nest(node):
                 # when it's a nest and we are on our way
                 # back -> reset the ant
-                if state.solution:
-                    ant.reset()
+                if ant.state.solution:
+                    raise Reset()
 
             # increase the solution count to check for most accessed
             # solutions at the end of the round
-            if state.solution:
-                self._solution_counts[state.solution] += 1
+            if ant.state.solution:
+                ctx.state._solution_counts[ant.state.solution] += 1
 
-    def end_turn(self, ant):
+    def end_turn(self, ctx, ant):
         """
         Check whether the ant is hopelessly running around and
         not finding a solution. Let it die with a certain probability.
         """
 
-        state = ant._state
+        state = ant.state
         state.turns += 1
 
         rand = random.random()
         if not state.solution:
-            if self._best_solution:
+            if ctx.state._best_solution:
                 if rand < 0.2 and state.turns > random.randrange(200, 400):
-                    ant.reset()
+                    raise Reset()
 
     def _is_path_accessible(self, path):
         """
@@ -340,33 +351,33 @@ class ShortestPathAlgorithm(Algorithm):
                 return False
         return True
 
-    def begin_round(self):
+    def begin_round(self, ctx):
         """
         Initialize some values which we create by round. This is the
         probability cache and the counts for active solutions.
         """
-        self._edge_probs = {}
-        self._solution_counts = collections.defaultdict(int)
+        ctx.state._edge_probs = {}
+        ctx.state._solution_counts = collections.defaultdict(int)
 
-    def end_round(self):
+    def end_round(self, ctx):
         """
         Determine the active, the best and the mostly used solutions.
 
         Evaporate the pheromone trails.
         """
-        self._rounds += 1
+        ctx.state._rounds += 1
 
-        if self._solution_counts:
-            self._solutions = sorted(self._solution_counts.keys(),
-                                     key=lambda item: item[1])
-            self._best_solution = self._solutions[0]
-            self._most_solution = max(self._solution_counts.items(),
-                                      key=operator.itemgetter(1))[0]
+        if ctx.state._solution_counts:
+            ctx.state._solutions = sorted(ctx.state._solution_counts.keys(),
+                                          key=lambda item: item[1])
+            ctx.state._best_solution = ctx.state._solutions[0]
+            ctx.state._most_solution = max(ctx.state._solution_counts.items(),
+                                           key=operator.itemgetter(1))[0]
         else:
-            self._best_solution = None
+            ctx.state._best_solution = None
 
         # evaporate pheromones
-        self.evaporate()
+        self.evaporate(ctx)
 
     def _can_pass(self, node):
         """
@@ -397,26 +408,7 @@ class ShortestPathAlgorithm(Algorithm):
         """
         Returns the default kind of pheromone of the ants colony
         """
-        colony = ant.colony
-        return colony.pheromone_kind('default')
-
-
-class AntColony(object):
-    """
-    Represents an ant colony. Will be passed to the ant.
-
-    By now only holds colony specific pheromone counts. This is ment
-    to be able to have multiple colonies on the field simultaniously.
-    """
-
-    def __init__(self, name):
-        # make a set out of the ants
-        self._pheromone_kinds = {
-            'default': PheromoneKind(name='%s:%s' % (name, 'default'))
-        }
-
-    def pheromone_kind(self, kind):
-        return self._pheromone_kinds[kind]
+        return ant.pheromones.pheromone_kind('default')
 
 
 class Ant(object):
@@ -426,28 +418,20 @@ class Ant(object):
     Ant ant is driven by the algorithm passed to it.
     """
 
-    def __init__(self, colony, initial_node, algorithm):
+    def __init__(self, initial_node, pheromones, state):
         """
         The ant is in fact a small wrapper around :cls:`.AntBehavior`.
 
         The behavior does the decisions and interactions with the environment.
         """
-        if initial_node is None:
-            raise ValueError('`initial_node` cannot be None')
 
-        # already setup the path with the 
-        # initial node as its only element
-        self._initial_node = initial_node
+        self._pheromones = pheromones
         self._current_node = initial_node
         self._current_edge = None
-        self._algorithm = algorithm
-        self._colony = colony
         self._path_length = 0
 
         # store your state here
-        self._state = None
-
-        self._algorithm.init_ant(self)
+        self._state = state
 
     @property
     def state(self):
@@ -457,14 +441,18 @@ class Ant(object):
     def state(self, state):
         self._state = state
 
-    def reset(self):
+    @property
+    def pheromones(self):
+        return self._pheromones
+
+    def reset(self, initial_node, state=None):
         """
         Resets the ant to initial state so it can be reused.
         """
-        self._state = None
-        self._current_node = self._initial_node
+
+        self._state = state
+        self._current_node = initial_node
         self._current_edge = None
-        self._algorithm.init_ant(self)
 
     def create_pheromone(self, kind, amount):
         """
@@ -472,13 +460,8 @@ class Ant(object):
 
         Pass 'default' for the default kind.
         """
-        colony = self._colony
-        kind = colony.pheromone_kind(kind)
+        kind = self.pheromones.pheromone_kind(kind)
         return Pheromone(kind, amount)
-
-    @property
-    def colony(self):
-        return self._colony
 
     @property
     def current_edge(self):
@@ -494,14 +477,14 @@ class Ant(object):
         """
         return self._current_node
 
-    def move(self):
+    def move(self, algorithm, ctx):
         """
         Move to the next node. This is entirely driven by algorithm.
         """
 
         current_node = self.current_node
 
-        edge = self._algorithm.choose_edge(self, current_node)
+        edge = algorithm.choose_edge(ctx, self, current_node)
 
         if edge:
             self._current_edge = edge
@@ -512,21 +495,21 @@ class Ant(object):
             # if the edge is unidirectional
             if next_node:
                 if self._current_edge:
-                    self._algorithm.leave_edge(
-                        self, self._current_edge)
+                    algorithm.leave_edge(
+                        ctx, self, self._current_edge)
 
                 self._current_node = next_node
 
-                self._algorithm.leave_node(self, current_node)
-                self._algorithm.visit_edge(self, edge)
-                self._algorithm.visit_node(self, next_node)
+                algorithm.leave_node(ctx, self, current_node)
+                algorithm.visit_edge(ctx, self, edge)
+                algorithm.visit_node(ctx, self, next_node)
             else:
                 # reset the ant
-                self.reset()
+                raise Reset()
 
-            self._algorithm.end_turn(self)
+            algorithm.end_turn(ctx, self)
         else:
-            self.reset()
+            raise Reset()
 
 
 def node_is_food(node):
@@ -549,9 +532,9 @@ def node_is_obstacle(node):
     return node.obstacle
 
 
-class Waypoint(graph.Node):
+class Waypoint(antz_graph.Node):
     def __init__(self, x=None, y=None, name=None, node_type='waypoint'):
-        graph.Node.__init__(self, name=name)
+        antz_graph.Node.__init__(self, name=name)
         self._x = x
         self._y = y
         self._node_type = node_type
@@ -622,32 +605,17 @@ class Waypoint(graph.Node):
     def __repr__(self):
         return ('%s(TYPE=%s, name=%s)'
                 % (self.__class__.__name__,
-                   self.TYPE, self._name))
+                   self.node_type, self._name))
 
 
-class Food(Waypoint):
-    """
-    Where the ants like to go to. When food is 
-    reached, ants go back to the nest.
-    """
-    TYPE = 'food'
-
-
-class Nest(Waypoint):
-    """
-    Where the ants have to spawn
-    """
-    TYPE = 'nest'
-
-
-class WaypointEdge(graph.Edge):
+class WaypointEdge(antz_graph.Edge):
     """
     Our edge implementation with pheromones
     """
 
     def __init__(self, node_from, node_to, pheromone_store=None,
                  evaporation_strategy=None, **kwargs):
-        graph.Edge.__init__(self, node_from, node_to, **kwargs)
+        antz_graph.Edge.__init__(self, node_from, node_to, **kwargs)
         self._ps = pheromone_store or PheromoneStore(
             evaporation_strategy=evaporation_strategy)
 
@@ -705,8 +673,7 @@ class PheromoneStore(object):
         self._set(k, self._get(k) + pheromone.amount)
 
     def _decrease(self, kind, amount):
-        self._set(kind, self._get(
-            pheromone.kind) - amount)
+        self._set(kind, self._get(kind) - amount)
 
     def _get(self, kind):
         level = self._level.get(kind, 0.0)
@@ -757,23 +724,90 @@ class PheromoneKind(object):
         return self._name
 
 
-class AntCollection(set):
-    def __init__(self, algorithm, *items):
-        set.__init__(self, *items)
-        self._algorithm = algorithm
-        self._lock = threading.RLock()
+class Pheromones(object):
+    def __init__(self, name=None):
+        name = name or str(uuid4())
+        # make a set out of the ants
+        self._pheromone_kinds = {
+            'default': PheromoneKind(name='%s:%s' % (name, 'default'))
+        }
 
-    def reset(self):
-        for ant in self:
-            ant.reset()
+    def pheromone_kind(self, kind):
+        return self._pheromone_kinds[kind]
+
+
+def _reset_ant(ant, algorithm, nest_node):
+    ant.reset(nest_node, algorithm.create_ant_state())
+    return ant
+
+
+class Runner(object):
+    """
+    Returned by AntColony.create_runner
+    """
+
+    def __init__(self, ants, nest_node, algorithm, graph):
+        self._nest_node = nest_node
+        self._state = algorithm.create_state()
+        self._algorithm = algorithm
+        self._ctx = AlgorithmContext(graph, self._state)
+        self._ants = ants
+
+    def _reset_ant(self, ant):
+        """
+        Resets an ant in one run. To reset the whole run,
+        you just have to create a new runner
+        """
+        _reset_ant(ant, self._algorithm, self._nest_node)
 
     @property
-    def lock(self):
-        return self._lock
+    def ants(self):
+        return self._ants
+
+    @property
+    def solutions(self):
+        return self._state.solutions
+
+    @property
+    def rounds(self):
+        return self._state.rounds
+
+    @property
+    def best_solution(self):
+        return self._state.best_solution
+
+    @property
+    def updated_edges(self):
+        return self._state.updated_edges
 
     def move(self):
-        with self._lock:
-            self._algorithm.begin_round()
-            for ant in self:
-                ant.move()
-            self._algorithm.end_round()
+        """
+        Move all ants
+        """
+        self._algorithm.begin_round(self._ctx)
+        for ant in self._ants:
+            try:
+                ant.move(self._algorithm,
+                         self._ctx)
+            except Reset:
+                self._reset_ant(ant)
+        self._algorithm.end_round(self._ctx)
+
+
+class AntColony(object):
+    def __init__(self, num_ants=1000):
+        self._num_ants = num_ants
+        self._pheromones = Pheromones()
+
+    @property
+    def pheromones(self):
+        return self._pheromones
+
+    def pheromone_kind(self, name):
+        return self._pheromones.pheromone_kind(name)
+
+    def create_runner(self, algorithm, graph, nest_node, num_ants=1000):
+        ants = set([Ant(nest_node, self._pheromones, algorithm.create_ant_state())
+                    for _ in range(0, num_ants or self._num_ants)])
+        return Runner(ants, nest_node, algorithm, graph)
+
