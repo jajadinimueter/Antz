@@ -130,8 +130,8 @@ class ShortestPathAlgorithm(Algorithm):
     through n nodes.
     """
 
-    ALPHA = 3
-    BETA = 1
+    ALPHA = 4
+    BETA = 2
     PHERO_DECREASE = 0.01
     PHERO_COST_DECREASE = False
     PHERO_COST_DECREASE_POW = 1
@@ -292,6 +292,9 @@ class ShortestPathAlgorithm(Algorithm):
                 cost_multiplicator **= self.phero_cost_decrease_pow
 
             phero_inc = 1 / (state.solution[1] * cost_multiplicator)
+            # existing_multiplicator = (1 - edge.pheromone_level(ant.pheromone_kind('default')))
+            # existing_multiplicator **= 4
+            # phero_inc *= existing_multiplicator
 
             edge.increase_pheromone(
                 ant.create_pheromone(
@@ -453,6 +456,9 @@ class Ant(object):
         self._state = state
         self._current_node = initial_node
         self._current_edge = None
+
+    def pheromone_kind(self, kind):
+        return self.pheromones.pheromone_kind(kind)
 
     def create_pheromone(self, kind, amount):
         """
