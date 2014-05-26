@@ -129,9 +129,27 @@ class Application(object):
         select.connect(gui.CHANGE, self._on_solver_change, select)
         return label, select
 
-    def _call_listeners(self, event):
+    def _on_show_grid_change(self, field):
+        self._call_listeners('show_grid', value=field.value)
+
+    def _create_show_grid_checkbox(self):
+        field = gui.Switch()
+        label = gui.Label('Show grid?')
+        field.connect(gui.CHANGE, self._on_show_grid_change, field)
+        return label, field
+
+    def _on_show_grid_lines_change(self, field):
+        self._call_listeners('show_grid_lines', value=field.value)
+
+    def _create_show_grid_lines_checkbox(self):
+        field = gui.Switch()
+        label = gui.Label('Show grid lines?')
+        field.connect(gui.CHANGE, self._on_show_grid_lines_change, field)
+        return label, field
+
+    def _call_listeners(self, event, *args, **kwargs):
         for listener in self._event_listeners.get(event, []):
-            listener(event, self, self._ctx)
+            listener(event, self, self._ctx, *args, **kwargs)
 
     def _build_buttons(self):
         self._start_button = gui.Button('Start')
@@ -152,6 +170,8 @@ class Application(object):
 
     def _build_ui(self):
         self._solver_label, self._solver_field = self._create_solver_select()
+        self._show_grid_label, self._show_grid_field = self._create_show_grid_checkbox()
+        self._show_grid_lines_label, self._show_grid_lines_field = self._create_show_grid_lines_checkbox()
 
         self._solver_ui = self._build_solver_ui(self._get_default_solver())
         self._solver_container = gui.ScrollArea(self._solver_ui)
@@ -162,6 +182,14 @@ class Application(object):
         self._main_container.tr()
         self._main_container.td(self._solver_label, valign=-1, align=-1)
         self._main_container.td(self._solver_field, valign=-1, align=-1)
+
+        self._main_container.tr()
+        self._main_container.td(self._show_grid_label, valign=-1, align=-1)
+        self._main_container.td(self._show_grid_field, valign=-1, align=-1)
+
+        self._main_container.tr()
+        self._main_container.td(self._show_grid_lines_label, valign=-1, align=-1)
+        self._main_container.td(self._show_grid_lines_field, valign=-1, align=-1)
 
         self._main_container.tr()
         self._main_container.td(self._solver_container, colspan=2,

@@ -33,10 +33,10 @@ def edge_factory(name):
         raise ValueError('Edge type %s does not exist' % name)
 
 
-node_colors = {
-    'nest': (get_color('green'), 255),
-    'food': (get_color('red'), 255),
-    'waypoint': (get_color('white'), 0)
+node_config = {
+    'nest': (get_color('green'), 255, 10, 10),
+    'food': (get_color('red'), 255, 10, 10),
+    'waypoint': (get_color('black'), 0, 2, 2)
 }
 
 
@@ -66,11 +66,12 @@ def restart_button_pressed(e, app, app_ctx):
 
         # create the waypoint, nest, food sprites
         for node in app_ctx.graph.nodes:
+            col, alpha, width, height = node_config.get(node.node_type)
             app_ctx.wp_sprites.add(
-                WpSprite(node, node_colors.get(node.node_type), 10, 10))
+                WpSprite(app_ctx, node, (col, alpha), width, height))
 
         for ant in app_ctx.runner.ants:
-            app_ctx.ant_sprites.add(AntSprite(ant, (89, 54, 99), 4, 4,
+            app_ctx.ant_sprites.add(AntSprite(app_ctx, ant, (89, 54, 99), 4, 4,
                                               color_dialog=app_ctx.ant_color_dialog))
 
         app_ctx.running = True
@@ -98,6 +99,16 @@ def reset_button_pressed(e, app, app_ctx):
         app_ctx.running = True
 
 
+# noinspection PyUnusedLocal
+def on_show_grid_change(e, app, app_ctx, value):
+    app_ctx.show_grid = value
+
+
+# noinspection PyUnusedLocal
+def on_show_grid_lines_change(e, app, app_ctx, value):
+    app_ctx.show_grid_lines = value
+
+
 class ApplicationContext(object):
     """
     Holds the whole state necessary for running the simulation
@@ -106,6 +117,9 @@ class ApplicationContext(object):
     def __init__(self, solvers):
         self.running = False
         self.paused = True
+
+        self.show_grid = False
+        self.show_grid_lines = False
 
         self.graph = None
         self.colony = None
@@ -190,6 +204,8 @@ def main():
                                      ctx.gui_panel_x, ctx.gui_panel_y,
                                      ctx.gui_panel_width, ctx.gui_panel_height)
 
+    application.listen_for('show_grid_lines', on_show_grid_lines_change)
+    application.listen_for('show_grid', on_show_grid_change)
     application.listen_for('restart', restart_button_pressed)
     application.listen_for('reset', reset_button_pressed)
     application.listen_for('start', start_button_pressed)
@@ -248,9 +264,7 @@ def main():
                     plevel = edge.pheromone_level(
                         ctx.colony.pheromone_kind('default'))
                     if plevel:
-                        # print(plevel)
                         level = 255 - (plevel * 10000)
-                        # print('Level: %s, Plevel: %s' % (level, plevel))
                         if level < MIN_BLUE:
                             level = MIN_BLUE
                         if level > 255:
@@ -259,11 +273,17 @@ def main():
                         pygame.draw.lines(screen, (0, 0, level), False,
                                           lines, 10)
 
+            if ctx.show_grid_lines:
+                for edge in ctx.graph.edges:
+                    lines = ctx.edge_lines[edge]
+                    pygame.draw.lines(screen, (0, 0, 0), False, lines, 1)
+
             label = default_font().render('Round %d' % ctx.runner.rounds, 5, get_color('black'))
             screen.blit(label, (100, 15))
 
             # ant_sprites.color = dialog.rgb
             ctx.ant_sprites.update()
+            ctx.wp_sprites.update()
 
             # Draw all the spites
             ctx.wp_sprites.draw(screen)

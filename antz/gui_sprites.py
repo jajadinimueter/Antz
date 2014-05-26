@@ -9,9 +9,10 @@ from antz.gui_util import get_color
 
 
 class AntSprite(pygame.sprite.Sprite):
-    def __init__(self, ant, color, width, height, color_dialog=None):
+    def __init__(self, app_ctx, ant, color, width, height, color_dialog=None):
         pygame.sprite.Sprite.__init__(self)
 
+        self._app_ctx = app_ctx
         self._ant = ant
         self._color = color
         self._color_dialog = color_dialog
@@ -42,9 +43,10 @@ class AntSprite(pygame.sprite.Sprite):
 
 
 class WpSprite(pygame.sprite.Sprite):
-    def __init__(self, node, color, width, height):
+    def __init__(self, app_ctx, node, color, width, height):
         pygame.sprite.Sprite.__init__(self)
         self._node = node
+        self._app_ctx = app_ctx
         self._color, self._alpha = color
         self.image = pygame.Surface([width, height])
         self.image.set_alpha(self._alpha)
@@ -63,3 +65,8 @@ class WpSprite(pygame.sprite.Sprite):
                 self.image.set_alpha(0)
                 self.image.fill((255, 255, 255))
 
+    def update(self):
+        if self._app_ctx.show_grid:
+            self.image.set_alpha(255)
+        else:
+            self.image.set_alpha(0)
