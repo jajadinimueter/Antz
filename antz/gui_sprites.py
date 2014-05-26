@@ -48,6 +48,21 @@ class WpSprite(pygame.sprite.Sprite):
         self._node = node
         self._app_ctx = app_ctx
         self._color, self._alpha = color
+
+        self._resize = self._node.obstacle
+
+        self._orig_color, self._orig_alpha = self._color, self._alpha
+        self._width = self._orig_width = width
+        self._height = self._orig_height = height
+
+        self._draw_surface(self._width, self._height)
+
+    def set_obstacle(self, obstacle):
+        if not self._node.nest and not self._node.food:
+            self._node.obstacle = obstacle
+            self._resize = not self._resize
+
+    def _draw_surface(self, width, height):
         self.image = pygame.Surface([width, height])
         self.image.set_alpha(self._alpha)
         self.image.fill(self._color)
@@ -55,18 +70,23 @@ class WpSprite(pygame.sprite.Sprite):
         self.rect.y = self._node.y - self.rect.height / 2.0
         self.rect.x = self._node.x - self.rect.width / 2.0
 
-    def set_obstacle(self, obstacle):
-        if not self._node.nest and not self._node.food:
-            self._node.obstacle = obstacle
-            if obstacle:
-                self.image.fill(get_color('green'))
-                self.image.set_alpha(255)
-            else:
-                self.image.set_alpha(0)
-                self.image.fill((255, 255, 255))
-
     def update(self):
-        if self._app_ctx.show_grid:
-            self.image.set_alpha(255)
+        if not self._node.obstacle:
+            self._width = self._orig_width
+            self._height = self._orig_height
+            if self._app_ctx.show_grid:
+                self._alpha = 255
+            else:
+                self._alpha = self._orig_alpha
+                self._color = self._orig_color
         else:
-            self.image.set_alpha(0)
+            self._alpha = 255
+            self._color = get_color('green')
+            self._width = 8
+            self._height = 8
+
+        if self._resize:
+            self._draw_surface(self._width, self._height)
+
+        self.image.set_alpha(self._alpha)
+        self.image.fill(self._color)

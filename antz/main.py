@@ -157,6 +157,33 @@ class ApplicationContext(object):
         self.algorithm = None
 
 
+def copy_rect(rect):
+    surface = pygame.Surface([rect.width + 10, rect.height + 10])
+    return surface.get_rect()
+
+
+def draw_obstacle(event, ctx):
+    if ctx.running:
+        r_w, r_h = 20, 20
+        collidesurv = pygame.Surface([r_w, r_h])
+        colliderect = collidesurv.get_rect()
+        colliderect.x, colliderect.y = event.pos
+        colliderect.x -= r_w / 2
+        colliderect.y -= r_h / 2
+
+        if ctx.paint:
+            # replace nodes with obstacle nodes
+            for s in ctx.wp_sprites.sprites():
+                if s.rect.colliderect(colliderect):
+                    s.set_obstacle(True)
+
+        if ctx.paint_erase:
+            # replace nodes with obstacle nodes
+            for s in ctx.wp_sprites.sprites():
+                if s.rect.colliderect(colliderect):
+                    s.set_obstacle(False)
+
+
 def main():
     """
     Implements the mainloop
@@ -228,27 +255,19 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
                 if ctx.running:
                     ctx.paint = True
+                    draw_obstacle(event, ctx)
             elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:
                 if ctx.running:
                     ctx.paint = False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
                 if ctx.running:
                     ctx.paint_erase = True
+                    draw_obstacle(event, ctx)
             elif event.type == pygame.MOUSEBUTTONUP and event.button == RIGHT:
                 if ctx.running:
                     ctx.paint_erase = False
             elif event.type == pygame.MOUSEMOTION:
-                if ctx.running:
-                    if ctx.paint:
-                        # replace nodes with obstacle nodes
-                        for s in ctx.wp_sprites.sprites():
-                            if s.rect.collidepoint(event.pos):
-                                s.set_obstacle(True)
-                    if ctx.paint_erase:
-                        # replace nodes with obstacle nodes
-                        for s in ctx.wp_sprites.sprites():
-                            if s.rect.collidepoint(event.pos):
-                                s.set_obstacle(False)
+                draw_obstacle(event, ctx)
 
         screen.fill(get_color('white'))
 
