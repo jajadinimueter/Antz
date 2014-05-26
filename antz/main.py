@@ -51,6 +51,11 @@ def stop_button_pressed(e, app, app_ctx):
     app_ctx.paused = True
 
 
+def create_ant_sprite(ant, app_ctx):
+    return AntSprite(app_ctx, ant, (89, 54, 99), 4, 4,
+                     color_dialog=app_ctx.ant_color_dialog)
+
+
 # noinspection PyUnusedLocal
 def restart_button_pressed(e, app, app_ctx):
     if app_ctx.algorithm:
@@ -62,7 +67,8 @@ def restart_button_pressed(e, app, app_ctx):
         # create and set the runner
         app_ctx.runner = app_ctx.colony.create_runner(app_ctx.algorithm,
                                                       app_ctx.graph,
-                                                      app_ctx.nest_node)
+                                                      app_ctx.nest_node,
+                                                      num_ants=app_ctx.num_ants)
 
         # create the waypoint, nest, food sprites
         for node in app_ctx.graph.nodes:
@@ -71,8 +77,7 @@ def restart_button_pressed(e, app, app_ctx):
                 WpSprite(app_ctx, node, (col, alpha), width, height))
 
         for ant in app_ctx.runner.ants:
-            app_ctx.ant_sprites.add(AntSprite(app_ctx, ant, (89, 54, 99), 4, 4,
-                                              color_dialog=app_ctx.ant_color_dialog))
+            app_ctx.ant_sprites.add(create_ant_sprite(ant, app_ctx))
 
         app_ctx.running = True
 
@@ -109,6 +114,29 @@ def on_show_grid_lines_change(e, app, app_ctx, value):
     app_ctx.show_grid_lines = value
 
 
+# noinspection PyUnusedLocal,PyBroadException
+def on_num_ants_change(e, app, app_ctx, value):
+    try:
+        num_ants = int(value)
+        app_ctx.num_ants = num_ants
+    except:
+        pass
+    else:
+        if app_ctx.ant_sprites and app_ctx.runner:
+            if app_ctx.num_ants:
+                lants = len(app_ctx.ant_sprites)
+                if app_ctx.num_ants > lants:
+                    diff = app_ctx.num_ants - lants
+                    for _ in range(0, diff):
+                        ant = app_ctx.runner.create_ant()
+                        app_ctx.ant_sprites.add(create_ant_sprite(ant, app_ctx))
+                elif app_ctx.num_ants < lants:
+                    diff = lants - app_ctx.num_ants
+                    for sprite in app_ctx.ant_sprites.sprites()[0:diff]:
+                        app_ctx.runner.remove_ant(sprite.ant)
+                        app_ctx.ant_sprites.remove(sprite)
+
+
 class ApplicationContext(object):
     """
     Holds the whole state necessary for running the simulation
@@ -117,6 +145,8 @@ class ApplicationContext(object):
     def __init__(self, solvers):
         self.running = False
         self.paused = True
+
+        self.num_ants = 1000
 
         self.show_grid = False
         self.show_grid_lines = False
@@ -231,6 +261,7 @@ def main():
                                      ctx.gui_panel_x, ctx.gui_panel_y,
                                      ctx.gui_panel_width, ctx.gui_panel_height)
 
+    application.listen_for('num_ants', on_num_ants_change)
     application.listen_for('show_grid_lines', on_show_grid_lines_change)
     application.listen_for('show_grid', on_show_grid_change)
     application.listen_for('restart', restart_button_pressed)

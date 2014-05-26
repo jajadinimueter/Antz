@@ -745,12 +745,16 @@ class Runner(object):
     Returned by AntColony.create_runner
     """
 
-    def __init__(self, ants, nest_node, algorithm, graph):
+    def __init__(self, ant_factory, nest_node, algorithm, graph,
+                 num_ants=1000):
         self._nest_node = nest_node
         self._state = algorithm.create_state()
         self._algorithm = algorithm
         self._ctx = AlgorithmContext(graph, self._state)
-        self._ants = ants
+        self._ant_factory = ant_factory
+        self._num_ants = num_ants
+        self._ants = set([self._ant_factory()
+                          for _ in range(0, self._num_ants)])
 
     def _reset_ant(self, ant):
         """
@@ -778,6 +782,14 @@ class Runner(object):
     @property
     def updated_edges(self):
         return self._state.updated_edges
+
+    def create_ant(self):
+        ant = self._ant_factory()
+        self._ants.add(ant)
+        return ant
+
+    def remove_ant(self, ant):
+        self._ants.remove(ant)
 
     def move(self):
         """
@@ -808,7 +820,10 @@ class AntColony(object):
     def create_runner(self, algorithm, graph, nest_node, num_ants=1000):
         for edge in graph.edges:
             edge.pheromone_store.clear()
-        ants = set([Ant(nest_node, self._pheromones, algorithm.create_ant_state())
-                    for _ in range(0, num_ants or self._num_ants)])
-        return Runner(ants, nest_node, algorithm, graph)
+
+        def ant_factory():
+            return Ant(nest_node, self._pheromones, algorithm.create_ant_state())
+
+        return Runner(ant_factory, nest_node, algorithm, graph,
+                      num_ants=num_ants)
 

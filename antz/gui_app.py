@@ -138,6 +138,15 @@ class Application(object):
         field.connect(gui.CHANGE, self._on_show_grid_change, field)
         return label, field
 
+    def _on_num_ants_change(self, field):
+        self._call_listeners('num_ants', value=field.value)
+
+    def _create_num_ants_field(self):
+        field = gui.Input(value=1000)
+        label = gui.Label('Number of Ants')
+        field.connect(gui.CHANGE, self._on_num_ants_change, field)
+        return label, field
+
     def _on_show_grid_lines_change(self, field):
         self._call_listeners('show_grid_lines', value=field.value)
 
@@ -172,6 +181,7 @@ class Application(object):
         self._solver_label, self._solver_field = self._create_solver_select()
         self._show_grid_label, self._show_grid_field = self._create_show_grid_checkbox()
         self._show_grid_lines_label, self._show_grid_lines_field = self._create_show_grid_lines_checkbox()
+        self._num_ants_label, self._num_ants_field = self._create_num_ants_field()
 
         self._solver_ui = self._build_solver_ui(self._get_default_solver())
         self._solver_container = gui.ScrollArea(self._solver_ui)
@@ -182,6 +192,10 @@ class Application(object):
         self._main_container.tr()
         self._main_container.td(self._solver_label, valign=-1, align=-1)
         self._main_container.td(self._solver_field, valign=-1, align=-1)
+
+        self._main_container.tr()
+        self._main_container.td(self._num_ants_label, valign=-1, align=-1)
+        self._main_container.td(self._num_ants_field, valign=-1, align=-1)
 
         self._main_container.tr()
         self._main_container.td(self._show_grid_label, valign=-1, align=-1)

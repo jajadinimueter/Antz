@@ -25,6 +25,10 @@ class AntSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.update()
 
+    @property
+    def ant(self):
+        return self._ant
+
     def get_color(self):
         if self._color_dialog:
             return self._color_dialog.rgb
@@ -60,7 +64,7 @@ class WpSprite(pygame.sprite.Sprite):
     def set_obstacle(self, obstacle):
         if not self._node.nest and not self._node.food:
             self._node.obstacle = obstacle
-            self._resize = not self._resize
+            self._resize = True
 
     def _draw_surface(self, width, height):
         self.image = pygame.Surface([width, height])
@@ -74,19 +78,20 @@ class WpSprite(pygame.sprite.Sprite):
         if not self._node.obstacle:
             self._width = self._orig_width
             self._height = self._orig_height
+            self._color = self._orig_color
+            self._alpha = self._orig_alpha
+
             if self._app_ctx.show_grid:
                 self._alpha = 255
-            else:
-                self._alpha = self._orig_alpha
-                self._color = self._orig_color
         else:
             self._alpha = 255
             self._color = get_color('green')
-            self._width = 8
-            self._height = 8
+            self._width = 9
+            self._height = 9
 
         if self._resize:
             self._draw_surface(self._width, self._height)
+            self._resize = False
 
         self.image.set_alpha(self._alpha)
         self.image.fill(self._color)
