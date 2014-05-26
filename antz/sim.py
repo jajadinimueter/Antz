@@ -405,8 +405,12 @@ class ShortestPathAlgorithm(Algorithm):
                 if best_solution[1] < ctx.state._best_solution[1]:
                     ctx.state._best_solution = best_solution
 
-            if self._is_path_accessible(best_solution[0]):
-                ctx.state._local_best_solution = best_solution
+            ctx.state._local_best_solution = best_solution
+
+        if ctx.state._local_best_solution:
+            path, _ = ctx.state._local_best_solution
+            if not self._is_path_accessible(path):
+                ctx.state._local_best_solution = None
 
         if ctx.state._best_solution:
             path, _ = ctx.state._best_solution

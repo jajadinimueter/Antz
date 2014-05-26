@@ -40,6 +40,11 @@ node_config = {
 }
 
 
+def create_ant_sprite(ant, app_ctx):
+    return AntSprite(app_ctx, ant, (89, 54, 99), 4, 4,
+                     color_dialog=app_ctx.ant_color_dialog)
+
+
 def start_button_pressed(e, app, app_ctx):
     if not app_ctx.running:
         reset_button_pressed(e, app, app_ctx)
@@ -51,14 +56,9 @@ def stop_button_pressed(e, app, app_ctx):
     app_ctx.paused = True
 
 
-def create_ant_sprite(ant, app_ctx):
-    return AntSprite(app_ctx, ant, (89, 54, 99), 4, 4,
-                     color_dialog=app_ctx.ant_color_dialog)
-
-
 # noinspection PyUnusedLocal
 def restart_button_pressed(e, app, app_ctx):
-    if app_ctx.algorithm:
+    if app_ctx.algorithm and app_ctx.graph:
         app_ctx.running = False
 
         app_ctx.ant_sprites = pygame.sprite.Group()
@@ -153,6 +153,7 @@ class ApplicationContext(object):
 
         self.graph = None
         self.colony = None
+        self.nest_node = None
         self.solvers = solvers
 
         self.edge_lines = {}
