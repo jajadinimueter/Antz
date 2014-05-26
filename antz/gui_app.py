@@ -10,7 +10,7 @@ from pgu import gui
 def attr_changer(attr):
     ctx, solver_cls, prop, field, converter = attr
 
-    solver = ctx.solver
+    solver = ctx.algorithm
 
     if solver:
         if not hasattr(solver, prop):
@@ -137,13 +137,16 @@ class Application(object):
         self._start_button = gui.Button('Start')
         self._stop_button = gui.Button('Stop')
         self._reset_button = gui.Button('Reset')
+        self._restart_button = gui.Button('Restart')
 
         self._start_button.connect(gui.CLICK, self._call_listeners, 'start')
         self._stop_button.connect(gui.CLICK, self._call_listeners, 'stop')
         self._reset_button.connect(gui.CLICK, self._call_listeners, 'reset')
+        self._restart_button.connect(gui.CLICK, self._call_listeners, 'restart')
 
         self._button_panel = gui.Document()
         self._button_panel.add(self._start_button)
+        self._button_panel.add(self._restart_button)
         self._button_panel.add(self._stop_button)
         self._button_panel.add(self._reset_button)
 
@@ -181,10 +184,3 @@ def create_application(ctx, screen_width, screen_height,
 
     return Application(ctx, screen_width, screen_height,
                        x, y, width, height)
-
-
-class ApplicationContext(object):
-    def __init__(self, solvers, solver=None):
-        self.solver = solver
-        self.solvers = solvers
-        self.runner = None

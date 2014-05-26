@@ -33,14 +33,47 @@ def edge_factory(name):
         raise ValueError('Edge type %s does not exist' % name)
 
 
+node_colors = {
+    'nest': (get_color('green'), 255),
+    'food': (get_color('red'), 255),
+    'waypoint': (get_color('white'), 0)
+}
+
+
 def start_button_pressed(e, app, app_ctx):
     if not app_ctx.running:
         reset_button_pressed(e, app, app_ctx)
     app_ctx.paused = False
 
 
+# noinspection PyUnusedLocal
 def stop_button_pressed(e, app, app_ctx):
     app_ctx.paused = True
+
+
+# noinspection PyUnusedLocal
+def restart_button_pressed(e, app, app_ctx):
+    if app_ctx.algorithm:
+        app_ctx.running = False
+
+        app_ctx.ant_sprites = pygame.sprite.Group()
+        app_ctx.wp_sprites = pygame.sprite.Group()
+
+        # create and set the runner
+        app_ctx.runner = app_ctx.colony.create_runner(app_ctx.algorithm,
+                                                      app_ctx.graph,
+                                                      app_ctx.nest_node)
+
+        # create the waypoint, nest, food sprites
+        for node in app_ctx.graph.nodes:
+            app_ctx.wp_sprites.add(
+                WpSprite(node, node_colors.get(node.node_type), 10, 10))
+
+        for ant in app_ctx.runner.ants:
+            app_ctx.ant_sprites.add(AntSprite(ant, (89, 54, 99), 4, 4,
+                                              color_dialog=app_ctx.ant_color_dialog))
+
+        app_ctx.running = True
 
 
 def reset_button_pressed(e, app, app_ctx):
@@ -51,36 +84,16 @@ def reset_button_pressed(e, app, app_ctx):
                                              app_ctx.anim_panel_y + app_ctx.anim_panel_height,
                                              10, node_factory, edge_factory, min_x=app_ctx.anim_panel_x,
                                              min_y=app_ctx.anim_panel_y, min_food_hops=100, max_food_hops=500)
-        nest_node, food_node, graph = graph_generator()
+
+        app_ctx.nest_node, app_ctx.food_node, app_ctx.graph = graph_generator()
 
         # precalculate lines between edges
         app_ctx.edge_lines = {}
-        for edge in graph.edges:
+        for edge in app_ctx.graph.edges:
             n1, n2 = edge.node_from, edge.node_to
             app_ctx.edge_lines[edge] = [(n1.x, n1.y), (n2.x, n2.y)]
 
-        node_colors = {
-            'nest': (get_color('green'), 255),
-            'food': (get_color('red'), 255),
-            'waypoint': (get_color('white'), 0)
-        }
-
-        app_ctx.ant_sprites = pygame.sprite.Group()
-        app_ctx.wp_sprites = pygame.sprite.Group()
-
-        # create and set the runner
-        app_ctx.runner = app_ctx.colony.create_runner(app_ctx.algorithm,
-                                                      graph,
-                                                      nest_node)
-
-        # create the waypoint, nest, food sprites
-        for node in graph.nodes:
-            app_ctx.wp_sprites.add(
-                WpSprite(node, node_colors.get(node.node_type), 10, 10))
-
-        for ant in app_ctx.runner.ants:
-            app_ctx.ant_sprites.add(AntSprite(ant, (89, 54, 99), 4, 4,
-                                    color_dialog=app_ctx.ant_color_dialog))
+        restart_button_pressed(e, app, app_ctx)
 
         app_ctx.running = True
 
@@ -177,6 +190,7 @@ def main():
                                      ctx.gui_panel_x, ctx.gui_panel_y,
                                      ctx.gui_panel_width, ctx.gui_panel_height)
 
+    application.listen_for('restart', restart_button_pressed)
     application.listen_for('reset', reset_button_pressed)
     application.listen_for('start', start_button_pressed)
     application.listen_for('stop', stop_button_pressed)
@@ -196,24 +210,29 @@ def main():
                 screen = pygame.display.set_mode(event.dict['size'], HWSURFACE | DOUBLEBUF | RESIZABLE)
                 pygame.display.flip()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == LEFT:
-                ctx.paint = True
+                if ctx.running:
+                    ctx.paint = True
             elif event.type == pygame.MOUSEBUTTONUP and event.button == LEFT:
-                ctx.paint = False
+                if ctx.running:
+                    ctx.paint = False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == RIGHT:
-                ctx.paint_erase = True
+                if ctx.running:
+                    ctx.paint_erase = True
             elif event.type == pygame.MOUSEBUTTONUP and event.button == RIGHT:
-                ctx.paint_erase = False
+                if ctx.running:
+                    ctx.paint_erase = False
             elif event.type == pygame.MOUSEMOTION:
-                if ctx.paint:
-                    # replace nodes with obstacle nodes
-                    for s in ctx.wp_sprites.sprites():
-                        if s.rect.collidepoint(event.pos):
-                            s.set_obstacle(True)
-                if ctx.paint_erase:
-                    # replace nodes with obstacle nodes
-                    for s in ctx.wp_sprites.sprites():
-                        if s.rect.collidepoint(event.pos):
-                            s.set_obstacle(False)
+                if ctx.running:
+                    if ctx.paint:
+                        # replace nodes with obstacle nodes
+                        for s in ctx.wp_sprites.sprites():
+                            if s.rect.collidepoint(event.pos):
+                                s.set_obstacle(True)
+                    if ctx.paint_erase:
+                        # replace nodes with obstacle nodes
+                        for s in ctx.wp_sprites.sprites():
+                            if s.rect.collidepoint(event.pos):
+                                s.set_obstacle(False)
 
         screen.fill(get_color('white'))
 
