@@ -132,9 +132,11 @@ class ShortestPathAlgorithm(Algorithm):
 
     ALPHA = 4
     BETA = 2
-    PHERO_DECREASE = 0.01
+    PHERO_DECREASE = 0.03
     PHERO_COST_DECREASE = False
     PHERO_COST_DECREASE_POW = 1
+    EXISTING_DECREASE = False
+    EXISTING_DECREASE_POW = 1
     COST_MULTIPLICATOR = 1
 
     # type and attributes are used by ui to show
@@ -148,6 +150,8 @@ class ShortestPathAlgorithm(Algorithm):
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
         Attribute('Phero Cost Decrease', 'phero_cost_decrease', bool, default=PHERO_COST_DECREASE),
         Attribute('Phero Cost Decrease Pow', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
+        Attribute('Existing Decrease', 'existing_decrease', bool, default=EXISTING_DECREASE),
+        Attribute('Existing Decrease Pow', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
     ]
 
     class AlgorithmState(object):
@@ -205,6 +209,8 @@ class ShortestPathAlgorithm(Algorithm):
         self.cost_multiplicator = self.COST_MULTIPLICATOR
         self.phero_cost_decrease = self.PHERO_COST_DECREASE
         self.phero_cost_decrease_pow = self.PHERO_COST_DECREASE_POW
+        self.existing_decrease = self.EXISTING_DECREASE
+        self.existing_decrease_pow = self.EXISTING_DECREASE_POW
 
     def choose_edge(self, ctx, ant, node):
         """
@@ -292,9 +298,11 @@ class ShortestPathAlgorithm(Algorithm):
                 cost_multiplicator **= self.phero_cost_decrease_pow
 
             phero_inc = 1 / (state.solution[1] * cost_multiplicator)
-            # existing_multiplicator = (1 - edge.pheromone_level(ant.pheromone_kind('default')))
-            # existing_multiplicator **= 4
-            # phero_inc *= existing_multiplicator
+
+            if self.existing_decrease:
+                existing_multiplicator = (1 - edge.pheromone_level(ant.pheromone_kind('default')))
+                existing_multiplicator **= self.existing_decrease_pow
+                phero_inc *= existing_multiplicator
 
             edge.increase_pheromone(
                 ant.create_pheromone(
@@ -347,6 +355,9 @@ class ShortestPathAlgorithm(Algorithm):
         """
         Checks whether the passed path only consists of accessible nodes.
         """
+        if not path:
+            return False
+
         for edge in path:
             n1 = edge.node_from
             n2 = edge.node_to
@@ -378,6 +389,11 @@ class ShortestPathAlgorithm(Algorithm):
                                            key=operator.itemgetter(1))[0]
         else:
             ctx.state._best_solution = None
+
+        if ctx.state._best_solution:
+            path, _ = ctx.state._best_solution
+            if not self._is_path_accessible(path):
+                ctx.state._best_solution = None
 
         # evaporate pheromones
         self.evaporate(ctx)
@@ -619,11 +635,9 @@ class WaypointEdge(antz_graph.Edge):
     Our edge implementation with pheromones
     """
 
-    def __init__(self, node_from, node_to, pheromone_store=None,
-                 evaporation_strategy=None, **kwargs):
+    def __init__(self, node_from, node_to, pheromone_store=None, **kwargs):
         antz_graph.Edge.__init__(self, node_from, node_to, **kwargs)
-        self._ps = pheromone_store or PheromoneStore(
-            evaporation_strategy=evaporation_strategy)
+        self._ps = pheromone_store or PheromoneStore()
 
     @property
     def pheromone_store(self):
@@ -650,22 +664,12 @@ class WaypointEdge(antz_graph.Edge):
                    self.node_from, self.node_to))
 
 
-class EvaporationStrategy(object):
-    def __init__(self, amount=10):
-        self._amount = amount
-
-    def amount(self, current_amount):
-        return current_amount - self._amount
-
-
-DEFAULT_EVAPORATION_STRATEGY = EvaporationStrategy()
-
-
 class PheromoneStore(object):
-    def __init__(self, evaporation_strategy=None):
-        evaporation_strategy = evaporation_strategy or DEFAULT_EVAPORATION_STRATEGY
+    def __init__(self):
         self._level = {}
-        self._es = evaporation_strategy
+
+    def clear(self):
+        self._level = {}
 
     @property
     def kinds(self):
@@ -694,17 +698,6 @@ class PheromoneStore(object):
 
     def decrease(self, pheromone):
         self._decrease(pheromone.kind, pheromone.amount)
-
-    def _evaporate(self, kind):
-        self._set(kind, self._es.amount(
-            self._level[kind]))
-
-    def evaporate(self, kind=None):
-        kind = aslist(kind)
-        if not kind:
-            kind = self._level.keys()
-        for k in kind:
-            self._evaporate(k)
 
 
 class Pheromone(object):
@@ -813,6 +806,8 @@ class AntColony(object):
         return self._pheromones.pheromone_kind(name)
 
     def create_runner(self, algorithm, graph, nest_node, num_ants=1000):
+        for edge in graph.edges:
+            edge.pheromone_store.clear()
         ants = set([Ant(nest_node, self._pheromones, algorithm.create_ant_state())
                     for _ in range(0, num_ants or self._num_ants)])
         return Runner(ants, nest_node, algorithm, graph)

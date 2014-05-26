@@ -54,7 +54,7 @@ class WpSprite(pygame.sprite.Sprite):
         self.rect.x = self._node.x - self.rect.width / 2.0
 
     def set_obstacle(self, obstacle):
-        if not self._node.nest and not self.node.food:
+        if not self._node.nest and not self._node.food:
             self._node.obstacle = obstacle
             if obstacle:
                 self.image.fill(get_color('green'))

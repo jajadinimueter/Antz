@@ -2,6 +2,7 @@
 Application controls go here
 """
 from decimal import Decimal
+import collections
 from pgu import gui
 
 
@@ -63,6 +64,8 @@ class Application(object):
         self._width = width
         self._height = height
 
+        self._event_listeners = collections.defaultdict(list)
+
         self._outer_container = gui.Container(width=screen_width,
                                               height=screen_height,
                                               align=-1, valign=-1)
@@ -80,6 +83,10 @@ class Application(object):
         application.init(self._outer_container)
 
         self._application = application
+
+    def listen_for(self, event, cb):
+        """ start, stop, reset """
+        self._event_listeners[event].append(cb)
 
     def _get_default_solver(self):
         solvers = list(sorted(self._solvers.values(),
@@ -111,6 +118,7 @@ class Application(object):
         value = field.value
         solver = self._get_solver(value)
         self._solver_container.widget = self._build_solver_ui(solver)
+        self._ctx.algorithm = solver
 
     def _create_solver_select(self):
         select = gui.Select()
@@ -121,10 +129,19 @@ class Application(object):
         select.connect(gui.CHANGE, self._on_solver_change, select)
         return label, select
 
+    def _call_listeners(self, event):
+        for listener in self._event_listeners.get(event, []):
+            listener(event, self, self._ctx)
+
     def _build_buttons(self):
         self._start_button = gui.Button('Start')
         self._stop_button = gui.Button('Stop')
         self._reset_button = gui.Button('Reset')
+
+        self._start_button.connect(gui.CLICK, self._call_listeners, 'start')
+        self._stop_button.connect(gui.CLICK, self._call_listeners, 'stop')
+        self._reset_button.connect(gui.CLICK, self._call_listeners, 'reset')
+
         self._button_panel = gui.Document()
         self._button_panel.add(self._start_button)
         self._button_panel.add(self._stop_button)
@@ -132,8 +149,10 @@ class Application(object):
 
     def _build_ui(self):
         self._solver_label, self._solver_field = self._create_solver_select()
+
         self._solver_ui = self._build_solver_ui(self._get_default_solver())
         self._solver_container = gui.ScrollArea(self._solver_ui)
+        self._on_solver_change(self._solver_field)
 
         self._build_buttons()
 
@@ -168,3 +187,4 @@ class ApplicationContext(object):
     def __init__(self, solvers, solver=None):
         self.solver = solver
         self.solvers = solvers
+        self.runner = None
