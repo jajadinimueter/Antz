@@ -249,6 +249,7 @@ def main():
     ctx.state = 'stop'
 
     pygame.init()
+    clock = pygame.time.Clock()
 
     screen = pygame.display.set_mode([ctx.screen_width, ctx.screen_height], HWSURFACE | DOUBLEBUF | RESIZABLE)
 
@@ -368,6 +369,8 @@ def main():
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
+
+        clock.tick()
 
     pygame.quit()
 

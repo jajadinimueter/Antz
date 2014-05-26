@@ -137,6 +137,7 @@ class ShortestPathAlgorithm(Algorithm):
     PHERO_COST_DECREASE_POW = 1
     EXISTING_DECREASE = False
     EXISTING_DECREASE_POW = 1
+    PHERO_UPDATE_INSTANT = True
     COST_MULTIPLICATOR = 1
 
     # type and attributes are used by ui to show
@@ -152,6 +153,7 @@ class ShortestPathAlgorithm(Algorithm):
         Attribute('Phero Cost Decrease Pow', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
         Attribute('Existing Decrease', 'existing_decrease', bool, default=EXISTING_DECREASE),
         Attribute('Existing Decrease Pow', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
+        Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
     ]
 
     class AlgorithmState(object):
@@ -216,6 +218,7 @@ class ShortestPathAlgorithm(Algorithm):
         self.phero_cost_decrease_pow = self.PHERO_COST_DECREASE_POW
         self.existing_decrease = self.EXISTING_DECREASE
         self.existing_decrease_pow = self.EXISTING_DECREASE_POW
+        self.phero_update_instant = self.PHERO_UPDATE_INSTANT
 
     def choose_edge(self, ctx, ant, node):
         """
@@ -315,6 +318,12 @@ class ShortestPathAlgorithm(Algorithm):
 
             ctx.state._pheromone_edges.add(edge)
 
+    def _add_solution(self, ctx, ant):
+        # increase the solution count to check for most accessed
+        # solutions at the end of the round
+        if ant.state.solution:
+            ctx.state._solution_counts[ant.state.solution] += 1
+
     def visit_node(self, ctx, ant, node):
         """
         Called when a node is visited. We mainly check wether we
@@ -330,16 +339,16 @@ class ShortestPathAlgorithm(Algorithm):
             if node_is_food(node):
                 # the ant found a solution
                 ant.state.solution = solution
+                self._add_solution(ctx, ant)
+                if self.phero_update_instant:
+                    for edge in ant.state.edges:
+                        self.visit_edge(ctx, ant, edge)
+                    raise Reset()
             elif node_is_nest(node):
                 # when it's a nest and we are on our way
                 # back -> reset the ant
                 if ant.state.solution:
                     raise Reset()
-
-            # increase the solution count to check for most accessed
-            # solutions at the end of the round
-            if ant.state.solution:
-                ctx.state._solution_counts[ant.state.solution] += 1
 
     def end_turn(self, ctx, ant):
         """
@@ -395,19 +404,14 @@ class ShortestPathAlgorithm(Algorithm):
             else:
                 if best_solution[1] < ctx.state._best_solution[1]:
                     ctx.state._best_solution = best_solution
-            ctx.state._local_best_solution = best_solution
-        else:
-            ctx.state._best_solution = None
+
+            if self._is_path_accessible(best_solution[0]):
+                ctx.state._local_best_solution = best_solution
 
         if ctx.state._best_solution:
             path, _ = ctx.state._best_solution
             if not self._is_path_accessible(path):
                 ctx.state._best_solution = None
-
-        if ctx.state._local_best_solution:
-            path, _ = ctx.state._local_best_solution
-            if not self._is_path_accessible(path):
-                ctx.state._local_best_solution = None
 
         # evaporate pheromones
         self.evaporate(ctx)
