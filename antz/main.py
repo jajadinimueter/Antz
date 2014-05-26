@@ -329,6 +329,9 @@ def main():
                     lines = ctx.edge_lines[edge]
                     pygame.draw.lines(screen, (0, 0, 0), False, lines, 1)
 
+            label = default_font().render('fps %d' % clock.get_fps(), 5, get_color('gray'))
+            screen.blit(label, (15, 15))
+
             label = default_font().render('Round %d' % ctx.runner.rounds, 5, get_color('black'))
             screen.blit(label, (100, 15))
 
