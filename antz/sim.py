@@ -160,6 +160,7 @@ class ShortestPathAlgorithm(Algorithm):
             self._pheromone_edges = set()
             self._solution_counts = collections.defaultdict(int)
             self._best_solution = None
+            self._local_best_solution = None
             self._rounds = 0
 
         @property
@@ -173,6 +174,10 @@ class ShortestPathAlgorithm(Algorithm):
         @property
         def best_solution(self):
             return self._best_solution
+
+        @property
+        def local_best_solution(self):
+            return self._local_best_solution
 
         @property
         def updated_edges(self):
@@ -384,9 +389,13 @@ class ShortestPathAlgorithm(Algorithm):
         if ctx.state._solution_counts:
             ctx.state._solutions = sorted(ctx.state._solution_counts.keys(),
                                           key=lambda item: item[1])
-            ctx.state._best_solution = ctx.state._solutions[0]
-            ctx.state._most_solution = max(ctx.state._solution_counts.items(),
-                                           key=operator.itemgetter(1))[0]
+            best_solution = ctx.state._solutions[0]
+            if not ctx.state._best_solution:
+                ctx.state._best_solution = best_solution
+            else:
+                if best_solution[1] < ctx.state._best_solution[1]:
+                    ctx.state._best_solution = best_solution
+            ctx.state._local_best_solution = best_solution
         else:
             ctx.state._best_solution = None
 
@@ -394,6 +403,11 @@ class ShortestPathAlgorithm(Algorithm):
             path, _ = ctx.state._best_solution
             if not self._is_path_accessible(path):
                 ctx.state._best_solution = None
+
+        if ctx.state._local_best_solution:
+            path, _ = ctx.state._local_best_solution
+            if not self._is_path_accessible(path):
+                ctx.state._local_best_solution = None
 
         # evaporate pheromones
         self.evaporate(ctx)
@@ -778,6 +792,10 @@ class Runner(object):
     @property
     def best_solution(self):
         return self._state.best_solution
+
+    @property
+    def local_best_solution(self):
+        return self._state.local_best_solution
 
     @property
     def updated_edges(self):

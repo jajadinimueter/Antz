@@ -331,6 +331,13 @@ def main():
             label = default_font().render('Round %d' % ctx.runner.rounds, 5, get_color('black'))
             screen.blit(label, (100, 15))
 
+            if ctx.runner.solutions:
+                num_solutions = len(ctx.runner.solutions)
+
+                label = default_font().render('(#%d)' % num_solutions,
+                                              5, get_color('black'))
+                screen.blit(label, (200, 15))
+
             # ant_sprites.color = dialog.rgb
             ctx.ant_sprites.update()
             ctx.wp_sprites.update()
@@ -342,12 +349,17 @@ def main():
                 draw_solution_line(screen, ctx.runner.best_solution,
                                    color=(255, 69, 0), thickness=8)
 
-                # draw_best_solution_text(screen, solver.best_solution,
-                #                         len(solver.solutions))
+                label = default_font().render('Best %.2f' % ctx.runner.best_solution[1],
+                                              5, get_color('black'))
+                screen.blit(label, (300, 15))
 
-            # for solution in solver.solutions[:10]:
-            #     if solution != solver.best_solution:
-            #         draw_solution_line(screen, solution, thickness=1, color=(255, 255, 250))
+            if ctx.runner.local_best_solution:
+                draw_solution_line(screen, ctx.runner.local_best_solution,
+                                   color=(150, 69, 0), thickness=3)
+
+                label = default_font().render('Local best %.2f' % ctx.runner.local_best_solution[1],
+                                              5, get_color('black'))
+                screen.blit(label, (500, 15))
 
             if not ctx.show_only_shortest:
                 ctx.ant_sprites.draw(screen)
