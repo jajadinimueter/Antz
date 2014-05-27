@@ -3,6 +3,8 @@ Adds some charts
 """
 import threading
 
+import matplotlib
+matplotlib.use('tkagg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -10,7 +12,7 @@ import matplotlib.animation as animation
 def live_chart(data_gen):
     fig, ax = plt.subplots()
     line, = ax.plot([], [], lw=2)
-    ax.set_ylim(0, 800)
+    ax.set_ylim(0, 300)
     ax.set_xlim(0, 100)
     ax.grid()
 

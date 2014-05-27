@@ -173,8 +173,11 @@ class Application(object):
 
         self._button_panel = gui.Document()
         self._button_panel.add(self._start_button)
+        self._button_panel.add(gui.Label('  '))
         self._button_panel.add(self._restart_button)
+        self._button_panel.add(gui.Label('  '))
         self._button_panel.add(self._stop_button)
+        self._button_panel.add(gui.Label('  '))
         self._button_panel.add(self._reset_button)
 
     def _build_ui(self):

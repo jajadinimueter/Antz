@@ -3,7 +3,7 @@ import glob
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
-        
+
 setup_args = dict(
     name = 'antz',
     version = '0.1',
@@ -39,17 +39,24 @@ else:
 
 installdatafiles = []
 
-share_target = os.path.join('share','pgu','themes')
+share_target = os.path.join('share', 'pgu', 'themes')
 
 if has_py2exe:
+    import matplotlib
+
     # we have to include datafiles only if we want
     # to build the exe. Otherwise the pgu dependency 
     # should ensure the presence of them
-    share = os.path.join(os.path.dirname(py2exe.__file__), 
-        '..', '..', '..', 'share', 'pgu', 'themes')
+    share = os.path.join('c:\\', 'Python27', 'share', 'pgu', 'themes')
     for name in ('default', 'gray', 'tools'):
+        search_path = os.path.join(share, name, '*')
+        print(search_path)
         installdatafiles.append((os.path.join(share_target, name),
-                                 glob.glob(os.path.join(share, name, '*'))))
+                                 glob.glob(search_path)))
+
+    installdatafiles.extend(matplotlib.get_py2exe_datafiles())
+
+    print(installdatafiles)
 
     # some hack I found. when not present, fonts are
     # not found :) somehow such thing were to be expected
@@ -63,7 +70,13 @@ if has_py2exe:
 
     setup_args.update(dict(
         data_files=installdatafiles,
-        console=['antz/main.py']
+        console=['antz/main.py'],
+        options={
+            'py2exe': {
+                # 'excludes': ['_gtkagg', '_tkagg'],
+                'includes': ["matplotlib.backends.backend_tkagg"],
+            }
+        }
     ))
 
 

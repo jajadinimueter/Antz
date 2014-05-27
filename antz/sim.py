@@ -150,9 +150,9 @@ class ShortestPathAlgorithm(Algorithm):
         # Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
         Attribute('Phero Cost Decrease', 'phero_cost_decrease', bool, default=PHERO_COST_DECREASE),
-        Attribute('Phero Cost Decrease Pow', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
+        Attribute('Phero Cost Decrease Exp', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
         Attribute('Existing Decrease', 'existing_decrease', bool, default=EXISTING_DECREASE),
-        Attribute('Existing Decrease Pow', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
+        Attribute('Existing Decrease Exp', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
         Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
     ]
 
