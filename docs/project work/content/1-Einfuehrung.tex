@@ -7,16 +7,25 @@
 
 
 
-\chapter{Einführung, Allgemeines}
+\chapter{Einführung}
 
 Im Rahmen des Softwareprojekts 2 gilt es, aus dem Bereich der Algorithmen und Datenstrukturen oder der Numerik eine lauffähige Applikation zu programmieren und angemessen zu dokumentieren. Die Auswahl der vorgeschlagenen Themen war breit gestreut (auch ein eigenes Thema konnte nach Absprache mit dem Fachbetreuer umgesetzt werden).
 
-Ziele dieses Softwareprojekts sind unter anderem, unser bisheriges Wissen in der Praxis anzuwenden und unsere Programmierkenntnisse zu vertiefen. Ebenso soll die eigene Erfahrung im   Projektmanagement vertieft werden (Planung, Schätzung, Arbeitsteilung). \\
+Ziele dieses Softwareprojekts sind unter anderem, unser bisheriges Wissen in der Praxis anzuwenden und unsere Programmierkenntnisse zu vertiefen. Ebenso soll die eigene Erfahrung im   Projektmanagement vertieft werden (Planung, Schätzung, Arbeitsteilung).
+
+In diesem ersten Kapitel erfolgt eine Einführung in allgemeine Aspekte des Themas. Einen Überblick über das Projekt liefert das zweite Kapitel, während das Programm detailliert im dritten Kapitel vorgestellt wird. Im vierten Kapitel werden die Erkenntnisse aus dem Projekt dargestellt, bevor eine Zusammenfassung folgt. \\
+
+\noindent
+Insbesondere danken wir Syrus Mozafar für die hilfreiche Projektbegleitung und Lars Kruse für die fachliche Beratung unseres Projektes.
 
 
 
 \section{Themenwahl (Überblick, Überlegungen, Schwierigkeiten)}
 
+Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen für kürzeste Pfade zwischen A und B gewählt, nämlich die Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei Optimierungsproblemen vielseitig einsetzbar.
+
+
+???
 \begin{itemize}[noitemsep]
 \item Überblick über die Arbeit geben (evtl. auch Programmstruktur?)
 \item Wichtige Entscheidungen kurz erwähnen
@@ -24,15 +33,10 @@ Ziele dieses Softwareprojekts sind unter anderem, unser bisheriges Wissen in der
 \end{itemize}
 
 
-Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen für kürzeste Pfade zwischen A und B gewählt, nämlich die Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei Optimierungsproblemen vielseitig einsetzbar.
-
-
 
 \subsection{Wahl der Technologie}
 
 Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wie quintus als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen (sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen Leistung sehr gut ist. Das fertige Programm wird so eine ausführbare Datei sein.
-
-\vspace*{1cm}
 
 
 
@@ -40,8 +44,7 @@ Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wi
 
 Weiter unten: Systemspezifische Beschränkungen erwähnen (Leistung), evtl. auf Optimierungsparameter eingehen
 
-\vspace*{1cm} 
-
+???
 \begin{itemize}[noitemsep]
 \item PGU: Library für Slider und Textfelder, etc.
 \item Optimierung: Anzahl Partikel; Speicherbedarf
@@ -51,20 +54,19 @@ Weiter unten: Systemspezifische Beschränkungen erwähnen (Leistung), evtl. auf 
 \end{itemize}
 
 
-\vspace*{1cm}
-
-
 
 
 \section{Anforderungen}
 
-Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen Klasse präsentiert. \\\\
+Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen Klasse präsentiert.
 
-% ???
+Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Ideales Ziel wäre eine Konvergenz des Algorithmus. Dagegen standen nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen. \\
+
+
+???
 % Vgl. meine Notizen (offiziell und projektspezifisch) \\
 
 Eingrenzung und Abgrenzung der Aufgabenstellung \\
-
 
 Detailanalyse der Aufgabenstellung (vgl. andere Arbeiten) \\
 
