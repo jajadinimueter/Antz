@@ -2,11 +2,6 @@
 % !TeX spellcheck = de-DE
 
 
-% % % Fragen
-% Kapitelbeginn (chapter) nicht nur auf ungeraden Seiten
-
-
-
 \chapter{Einführung}
 
 Im Rahmen des Softwareprojekts 2 gilt es, aus dem Bereich der Algorithmen und Datenstrukturen oder der Numerik eine lauffähige Applikation zu programmieren und angemessen zu dokumentieren. Die Auswahl der vorgeschlagenen Themen war breit gestreut (auch ein eigenes Thema konnte nach Absprache mit dem Fachbetreuer umgesetzt werden).
@@ -24,14 +19,7 @@ Insbesondere danken wir Syrus Mozafar für die hilfreiche Projektbegleitung und 
 
 Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen für kürzeste Pfade zwischen A und B gewählt, nämlich die Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei Optimierungsproblemen vielseitig einsetzbar.
 
-
-???
-\begin{itemize}[noitemsep]
-\item Überlegungen, Schwierigkeiten
-\item Überblick über die Arbeit geben (evtl. auch Programmstruktur?)
-\item Wichtige Entscheidungen kurz erwähnen
-\item Schwierigkeiten aufzeigen (z.B. bezüglich der Technologie)
-\end{itemize}
+Aus dem breiten Bereich des Themas galt es, eine Entscheidung für eine umsetzbare Lösung zu treffen. Zu entscheiden war beispielsweise, ob der Fokus mehr auf die Implementierung eines möglichst effizienten Algorithmus, auf dem Vergleich zwischen verschiedenen Algorithmen oder stärker auf der graphischen Veranschaulichung liegen sollte. Diese Fragen waren auch eng mit der Wahl der Technologie für die Umsetzung verbunden. Ferner stellte sich bald heraus, dass etwa hinsichtlich der verfügbaren Rechenkapazität eines durchschnittlichen Computers die Anzahl der Ameisen (Sprites) gewisse Grenzen nicht überschreiten sollte.
 
 
 
@@ -61,8 +49,9 @@ Weiter unten: Systemspezifische Beschränkungen erwähnen (Leistung), evtl. auf 
 
 Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen Klasse präsentiert.
 
-Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Ideales Ziel wäre eine Konvergenz des Algorithmus. Dagegen standen nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen. \\
+Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Idealerweise führt der Algorithmus zu einer Konvergenz, dass also eine grosse Anzahl Ameisen den kürzesten Weg nehmen. Dagegen stand nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen.
 
+Bezüglich der Programmarchitektur setzten wir uns zum Ziel, eine nach gängigen Entwurfsprinzipien möglichst gute und klare Struktur zu entwickeln, bei der die Abhängigkeiten der einzelnen Programmbausteine ersichtlich sind.
 
 ???
 % Vgl. meine Notizen (offiziell und projektspezifisch) \\
