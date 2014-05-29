@@ -3,35 +3,49 @@
 
 \chapter{Applikation}
 
+Dieses Kapitel beschreibt den Entwicklungsverlauf unserer Applikation, die zugrundeliegenden Algorithmen und Datenstrukturen, sowie das Klassenmodell und die Interaktionen zwischen den verschiedenen Applikations-Schichten.
 
+Programmausschnitte werden  in Python-Code wiedergegeben.
 
-Vorsichtsmassnahme, dass gewisse Ameisen sterben (weil z.B. 500 Ameisen, die sich auf einer Seite des Displays befinden, nicht zurück können, da sie den Weg zurück nicht nehmen können; sobald ein bester Pfad gefunden ist, sterben gewisse Ameisen nach einer gewissen Zeit, wenn sie nicht mehr mit Pheromon in Verbindung kommen) \\
+\section{Algorithmus}
 
+Der Ameisen Optimierungs-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten entscheiden, über welche Kante sie zum nächsten gelangen möchte. Diese Entscheidung basiert hauptsächlich auf der Menge von Pheromonen, welche sich auf dieser Kante befinden. Dies wird wiederholt, bis die Ameise den Futterknoten erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben Weg, den sie gekommen ist zurück und erhöht jeweils die Pheromonwerte auf den Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den Weg geschickt.
+
+Programmiert könnte der Algorithmus etwa so aussehen:
+
+\begin{lstlisting}
+	def ant_algorithm(ants, graph):
+		for ant in ants:
+			next_edge = choose_next_edge(ant.node, graph)
+			ant.node = next_edge.other_node(ant.node)
+			if ant.has_solution:
+				ant.update_phermone_trail(next_edge)	
+		evaporate_pheromones(graph)
+		reset_ants_with_solution(ants)
+\end{lstlisting}
+
+Wichtig sind natürlich die verschiedenen Funktionen, die in diesem kurzen Codeblock aufgerufen werden:
+
+\begin{description}
+\item[choose\_next\_edge] Bestimmt auf der Grundlage von verschiedenen Parametern, die wir jetzt noch nicht kennen, welche Kante die Ameise als nächstes besuchen wird.
+\item[update\_pheromone\_trail] Wird 
+\end{description}
 
 \section{Aufbau/Überblick}
 
-Struktur des Programms beschreiben \\
+Die Applikation besteht hauptsächlich aus zwei unterschiedlichen voneinander losgelösten Teilen: dem Benutzerinterface (GUI) und der Simulation (Backend).
 
+Die Simulation kennt dabei die GUI-Schicht nicht, sondern wird von ihr angesprochen, wenn weitere Schritte des Algorithmus berechnet werden sollen.
 
-\vspace*{1cm}
+TODO: Abbildung mit den zwei Teilen
 
-\subsection{Pygame (Sprites)}
+\section{Vorgehen bei der Programmierung}
 
-
-\vspace*{1cm}
-
-
-\subsection{Graph: Datenstruktur (Gründe für deren Verwendung)}
-
-
-\vspace*{1cm}
-
-
+Wie unseren Release-Zusammenfassungen zu entnehmen ist, haben wir uns am Anfang primär auf die Entwicklung einer lauffähigen Version mit graphischer Darstellung konzentriert, in der sich Ameisen nach gewissen Regeln fortbewegen. 
 
 \section{Mockups}
 
 Zwei verschiedene Varianten für das spätere Aussehen des Programms standen im Vordergrund: eine mit der Einstellungsleiste im oberen Fensterbereich, eine zweite mit den Einstellungen am rechten Seitenrand.
-
 
 \begin{figure}[h]
   \centering
@@ -39,46 +53,40 @@ Zwei verschiedene Varianten für das spätere Aussehen des Programms standen im 
 	\caption{Mockup-Variante 1: Einstellungen im oberen Fensterbereich}
 \end{figure}
 
-
-%\begin{minipage}[h]{10cm}
-%\vspace*{2.5cm}
-%\end{minipage}
-
-
 \begin{figure}[h]
   \centering
 	\includegraphics [width=0.85\textwidth]{images/Antz_Mockup_1_sw.png} 
 	\caption{Mockup-Variante 2: Einstellungen im rechten Fensterbereich}
 \end{figure}
 
-
-\vspace*{2cm}
-
-
-
 \section{Klassendiagramme}
-
-
-\vspace*{1cm}
-
-
-\section{Screenshots aus dem Programm}
-
-
-\vspace*{1cm}
-
 
 \section{Auswertungen: Konvergenz, Parameter}
 
+\section{Vergleich mit Dijkstra und A*}
 
-\vspace*{1cm}
+Wir selbst haben zwar keinen Vergleich mit Dijkstra oder A* aufgestellt, trotzdem möchten wir kurz darauf eingeben und dafür die Resultate von \citet*{leo-perf} eingehen.
 
+\citeauthor*{leo-perf} untersucht die drei Algorithmen Dijstra, A* und Ant auf ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangt er zu folgenden Resultaten:
 
-\section{Algorithmus/Performance, gewichtete Wahrscheinlichkeiten}
+\begin{table}[h]
+\begin{tabular}{ | l | r | }
+\hline
+Dijstra & ~140ms \\
+\hline
+A* & ~110ms \\
+\hline
+Ant & ~13900ms \\
+\hline
+\end{tabular}
+\caption{Vergleich zwischen Dijkstra, A* und Ant}
+\end{table}
 
+Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit kommt noch, dass Dijstra und A* immer den optimalen Weg finden, der Ant-Algorithmus jedoch nicht zwingend.
 
-\vspace*{1cm}
+\citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen.
 
+\section{Screenshots}
 
 \subsubsection*{Iteration 1}
 

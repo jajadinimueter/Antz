@@ -162,6 +162,7 @@ class ShortestPathAlgorithm(Algorithm):
             self._pheromone_edges = set()
             self._solution_counts = collections.defaultdict(int)
             self._best_solution = None
+            self._max_phero = 0
             self._local_best_solution = None
             self._rounds = 0
 
@@ -300,21 +301,31 @@ class ShortestPathAlgorithm(Algorithm):
             min_cost = 0
             max_cost = ctx.graph.max_cost
 
+            current_phero = edge.pheromone_level(ant.pheromone_kind('default'))
+
+            min_phero = 0
+            max_phero = ctx.state._max_phero or current_phero
+
             cost_multiplicator = 1
+
             if self.phero_cost_decrease:
                 cost_multiplicator = ((edge.cost - min_cost) / (max_cost - min_cost))
                 cost_multiplicator **= self.phero_cost_decrease_pow
 
             phero_inc = 1 / (state.solution[1] * cost_multiplicator)
-
-            if self.existing_decrease:
-                existing_multiplicator = (1 - edge.pheromone_level(ant.pheromone_kind('default')))
-                existing_multiplicator **= self.existing_decrease_pow
-                phero_inc *= existing_multiplicator
+            #
+            # if self.existing_decrease and current_phero and max_phero:
+            #     existing_multiplicator = (current_phero - max_phero) / (max_phero - min_phero)
+            #     existing_multiplicator **= self.existing_decrease_pow
+            #     phero_inc *= existing_multiplicator
 
             edge.increase_pheromone(
                 ant.create_pheromone(
                     'default', phero_inc))
+
+            current_phero = edge.pheromone_level(ant.pheromone_kind('default'))
+            if current_phero > ctx.state._max_phero:
+                ctx.state._max_phero = current_phero
 
             ctx.state._pheromone_edges.add(edge)
 

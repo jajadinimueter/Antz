@@ -2,6 +2,8 @@
 % !TeX program = pdflatex
 % !TeX spellcheck = de-DE
 
+% % define python code style
+
 %% Bug fixes and other packages to be loaded before the class
 \RequirePackage[l2tabu, orthodox]{nag} % check for mistakes in the code
 \RequirePackage{fix-cm} % permit Computer Modern fonts at arbitrary sizes.
@@ -146,6 +148,29 @@
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\lstset{language=Python}
+
 % Configure page numbering - required for hyperref (not displayed)
 \pagenumbering{alph}\setcounter{page}{1}%
 \pagestyle{empty}
@@ -234,11 +259,6 @@
 % must be _input_, otherwise the TOC entry is at the wrong place
 \input{content/Z-Appendix.tex}
 
-% -- only in phd thesis --->
-\input{content/Z-Publications.tex}
-% \input{content/Z-CV.tex}		% auskommentiert am 24.05.2014
-% <------------------------
-
 %% -- Index --
 % _Remove_ Index unless you really want to invest a large amount
 % of time and effort to create a good index!
@@ -246,8 +266,6 @@
   \cleardoublepage\IfDefined{phantomsection}{\phantomsection}\label{sec:index}%
   \printindex%
 }% end of index
-
-\input{content/Z-Thanks.tex}
 
 % add todo list (remove for final document!)
 % \input{content/Z-Todo.tex}
