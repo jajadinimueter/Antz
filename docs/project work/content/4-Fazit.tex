@@ -1,19 +1,26 @@
 % !TeX encoding=utf8
 % !TeX spellcheck = de-DE
 
+
 \chapter{Fazit und Ausblick}
+
+
+\section{Fazit}
 
 Die Programmierung des Ameisen-Algorithmus war spannend. Besonders interessant war das Beobachten der Ameisen beim Suchen eines optimalen Pfades. Die Integration der Simulation in ein Game-Framework war eine neue Erfahrung und eröffnete zudem die Perspektive, ein solches Framework für weitere Problemlösungen verwenden zu können.
 
-Ein grosser Anteil der investierten Zeit wurde in das Anpassen und Herumspielen mit den verschiedenen Parametern investiert. Auch mussten mehrere Refactorings durchgeführt werden, bis eine passable Lösung erreicht werden konnte.
+Ein grosser Anteil der aufgewendeten Zeit wurde in das Anpassen und Herumspielen mit den verschiedenen Parametern investiert. Auch waren mehrere Refactorings durchzuführen, bis eine passable Lösung erreicht werden konnte.
 
-Negativ war, dass wir den Fokus des Projektes nicht genauer spezifiziert haben. Dies führte dazu, dass der ganze Aufbau der Simulation nicht auf Geschwindigkeit, sondern auf Erweiterbarkeit ausgelegt wurde. Die Performance litt dementsprechend, ohne dass die geplanten Features wie mehrere Ameisen-Kolonien, die gegeneinander kämpfen können oder eine Lösung für das Travelling-Salesman Problem implementiert wurden. Der Fokus lag am Schluss auf dem Optimieren des Algorithmus zur Suche des kürzesten Pfades.
+Negativ war, dass wir den Fokus des Projektes nicht genauer spezifiziert haben. Dies führte dazu, dass der ganze Aufbau der Simulation nicht auf Geschwindigkeit, sondern auf Erweiterbarkeit ausgelegt wurde. Die Performance litt dementsprechend, ohne dass die geplanten Features, wie mehrere Ameisen-Kolonien, die gegeneinander kämpfen können, oder eine Lösung für das Travelling Salesman Problem implementiert wurden. Der Fokus lag am Ende auf der Optimierung des Algorithmus zur Suche des kürzesten Pfades.
 
-Negativ war zudem, dass man eingestehen muss, dass dieser Algorithmus sehr viel schlechter zum Finden von kürzesten Pfaden geeignet ist, als Dijkstra oder A*, egal welche Konfiguration verwendet wird.
+Eine wichtige Erkenntnis ist zudem, dass dieser Algorithmus sehr viel schlechter zum Finden von kürzesten Pfaden geeignet ist als Dijkstra oder A*, unabhängig von der verwendeten Konfiguration.
+
+
+
 
 \section{Ausblick}
 
-Entweder könnte man versuchen, die Simulation mehr der Realität anzunähern und mehrere Kolonien und Pheromon-Arten, sowie Feinde und Überlebensstrategien entwickeln oder man geht Richtung Performance oder das Lösen von weiteren Problemen wie z.B. den TSP.
+Entweder könnte man versuchen, die Simulation mehr der Realität anzunähern und mehrere Kolonien und Pheromon-Arten sowie Feinde und Überlebensstrategien entwickeln, oder man geht in Richtung Performance oder integriert eine Lösung für weitere Probleme, wie z.B. das TSP.
 
 Die erste Variante erscheint sinnvoller, wenn man bedenkt, dass dieser Algorithmus zum Lösen von Pfad-Problemen nicht geeignet ist.
 
