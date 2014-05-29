@@ -35,9 +35,15 @@ Wichtig sind natürlich die verschiedenen Funktionen, die in diesem kurzen Codeb
 \item[reset\_ants\_with\_solution] Die Ameisen, die mit einer fertigen Lösung wieder beim Nest angekommen sind, werden zurückgesetzt und können wiederverwendet werden. 
 \end{description}
 
-\subsection{Ablauf und Formeln}
+\subsection{Ablauf und Berechnungen}
 
-Für die verschiedenen Teilschritte sind ein paar wenige, einfache Formeln nötig. Sie werden benötigt um die Wahrscheinlichkeit einer Kante zu ermitteln, von der Ameise ausgewählt zu werden, die Menge an Pheromonen zu bestimmen, die eine Ameise auf einer Kante hinterlässt und die bei der Evaporation verringert wird.
+Für die verschiedenen Teilschritte sind ein paar wenige, einfache Formeln nötig. Sie werden benötigt um
+
+\begin{itemize}
+\item zu ermitteln, welche Wahrscheinlichkeit einzelne Kanten haben, als nächstes von einer Ameise ausgewählt zu werden
+\item die Menge an Pheromonen zu bestimmen, die ein Ameise auf einer Kante hinterlässt und
+\item die Pheromonmenge nach der Evaporation zu berechnen
+\end{itemize}
 
 \paragraph*{}
 Für die Betrachtung der verschiedenen Formeln soll folgender Graph als Grundlage dienen:
@@ -54,23 +60,23 @@ Für die Betrachtung der verschiedenen Formeln soll folgender Graph als Grundlag
 
   \path[every node/.style={font=\sffamily\small}]
     (nn) edge node [left] {$k_1$} (n1)
-    (n1) edge node [right] {$k_2$} (n2)
-         edge node [above] {$k_3$} (n3)
+    (n1) edge node [right] {$k_3$} (n2)
+         edge node [above] {$k_2$} (n3)
     (n2) edge node [below] {$k_4$} (n4)
     (n3) edge node [left] {$k_5$} (n4)
          edge node [above right] {$k_6$} (nf)
     (n4) edge node [above left] {$k_7$} (nf);
 \end{tikzpicture}
 
-\subsubsection*{Exploration}
+\subsubsection*{Exploration (Erkundung)}
 
-Solange die Ameise keinen Futterknoten gefunden hat, befindet sie sich in der Explorationsphase (Erkundungsphase). Wir nehmen an, dass sie sich momentan beim Knoten $K_1$ befindet. Sie hat bis dahin bereits die Knoten $\{Nest\}$ besucht. Um Loops zu vermeiden, ist es einer Ameise nicht gestattet, einen Knoten zweimal zu besuchen. Die Menge der begehbaren Kanten ist demnach $\{k_3, k_2\}$. Die Pheromonwerte an den beiden Kanten sind $\{phero_{k_3}, phero_{k_4}\}$. 
+Solange die Ameise keinen Futterknoten gefunden hat, befindet sie sich in der Explorationsphase (Erkundungsphase). Wir nehmen an, dass sie sich momentan beim Knoten $K_1$ befindet. Sie hat bis dahin bereits die Knoten $\{Nest\}$ besucht. Um Loops zu vermeiden, ist es einer Ameise nicht gestattet, einen Knoten zweimal zu besuchen. Die Menge der begehbaren Kanten ist demnach $\{k_2, k_3\}$. Die Pheromonwerte an den beiden Kanten sind $\{phero_{k_2}, phero_{k_3}\}$. 
 
 Die Wahrscheinlichkeit für eine Kante berechnet sich durch:
 
-\[ p_{k_i} = \frac{phero_{k_i}^\alpha}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha} \]
+\[ p_{k_x} = \frac{phero_{k_x}^\alpha}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha} \]
 
-Der Exponent $\alpha$ ist eine experimentell festgestellte Grösse und wird in der Literatur mit $2$ angegeben. Um den Exponenten vernünftig anwenden zu können, müssen sich die Pheromonwerte zwischen $0$ und $1$ befinden, ansonsten ist das Resultat nicht vorhersehbar. Dies erreicht man, indem man die maximale Menge an Pheromonen auf den zur Auswahl stehenden Kanten ermittelt und folgende Formel auf alle Pheromonwerte anwendet. Als untere Grenze ($phero_{min}$) wird jeweils $0$ verwendet.
+Der Exponent $\alpha$ ist eine experimentell festgestellte Grösse und wird in der Literatur mit $2$ angegeben. Um den Exponenten vernünftig anwenden zu können, müssen sich die Pheromonwerte zwischen $0$ und $1$ befinden, ansonsten ist das Resultat nicht vorhersehbar. Dies erreicht man, indem man die maximale Menge an Pheromonen $phero_{max}$ auf den zur Auswahl stehenden Kanten ermittelt und folgende Formel auf alle Pheromonwerte anwendet. Als untere Grenze ($phero_{min}$) wird jeweils $0$ verwendet.
 
 \[ phero_{k_i} = \frac{phero_{k_i} - phero_{min}}{phero_{max} - phero_{min}} \] 
 
@@ -78,11 +84,11 @@ Wie man gleich an einem Rechenbeispiel erkennen kann, verstärkt der Exponent $\
 
 \paragraph*{Rechenbeispiel}
 
-Wir betrachten immer noch den Fall von oben und nehmen für die Pheromonwerte der Kanten $k_3$ und $k_4$ die Werte $phero_{k_3} = 15 $ und $phero_{k_4} = 46$ an. Zuerst müssen wir diese Werte auf Zahlen zwischen $0$ und $1$ normieren:
+Wir betrachten immer noch den Fall von oben und nehmen für die Pheromonwerte der Kanten $k_2$ und $k_3$ die Werte $phero_{k_2} = 15 $ und $phero_{k_3} = 46$ an. Zuerst müssen wir diese Werte auf Zahlen zwischen $0$ und $1$ normieren:
 
 \begin{equation*}
 \begin{split}
-phero_{k_3} & = \frac{phero_{k_3} - phero_{min}}{phero_{max} - phero_{min}} \\
+phero_{k_2} & = \frac{phero_{k_2} - phero_{min}}{phero_{max} - phero_{min}} \\
             & = \frac{15 - 0}{46 - 0} \\
             & = 0.37
 \end{split}
@@ -90,68 +96,70 @@ phero_{k_3} & = \frac{phero_{k_3} - phero_{min}}{phero_{max} - phero_{min}} \\
 
 \begin{equation*}
 \begin{split}
-phero_{k_4} & = \frac{phero_{k_4} - phero_{min}}{phero_{max} - phero_{min}} \\
+phero_{k_3} & = \frac{phero_{k_3} - phero_{min}}{phero_{max} - phero_{min}} \\
             & = \frac{46 - 0}{46 - 0} \\
             & = 1
 \end{split}
 \end{equation*}
 
-Ohne $\alpha$ zu beachten, wären die Zähler der Wahrscheinlichkeitsformel nun $0.37$ und $1$. Die Differenz ist demnach $1 - 0.37 = 0.63$. Wenn $\alpha = 2$ verwendet wird, betragen die Werte $0.37^2 = 0.1369$ und $1^2 = 1$. Die Differenz ist nun $1 - 0.1369 = 0.8631$. Es wird also wahrscheinlicher, dass $k_4$ als nächste Kante gewählt wird.
+Ohne $\alpha$ zu beachten, wären die Zähler der Wahrscheinlichkeitsformel nun $0.37$ und $1$. Die Differenz ist demnach $1 - 0.37 = 0.63$. Wenn $\alpha = 2$ verwendet wird, betragen die Werte $0.37^2 = 0.1369$ und $1^2 = 1$. Die Differenz ist nun $1 - 0.1369 = 0.8631$. Es wird also wahrscheinlicher, dass $k_3$ als nächste Kante gewählt wird.
 
-Die berechneten Wahrscheinlichkeiten für beide Kanten betragen mit $\alpha = 2$
+Die berechneten Wahrscheinlichkeiten für beide Kanten betragen mit $\alpha = 2$:
 
 \begin{equation*}
 \begin{split}
-p_{k_3} & = \frac{0.37^2}{0.37^2 + 1^2} \\
+p_{k_2} & = \frac{0.37^2}{0.37^2 + 1^2} \\
         & = 0.12
 \end{split}
 \end{equation*}
 
 \begin{equation*}
 \begin{split}
-p_{k_4} & = \frac{1^2}{0.37^2 + 1^2} \\
+p_{k_3} & = \frac{1^2}{0.37^2 + 1^2} \\
         & = 0.88
 \end{split}
 \end{equation*}
 
-Die Kante $k_4$ hat demnach eine ca. 7 mal höhere Chance, als nächste ausgewählt zu werden als $k_3$
+Die Kante $k_3$ hat demnach eine ca. 7 mal höhere Chance, als nächste ausgewählt zu werden als $k_2$.
 
-Um die nächste Kante tatsächlich auswählen zu können, werden die Wahrscheinlichkeiten gewichtet und durch eine Zufallszahl ausgewählt. Dazu wird zuerst ein n-Tupel der Form $(p_0, p_0 + p_1, p_0 + p_1 + p_2, ..., \sum\nolimits_{i=0}^n p_n)$ erstellt. Danach generiert man eine Zufallszahl zwischen $0$ und $1$ und ermittelt mittels Bisektion den korrespondierenden Wert im Tupel. Unser Tupel besteht nur aus zwei Einträgen $(0.12, 0.12 + 0.82) = (0.12, 1)$. $k_3$ wird ausgewählt, wenn sich die Zufallszahl zwischen $0$ und $0.12$, $k_4$, wenn sie sich zwischen $0.12$ und $1.0$ befindet. 
+Um die nächste Kante tatsächlich auswählen zu können, werden die Wahrscheinlichkeiten gewichtet und durch eine Zufallszahl ausgewählt. Dazu wird zuerst ein n-Tupel der Form $(p_0, p_0 + p_1, p_0 + p_1 + p_2, ..., \sum\nolimits_{i=0}^n p_n)$ erstellt. Danach generiert man eine Zufallszahl zwischen $0$ und $1$ und ermittelt mittels Bisektion den korrespondierenden Wert im Tupel. Unser Tupel besteht nur aus zwei Einträgen $(0.12, 0.12 + 0.82) = (0.12, 1)$. $k_2$ wird ausgewählt, wenn die Zufallszahl $z \in [0, 0.12)$, $k_3$, falls $z \in [0.12, 1)$.
 
 \paragraph*{Erweiterung}
 
-Die oben aufgeführte Formel zur Berechnung der Wahrscheinlichkeit lässt sich auf einfache Weise durch einen bekannten Wert erweitern und beinflussen. In unserem Fall sind das die Kosten der jeweiligen Kante $cost_{k_i}$. Die Kosten sollen die Wahrscheinlichkeit gegebenenfalls nach unten korrigieren. Die angepasste Formel lautet
+Die oben aufgeführte Formel zur Berechnung der Wahrscheinlichkeit lässt sich auf einfache Weise durch einen bekannten Wert erweitern und beinflussen. In unserem Fall sind das die Kosten der jeweiligen Kante $cost_{k_i}$. Die Kosten sollen die Wahrscheinlichkeit gegebenenfalls nach unten korrigieren. Die angepasste Formel lautet:
 
 \[ p_{k_i} = \frac{phero_{k_i}^\alpha \cdot cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot cost_{k_i}^\beta} \] 
 
-Auch hier müssen die Kosten normiert werden. Das Ziel ist, die Wahrscheinlichkeit stärker mehr zu verringern, je grösser die Kosten der entsprechenden Kante sind. Das heisst, dass wenn der Kostenwert zwischen $0$ und $1$ normiert wird, höhere Kosten näher bei $0$ und tiefere näher bei $1$ sein müssen. Dies wird durch die folgende Normierungsformel erreicht:
+Auch hier müssen die Kosten normiert werden. Das Ziel ist, die Wahrscheinlichkeit stärker zu verringern, je grösser die Kosten der entsprechenden Kante sind. Das heisst, dass wenn der Kostenwert zwischen $0$ und $1$ normiert wird, höhere Kosten näher bei $0$ und tiefere näher bei $1$ sein müssen. Dies wird durch die folgende Normierungsformel erreicht:
 
 \[ cost_{k_i} = \frac{1}{\frac{cost_{k_i}}{cost_{min}}} \]
+
+Für dieses Beispiel seinen $cost_{k_2} = 10$ und $cost_{k_3} = 20$
 
 In unserem Beispiel sind die neuen Kosten demnach
 
 \begin{equation*}
 \begin{split}
-cost_{k_3} & = \frac{1}{\frac{15}{15}} \\
+cost_{k_2} & = \frac{1}{\frac{10}{10}} \\
            & = 1
 \end{split}
 \end{equation*}
 
 \begin{equation*}
 \begin{split}
-cost_{k_4} & = \frac{1}{\frac{46}{15}} \\
-           & = \frac{15}{46}
-           & = 0.33
+cost_{k_3} & = \frac{1}{\frac{20}{10}} \\
+           & = \frac{10}{20}
+           & = 0.5
 \end{split}
 \end{equation*}
 
-Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_4$ die Pheromonwerte mit $0.33$ multipliziert und dadurch verringert werden. Die Unterschiede zwischen den Kosten-Modifikatoren kann durch $\beta$ beeinflusst werden. Hohe Werte verstärken die Unterschiede, Werte zwischen $0$ und $1$ verringern sie.
+Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_3$ die Pheromonwerte mit $0.5$ multipliziert und dadurch verringert werden. Die Unterschiede zwischen den Kosten-Modifikatoren kann durch $\beta$ beeinflusst werden. Hohe Werte verstärken die Unterschiede, Werte zwischen $0$ und $1$ verringern sie.
 
 \subsubsection*{Exploitation (Verwertung)}
 
-Die zweite Phase des Algorithmus ist die Verwertung des Ergebnissen. Sie beginnt, wenn die Ameise den Futterknoten erreicht. In dem Moment geht sie den von ihr gefundenen Pfad zurück und erhöht die Pheromonmenge auf jeder Kante, die sie entlang läuft.
+Die zweite Phase des Algorithmus ist die Verwertung des Ergebnisses. Sie beginnt, wenn die Ameise den Futterknoten erreicht hat. Ab diesem Zeitpunkt geht sie den von ihr gefundenen Pfad zurück und erhöht die Pheromonmenge auf jeder Kante, die sie entlang läuft.
 
-Die Menge an Pheromonen hängt dabei direkt von der gefundenen Pfadlänge ab:
+Die Menge an Pheromonen ($phero_{inc}$), die zu der bestehenden hinzu addiert wird hängt dabei direkt von der gefundenen Pfadlänge ($pathlength$) ab:
 
 \[ phero_{inc} = {\frac{1}{pathlength}}^\gamma \]
 
@@ -169,25 +177,25 @@ Eine sinnvolle, auch von uns implementierte Erweiterung ist die Reduzierung der 
 
 Dazu errechnen wir einen Multiplikator. Der Multiplikator soll nah an $0$ sein, wenn die sich bereits auf der Kante befindende Menge an Pheromonen gross ist und nah an $1$, wenn dieser Wert klein ist.
 
-Dazu speichern wir zu jeder Zeit die maximale Anzahl Pheromone, die sich auf einer Kante im Graph befinden in $phero_{max}$ (das Maximum über alle Kanten des Graphen gesehen). Die Menge auf einer spezifischen Kante ist $phero_{k_i}$. Daraus errechnet sich folgender Multiplikator:
+Dazu speichern wir zu jeder Zeit die Pheromonmenge der Kante mit den meisten Pheromonen über den gesamten Graph hinweg gesehen in  $phero_{max}$. Die Menge auf einer spezifischen Kante ist $phero_{k_i}$. Daraus errechnet sich folgender Multiplikator:
 
-\[ phero_{mul} ={ 1 - \frac{phero_{cur}}{phero_{max}}}^\delta \]
+\[ phero_{mul} ={ 1 - \frac{phero_{k_i}}{phero_{max}}}^\delta \]
 
 Dies führt zu folgender Formel zur Berechnung der Menge an Pheromonen, die zur bestehenden hinzu addiert werden soll:
 
 \[ phero_{inc} = phero_{inc} * phero_{mul} \]
 
-$\delta$ ist wie bereits mehrmals erwähnt zur Gewichtung und beträgt in unserer Implementation standardmässig $0.1$.
+$\delta$ kann wie bereits mehrmals erwähnt, zur Gewichtung verwendet werden und beträgt in unserer Implementation standardmässig $0.1$.
 
-Rechenbeispiel: Die maximale Menge an Pheromonen im Graph sei $phero_{max} = 13$, die Mengen auf den Knoten $k_1 = 5$ und $k_2 = 12$. Das ergibt für $phero_{mul_{k_1}} = 1 - \frac{5}{13} = 0.62$ und $phero_{mul_{k_2}} = 1 - \frac{12}{13} = 0.08$. Man sieht, dass auf die Kante mit höherer Konzentration viel weniger dazu addiert wird als auf die mit der geringeren Konzentration. 
+Rechenbeispiel: Die maximale Menge an Pheromonen im Graph sei $phero_{max} = 13$, die Mengen auf den Knoten $k_1 = 5$ und $k_2 = 12$. Das ergibt für $phero_{mul_{k_1}} = 1 - \frac{5}{13} = 0.62$ und $phero_{mul_{k_2}} = 1 - \frac{12}{13} = 0.08$. Man sieht, dass auf die Kante mit höherer Konzentration viel weniger dazu addiert wird als auf die mit der geringeren Konzentration.
 
-\subsubsection*{Evaporation}
+\subsubsection*{Evaporation (Verdunstung)}
 
-Im letzten Schritt werden die Pheromonwerte auf allen Kanten verringert. Die Verringerung ist kein absoluter Wert, ansonsten würden früher oder später Zahlen $< 1$ erreicht. Daher errechnet sich der neue Pheromonwert einer Kante bei einer Reduktion von $\epsilon \in [0, 1]$ durch
+Im letzten Schritt werden die Pheromonwerte auf allen Kanten verringert. Die Verringerung ist kein absoluter Wert, ansonsten würden früher oder später Zahlen $< 0$ erreicht. Daher errechnet sich der neue Pheromonwert einer Kante bei einer Reduktion von $phero_{red} \in [0, 1]$ durch
 
-\[ phero_{k_i} = (1 - \epsilon) \cdot phero_{k_i} \]
+\[ phero_{k_i} = (1 - phero_{red}) \cdot phero_{k_i} \]
 
-Das ergibt z.B. bei einer Pheromonmenge $phero_{k_i} = 10$ und $\epsilon = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
+Das ergibt z.B. bei einer Pheromonmenge $phero_{k_i} = 10$ und $phero_{red} = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
 
 \section{Aufbau der Applikation}
 
@@ -246,7 +254,7 @@ Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadf
 
 \section{Screenshots}
 
-\secion{Schwierigkeiten}
+\section{Schwierigkeiten}
 
 \subsubsection*{Iteration 1}
 

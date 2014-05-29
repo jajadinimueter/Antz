@@ -133,7 +133,7 @@ class ShortestPathAlgorithm(Algorithm):
     ALPHA = 2
     BETA = 2
     GAMMA = 2
-    PHERO_DECREASE = 0.03
+    PHERO_DECREASE = 0.01
     EXISTING_DECREASE_POW = 0.1
     PHERO_UPDATE_INSTANT = False
     COST_MULTIPLICATOR = 1
@@ -149,7 +149,7 @@ class ShortestPathAlgorithm(Algorithm):
         # Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
         Attribute('Existing Decrease Exp', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
-        Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
+        # Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
     ]
 
     class AlgorithmState(object):
@@ -343,15 +343,14 @@ class ShortestPathAlgorithm(Algorithm):
                 # the ant found a solution
                 ant.state.solution = solution
                 self._add_solution(ctx, ant)
-                if self.phero_update_instant:
-                    for edge in ant.state.edges:
-                        self.visit_edge(ctx, ant, edge)
-                    raise Reset()
             elif node_is_nest(node):
                 # when it's a nest and we are on our way
                 # back -> reset the ant
                 if ant.state.solution:
                     raise Reset()
+
+            if ant.state.solution:
+                ctx.state._solution_counts[ant.state.solution] += 1
 
     def end_turn(self, ctx, ant):
         """
