@@ -130,14 +130,12 @@ class ShortestPathAlgorithm(Algorithm):
     through n nodes.
     """
 
-    ALPHA = 4
+    ALPHA = 2
     BETA = 2
+    GAMMA = 2
     PHERO_DECREASE = 0.03
-    PHERO_COST_DECREASE = False
-    PHERO_COST_DECREASE_POW = 1
-    EXISTING_DECREASE = False
-    EXISTING_DECREASE_POW = 1
-    PHERO_UPDATE_INSTANT = True
+    EXISTING_DECREASE_POW = 0.1
+    PHERO_UPDATE_INSTANT = False
     COST_MULTIPLICATOR = 1
 
     # type and attributes are used by ui to show
@@ -147,11 +145,9 @@ class ShortestPathAlgorithm(Algorithm):
     ATTRIBUTES = [
         Attribute('Alpha', 'alpha', float, default=ALPHA),
         Attribute('Beta', 'beta', float, default=BETA),
+        Attribute('Gamma', 'gamma', float, default=GAMMA),
         # Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
-        Attribute('Phero Cost Decrease', 'phero_cost_decrease', bool, default=PHERO_COST_DECREASE),
-        Attribute('Phero Cost Decrease Exp', 'phero_cost_decrease_pow', float, default=PHERO_COST_DECREASE_POW),
-        Attribute('Existing Decrease', 'existing_decrease', bool, default=EXISTING_DECREASE),
         Attribute('Existing Decrease Exp', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
         Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
     ]
@@ -189,9 +185,13 @@ class ShortestPathAlgorithm(Algorithm):
     class AntState(object):
         def __init__(self):
             self.edges = []
+            self.nodes = set()
             self.turns = 0
             self.solution = None
             self.solution_length = 0
+
+        def add_node(self, node):
+            self.nodes.add(node)
 
         def add_edge(self, edge):
             self.edges.append(edge)
@@ -213,11 +213,9 @@ class ShortestPathAlgorithm(Algorithm):
     def __init__(self):
         self.alpha = self.ALPHA
         self.beta = self.BETA
+        self.gamma = self.GAMMA
         self.phero_decrease = self.PHERO_DECREASE
         self.cost_multiplicator = self.COST_MULTIPLICATOR
-        self.phero_cost_decrease = self.PHERO_COST_DECREASE
-        self.phero_cost_decrease_pow = self.PHERO_COST_DECREASE_POW
-        self.existing_decrease = self.EXISTING_DECREASE
         self.existing_decrease_pow = self.EXISTING_DECREASE_POW
         self.phero_update_instant = self.PHERO_UPDATE_INSTANT
 
@@ -232,7 +230,7 @@ class ShortestPathAlgorithm(Algorithm):
         if state.solution:
             return state.edges.pop()
         else:
-            edges = self._get_edges_to_consider(node, exclude_edges=state.edges)
+            edges = self._get_edges_to_consider(node, exclude_nodes=state.nodes)
             if edges:
                 probabilities = ctx.state._edge_probs.get(node)
                 if not probabilities:
@@ -298,26 +296,18 @@ class ShortestPathAlgorithm(Algorithm):
         if not state.solution:
             state.add_edge(edge)
         else:
-            min_cost = 0
-            max_cost = ctx.graph.max_cost
-
             current_phero = edge.pheromone_level(ant.pheromone_kind('default'))
 
             min_phero = 0
-            max_phero = ctx.state._max_phero or current_phero
+            max_phero = ctx.state._max_phero
 
-            cost_multiplicator = 1
+            phero_inc = (1 / state.solution[1]) ** self.gamma
 
-            if self.phero_cost_decrease:
-                cost_multiplicator = ((edge.cost - min_cost) / (max_cost - min_cost))
-                cost_multiplicator **= self.phero_cost_decrease_pow
-
-            phero_inc = 1 / (state.solution[1] * cost_multiplicator)
-            #
-            # if self.existing_decrease and current_phero and max_phero:
-            #     existing_multiplicator = (current_phero - max_phero) / (max_phero - min_phero)
-            #     existing_multiplicator **= self.existing_decrease_pow
-            #     phero_inc *= existing_multiplicator
+            if current_phero and max_phero:
+                existing_multiplicator = (current_phero - min_phero) / (max_phero - min_phero)
+                existing_multiplicator = 1 - existing_multiplicator
+                existing_multiplicator **= self.existing_decrease_pow
+                phero_inc *= existing_multiplicator
 
             edge.increase_pheromone(
                 ant.create_pheromone(
@@ -345,6 +335,8 @@ class ShortestPathAlgorithm(Algorithm):
             # if the ant hits an obstacle, kill it
             raise Reset()
         else:
+            ant.state.add_node(node)
+
             solution = (tuple(ant.state.edges), ant.state.solution_length)
 
             if node_is_food(node):
@@ -439,17 +431,17 @@ class ShortestPathAlgorithm(Algorithm):
         """
         return not node_is_obstacle(node)
 
-    def _get_edges_to_consider(self, node, exclude_edges=None):
+    def _get_edges_to_consider(self, node, exclude_nodes=None):
         """
         Returns edges which are not yet accessed by the ant (passed by
         `exclude_edges` and which are accessible (not obstacles).
         """
 
         edges = node.edges
-        exclude_edges = exclude_edges or []
+        exclude_nodes = exclude_nodes or set()
 
         edges = [e for e in edges
-                 if e not in exclude_edges]
+                 if e.other_node(node) not in exclude_nodes]
 
         edges = [e for e in edges
                  if self._can_pass(e.other_node(node))]

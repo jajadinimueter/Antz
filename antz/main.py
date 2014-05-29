@@ -86,15 +86,15 @@ def reset_button_pressed(e, app, app_ctx):
     if app_ctx.algorithm:
         app_ctx.running = False
 
-        graph_generator = RandomGraphGenerator(app_ctx.anim_panel_x + app_ctx.anim_panel_width,
-                                               app_ctx.anim_panel_y + app_ctx.anim_panel_height,
-                                               50, node_factory, edge_factory, min_x=app_ctx.anim_panel_x,
-                                               min_y=app_ctx.anim_panel_y, max_connections=2)
+        # graph_generator = RandomGraphGenerator(app_ctx.anim_panel_x + app_ctx.anim_panel_width,
+        #                                        app_ctx.anim_panel_y + app_ctx.anim_panel_height,
+        #                                        50, node_factory, edge_factory, min_x=app_ctx.anim_panel_x,
+        #                                        min_y=app_ctx.anim_panel_y, max_connections=2)
 
-        # graph_generator = GridGraphGenerator(app_ctx.anim_panel_x + app_ctx.anim_panel_width,
-        #                                      app_ctx.anim_panel_y + app_ctx.anim_panel_height,
-        #                                      10, node_factory, edge_factory, min_x=app_ctx.anim_panel_x,
-        #                                      min_y=app_ctx.anim_panel_y, min_food_hops=100, max_food_hops=500)
+        graph_generator = GridGraphGenerator(app_ctx.anim_panel_x + app_ctx.anim_panel_width,
+                                             app_ctx.anim_panel_y + app_ctx.anim_panel_height,
+                                             10, node_factory, edge_factory, min_x=app_ctx.anim_panel_x,
+                                             min_y=app_ctx.anim_panel_y, min_food_hops=100, max_food_hops=500)
 
         app_ctx.nest_node, app_ctx.food_node, app_ctx.graph = graph_generator()
 

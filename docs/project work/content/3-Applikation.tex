@@ -163,13 +163,31 @@ Das heisst, dass bei längeren Pfaden generell weniger Pheromone platziert werde
 
 Sobald die Ameise das Nest erreicht, verliert sie die aktuelle Lösung und beginnt wieder von vorn.
 
+\paragraph*{Erweiterung}
+
+Eine sinnvolle, auch von uns implementierte Erweiterung ist die Reduzierung der addierten Menge an Pheromonen, falls sich bereits eine grosse Menge auf der Kante befindet. Dies verhindert, dass auf einer Kante immer mehr Pheromone abgelagert werden, was dazu führen würde, dass andere Kanten keine Chance mehr hätten, ausgewählt zu werden.
+
+Dazu errechnen wir einen Multiplikator. Der Multiplikator soll nah an $0$ sein, wenn die sich bereits auf der Kante befindende Menge an Pheromonen gross ist und nah an $1$, wenn dieser Wert klein ist.
+
+Dazu speichern wir zu jeder Zeit die maximale Anzahl Pheromone, die sich auf einer Kante im Graph befinden in $phero_{max}$ (das Maximum über alle Kanten des Graphen gesehen). Die Menge auf einer spezifischen Kante ist $phero_{k_i}$. Daraus errechnet sich folgender Multiplikator:
+
+\[ phero_{mul} ={ 1 - \frac{phero_{cur}}{phero_{max}}}^\delta \]
+
+Dies führt zu folgender Formel zur Berechnung der Menge an Pheromonen, die zur bestehenden hinzu addiert werden soll:
+
+\[ phero_{inc} = phero_{inc} * phero_{mul} \]
+
+$\delta$ ist wie bereits mehrmals erwähnt zur Gewichtung und beträgt in unserer Implementation standardmässig 0.1.
+
+Rechenbeispiel: Die maximale Menge an Pheromonen im Graph sei $phero_{max} = 13$, die Mengen auf den Knoten $k_1 = 5$ und $k_2 = 12$. Das ergibt für $phero_{mul_{k_1}} = 1 - \frac{5}{13} = 0.62$ und $phero_{mul_{k_2}} = 1 - \frac{12}{13} = 0.08$. Man sieht, dass auf die Kante mit höherer Konzentration viel weniger dazu addiert wird als auf die mit der geringeren Konzentration. 
+
 \subsubsection*{Evaporation}
 
 Im letzten Schritt werden die Pheromonwerte auf allen Kanten verringert. Die Verringerung ist kein absoluter Wert, ansonsten würden früher oder später Zahlen $< 1$ erreicht. Daher errechnet sich der neue Pheromonwert einer Kante bei einer Reduktion von $\epsilon \in [0, 1]$ durch
 
 \[ phero_{k_i} = (1 - \epsilon) \cdot phero_{k_i} \]
 
-Das ergibt z.B. bei einer Pheromonmenge $phero_{k_n} = 10$ und $\epsilon = 0.01$ einen neuen Wert von $phero_{k_n} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
+Das ergibt z.B. bei einer Pheromonmenge $phero_{k_i} = 10$ und $\epsilon = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
 
 \section{Aufbau der Applikation}
 
