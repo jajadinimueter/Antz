@@ -2,11 +2,6 @@
 % !TeX spellcheck = de-DE
 
 
-% % % Fragen
-% Kapitelbeginn (chapter) nicht nur auf ungeraden Seiten
-
-
-
 \chapter{Einführung}
 
 Im Rahmen des Softwareprojekts 2 gilt es, aus dem Bereich der Algorithmen und Datenstrukturen oder der Numerik eine lauffähige Applikation zu programmieren und angemessen zu dokumentieren. Die Auswahl der vorgeschlagenen Themen war breit gestreut (auch ein eigenes Thema konnte nach Absprache mit dem Fachbetreuer umgesetzt werden).
@@ -19,21 +14,15 @@ In diesem ersten Kapitel erfolgt eine Einführung in allgemeine Aspekte des Them
 Insbesondere danken wir Syrus Mozafar für die hilfreiche Projektbegleitung und Lars Kruse für die fachliche Beratung unseres Projektes.
 
 
-
-\section{Themenwahl (Überblick, Überlegungen, Schwierigkeiten)}
+\section{Themenwahl}
 
 Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen für kürzeste Pfade zwischen A und B gewählt, nämlich die Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei Optimierungsproblemen vielseitig einsetzbar.
 
-???
-\begin{itemize}[noitemsep]
-\item Überblick über die Arbeit geben (evtl. auch Programmstruktur?)
-\item Wichtige Entscheidungen kurz erwähnen
-\item Schwierigkeiten aufzeigen (z.B. bezüglich der Technologie)
-\end{itemize}
+Aus dem breiten Bereich des Themas galt es, eine Entscheidung für eine umsetzbare Lösung zu treffen. Zu entscheiden war beispielsweise, ob der Fokus mehr auf die Implementierung eines möglichst effizienten Algorithmus, auf dem Vergleich zwischen verschiedenen Algorithmen oder stärker auf der graphischen Veranschaulichung liegen sollte. Diese Fragen waren auch eng mit der Wahl der Technologie für die Umsetzung verbunden. Ferner stellte sich bald heraus, dass etwa hinsichtlich der verfügbaren Rechenkapazität eines durchschnittlichen Computers die Anzahl der Ameisen (Sprites) gewisse Grenzen nicht überschreiten sollte.
 
 \subsection{Wahl der Technologie}
 
-Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wie quintus als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen (sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen Leistung sehr gut ist. Das fertige Programm wird so eine ausführbare Datei sein.
+Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wie quintus als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen (sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen Leistung sehr gut ist. Das fertige Programm lässt sich so in eine ausführbare Datei umwandeln.
 
 \subsection{Schwierigkeiten}
 
@@ -55,8 +44,9 @@ Weiter unten: Systemspezifische Beschränkungen erwähnen (Leistung), evtl. auf 
 
 Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen Klasse präsentiert.
 
-Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Ideales Ziel wäre eine Konvergenz des Algorithmus. Dagegen standen nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen. \\
+Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Idealerweise führt der Algorithmus zu einer Konvergenz, dass also eine grosse Anzahl Ameisen den kürzesten Weg nehmen. Dagegen stand nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen.
 
+Bezüglich der Programmarchitektur setzten wir uns zum Ziel, eine nach gängigen Entwurfsprinzipien möglichst gute und klare Struktur zu entwickeln, bei der die Abhängigkeiten der einzelnen Programmbausteine ersichtlich sind.
 
 ???
 % Vgl. meine Notizen (offiziell und projektspezifisch) \\
@@ -70,17 +60,14 @@ Formulierung von (Teil-)Zielen \\
 \vspace*{1cm}
 
 
-\section{Theorie/Geschichtlicher Hintergrund} 
-
-Evtl. kurz die Entwicklung der Algorithmen zur Ameisenkolonieoptimierung aufzeigen (vgl. die Literatur, Wikipedia-Artikel, u.ä.).
-
+\section{Theorie zum Algorithmus der Ameisenkolonieoptimierung} 
 
 Die Ameisenkolonie-Optimierung (Ant Colony Optimization, ACO) richtet sich nach dem Verhalten von Ameisen bei der Wegfindung vom Nest zu Futterquellen, um damit verschiedene Probleme der kombinatorischen Optimierung zu lösen (vgl. \cite[S. 1]{sch-koa}). Dabei senden die Ameisen auf Futtersuche den Duftstoff Pheromon aus. Auf kürzeren Wegen ist die Pheromonkonzentration im Laufe der Zeit höher. Andere Ameisen richten sich bei ihrer Wegfindung nach der Höhe des Pheromons, so dass sie eher einen Weg mit hoher Pheromonkonzentration und damit einen kürzeren Pfad einschlagen. Es bildet sich eine sogenannte Ameisenstrasse aus.
 
 Dieses Ameisenverhalten wurde auf Algorithmen übertragen. Der erste dieser Art wurde 1991 von Marco Dorigo publiziert, und zwar zur Lösung des Problems des Handlungsreisenden (Traveling Salesman Problem, TSP). 1999 steuerte Thomas Stützle entscheidende Ergänzungen bei (vgl. \cite{ds-ant, wiki-antalg}). Diese Algorithmen lassen sich grundlegend so charakterisieren: \blockquote{Zwei herausstechende Merkmale sind Einfachheit und Allgemeingültigkeit der Metaheuristik. Die allgemein zugrunde liegenden und abgebildeten Prinzipien erlauben eine vielfältige Ausgestaltung und breit gefächerte Anwendung des Konzepts. Vielfältige ACO-Algorithmen wurden entwickelt. Die ersten Umsetzungen bewiesen die Anwendbarkeit der Metaheuristik zur Lösung NP-harter Optimierungsprobleme, zeigten aber gleichzeitig Probleme auf, wie die vorschnelle Konvergenz in lokale Optima.\footnote{\cite[S. 19]{sch-koa}}}
 
 
-Beschreibung der Besonderheiten (Heuristik: nicht zwingend korrekte Lösung)??? \\
+???Beschreibung der Besonderheiten (Heuristik: nicht zwingend korrekte Lösung) \\
 
 \noindent
 ACO-Algorithmen lassen sich insbesondere auf graphenbasierte Probleme anwenden, z.B. für die Routenplanung, für Teilmengenprobleme (Rucksackproblem), im Data Mining, Netzwerk-Routing oder für die Ablaufplanung in Fertigungsprozessen.\footnote{\cite[Vgl.][S. 15ff.]{sch-koa}; \cite[vgl.][]{wiki-antalg}} \\
