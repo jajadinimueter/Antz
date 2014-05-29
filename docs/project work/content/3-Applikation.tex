@@ -9,10 +9,10 @@ Programmausschnitte werden  in Python-Code wiedergegeben.
 
 \section{Algorithmus}
 
-\paragraph*{}
 Der Ameisen Optimierungs-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten entscheiden, über welche Kante sie zum nächsten gelangen möchte. Diese Entscheidung basiert hauptsächlich auf der Menge von Pheromonen, welche sich auf dieser Kante befinden. Dies wird wiederholt, bis die Ameise den Futterknoten erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben Weg, den sie gekommen ist zurück und erhöht jeweils die Pheromonwerte auf den Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den Weg geschickt.
 
 \paragraph*{}
+\noindent
 Programmiert könnte der Algorithmus etwa so aussehen:
 
 \begin{lstlisting}
@@ -225,7 +225,7 @@ Zwei verschiedene Varianten für das spätere Aussehen des Programms standen im 
 
 Wir selbst haben zwar keinen Vergleich mit Dijkstra oder A* aufgestellt, trotzdem möchten wir kurz darauf eingeben und dafür die Resultate von \citet*{leo-perf} eingehen.
 
-\citeauthor*{leo-perf} untersucht die drei Algorithmen Dijstra, A* und Ant auf ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangt er zu folgenden Resultaten:
+\citeauthor*{leo-perf} untersuchen die drei Algorithmen Dijstra, A* und Ant auf ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangt er zu folgenden Resultaten:
 
 \begin{table}[h]
 \begin{tabular}{ | l | r | }
@@ -245,6 +245,8 @@ Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadf
 \citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen.
 
 \section{Screenshots}
+
+\secion{Schwierigkeiten}
 
 \subsubsection*{Iteration 1}
 
