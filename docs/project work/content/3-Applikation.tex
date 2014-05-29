@@ -1,5 +1,5 @@
 % !TeX encoding=utf8
-% !TeX spellcheck = de-DE
+% !TeX spellcheck = de-CH
 
 \chapter{Applikation}
 
@@ -8,6 +8,7 @@ Dieses Kapitel beschreibt den Entwicklungsverlauf unserer Applikation, die zugru
 Programmausschnitte werden  in Python-Code wiedergegeben.
 
 \section{Algorithmus}
+\label{sec:algorithm}
 
 Der Ameisen Optimierungs-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten entscheiden, über welche Kante sie zum nächsten gelangen möchte. Diese Entscheidung basiert hauptsächlich auf der Menge von Pheromonen, welche sich auf dieser Kante befinden. Dies wird wiederholt, bis die Ameise den Futterknoten erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben Weg, den sie gekommen ist zurück und erhöht jeweils die Pheromonwerte auf den Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den Weg geschickt.
 
@@ -292,34 +293,16 @@ Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadf
 
 \subsection{Schwierigkeiten}
 
-Weiter unten: Systemspezifische Beschränkungen erwähnen (Leistung), evtl. auf Optimierungsparameter eingehen
+Wir hatten bei der Programmierung einige Schwierigkeiten. Hier eine Auflistung, die eventuell nicht vollständig ist:
 
-???
-\begin{itemize}[noitemsep]
-\item PGU: Library für Slider und Textfelder, etc.
-\item Optimierung: Anzahl Partikel; Speicherbedarf
-\item Zwei Modi (mehrere Render-Möglichkeiten des Algorithmus)
-\item Anfangs: 2D; trotzdem 3D-Koordinaten einbauen (dafür: WebGL als weiterer Renderer)
-\item Einbau von Hindernissen
-\end{itemize}
+\paragraph*{Algorithmus}
 
-\subsubsection*{Iteration 1}
+Wie im Kapitel \ref{sec:algorithm} besprochen, müssen verschiedene Werte auf das Interval $[0,1]$ normiert werden. Dies haben wir erst sehr spät herausgefunden. Somit waren die Ergebnisse, die wir erhielten nicht konstant, wodurch wir durch Debugging sehr viel Zeit verloren haben. Insbesondere haben wir relativ spät (erst in der letzten Iteration) richtig verstanden, wie sich die Exponenten auf die Wahrscheinlichkeiten auswirken.
 
-Noch nicht implementiert, dass die Wegfindung abhängig von der Anzahl Ameisen, die durchlaufen, ist. \\
+\paragraph*{Performance}
 
-Evtl. noch eine Multi-Threaded-Lösung integrieren (sehr gut zu parallelisieren) \\
+Die Performance war lange sehr schlecht, wegen zu häufiger Iterationen über z.B. die Kanten, um Pheromone zu evaporieren. Diese Probleme konnten jedoch bereits in der 2. Iteration behoben werden.
 
-Ausserdem: schnellere Python-Interpreter wie pypy (oder für numerische Berechnungen); für z.B . 10'000 Nodes! \\
+\paragraph*{Code-Stil und Refactorings}
 
-Idee: vielleicht noch Rauschen integrieren? Random von 20\,\% konvergiert überhaupt nicht mehr.
-
-\vspace*{3cm}
-
-
-Inputs von Syrus: \\
-
-\begin{itemize}
-\item Interessant wäre, das Maximum der Verlangsamung bei mehr Ameisen zu messen
-\item Eventuell in Richtung Programming Tuning gehen? (Performance-Messungen: wie viel fällt auf welchen Bereich?) 
-\item Für die Iterationen 2 und 3: Einsatz der Ressourcen planen (Andere Algorithmen; Optimierung; Vergleich mit Djikstra: Statistiken; vgl. Optimierungspotential bezüglich Zeit und Speicheraufwand, etc.); z.B. eher TSP (weil visuell für die Mitstudierenden ansprechender?) 
-\end{itemize}
+Dadurch, dass wir das Game-Framework pyGame verwendet haben, ohne vorher damit gearbeitet zu haben, sah unser GUI-Code schnell aus, wie ein Auszug aus einem Anfänger-Tutorial. Der Code war sehr unstrukturiert. In der letzten Iteration mussten wir deswegen ein grösseres Refactoring vornehmen. Ansonsten wären die Funktionalitäten wie Restart und Reset kaum möglich gewesen.
