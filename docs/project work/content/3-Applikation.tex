@@ -206,11 +206,18 @@ Die Simulation kennt dabei die GUI-Schicht nicht, sondern wird von ihr angesproc
 \pagebreak
 \subsection{Klassendiagramm}
 
-\begin{sidewaysfigure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\textheight]{images/class_diagram.png}     
+    \rotatebox{90}{
+    	\includegraphics[width=0.85\textheight]
+    	{images/class_diagram.png}}
     \caption{Klassendiagramm}
-\end{sidewaysfigure}
+\end{figure}
+
+\pagebreak
+\subsubsection*{Ergänzungen zum Klassendiagramm}
+
+Dem Klassendiagramm kann entnommen werden, dass die einzelnen Klassen sehr lose gekoppelt sind. So werden z.B. dem \texttt{Algorithm} Interface der \texttt{AlgorithmContext}, die \texttt{Ant}, sowie der \texttt{Node} oder \texttt{Edge} bei jedem Aufruf mitgegeben. Der \texttt{AlgorithmContext} enhält zudem einen \texttt{state}, der zwar über die Factory-Methode \texttt{Algorithm.create\_state()} erstellt wird, danach dem Algorithmus jedoch bei jedem Aufruf übergeben wird. Damit kann für eine ganze Simulation eine \texttt{Algorithm}-Instanz erstellt werden. Der \texttt{Algorithm} muss dadurch auch bei der Neugenerierung des Graphen oder der Ameisen-Kolonie nicht mehr neu instanziert werden.
 
 \section{Vorgehen bei der Programmierung}
 
@@ -234,6 +241,32 @@ Zwei verschiedene Varianten für das spätere Aussehen des Programms standen im 
 
 \section{Auswertungen: Konvergenz, Parameter}
 
+\section{Screenshots}
+
+\begin{figure}[h]
+  \centering
+	\includegraphics [width=0.85\textwidth]{images/screenshots/good1.png} 
+	\caption{Gute Konvergenz mit $\alpha = 4$}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+	\includegraphics [width=0.85\textwidth]{images/screenshots/good1_chart.png} 
+	\caption{Konvergenzverlauf mit $\alpha = 4$}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+	\includegraphics [width=0.85\textwidth]{images/screenshots/bad1.png} 
+	\caption{Schlechte Konvergenz mit $\alpha = 1$}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+	\includegraphics [width=0.85\textwidth]{images/screenshots/bad1_chart.png} 
+	\caption{Konvergenzverlauf mit $\alpha = 1$}
+\end{figure}
+
 \section{Vergleich mit Dijkstra und A*}
 
 Wir selbst haben zwar keinen Vergleich mit Dijkstra oder A* aufgestellt, trotzdem möchten wir kurz darauf eingeben und dafür die Resultate von \citet*{leo-perf} eingehen.
@@ -255,9 +288,7 @@ Ant & ~13900ms \\
 
 Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit kommt noch, dass Dijstra und A* immer den optimalen Weg finden, der Ant-Algorithmus jedoch nicht zwingend.
 
-\citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen.
-
-\section{Screenshots}
+\citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen. Es ist jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus nicht.
 
 \subsection{Schwierigkeiten}
 
