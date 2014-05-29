@@ -1,21 +1,22 @@
 % !TeX encoding=utf8
 % !TeX spellcheck = de-CH
 
+
 \chapter{Applikation}
 
-Dieses Kapitel beschreibt den Entwicklungsverlauf unserer Applikation, die zugrundeliegenden Algorithmen und Datenstrukturen, sowie das Klassenmodell und die Interaktionen zwischen den verschiedenen Applikations-Schichten.
+Dieses Kapitel beschreibt den Entwicklungsverlauf unserer Applikation, die zugrundeliegenden Algorithmen und Datenstrukturen sowie das Klassenmodell und die Interaktionen zwischen den verschiedenen Applikationsschichten.
 
 Programmausschnitte werden  in Python-Code wiedergegeben.
 
 \section{Algorithmus}
-\label{sec:algorithm}
 
-Der Ameisen Optimierungs-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten entscheiden, über welche Kante sie zum nächsten gelangen möchte. Diese Entscheidung basiert hauptsächlich auf der Menge von Pheromonen, welche sich auf dieser Kante befinden. Dies wird wiederholt, bis die Ameise den Futterknoten erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben Weg, den sie gekommen ist zurück und erhöht jeweils die Pheromonwerte auf den Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den Weg geschickt.
+Der ACO-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten entscheiden, über welche Kante sie zum nächsten Knoten gelangen möchte. Diese Entscheidung basiert hauptsächlich auf der Menge an Pheromon, die sich auf dieser Kante befindet. Dies wird wiederholt, bis die Ameise den Futterknoten erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben Weg, den sie gekommen ist, zurück und erhöht jeweils die Pheromonwerte auf den Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den Weg geschickt.
 
 \paragraph*{}
 \noindent
 Programmiert könnte der Algorithmus etwa so aussehen:
 
+\lstset{language=Python}
 \begin{lstlisting}
 	def ant_algorithm(ants, graph):
 		for ant in ants:
@@ -27,6 +28,7 @@ Programmiert könnte der Algorithmus etwa so aussehen:
 		reset_ants_with_solution(ants)
 \end{lstlisting}
 
+\noindent
 Wichtig sind natürlich die verschiedenen Funktionen, die in diesem kurzen Codeblock aufgerufen werden:
 
 \begin{description}
@@ -38,18 +40,17 @@ Wichtig sind natürlich die verschiedenen Funktionen, die in diesem kurzen Codeb
 
 \subsection{Ablauf und Berechnungen}
 
-Für die verschiedenen Teilschritte sind ein paar wenige, einfache Formeln nötig. Sie werden benötigt um
+Für die verschiedenen Teilschritte sind ein paar wenige, einfache Formeln zu verwenden. Sie werden benötigt um
 
 \begin{itemize}
-\item zu ermitteln, welche Wahrscheinlichkeit einzelne Kanten haben, als nächstes von einer Ameise ausgewählt zu werden
-\item die Menge an Pheromonen zu bestimmen, die ein Ameise auf einer Kante hinterlässt und
-\item die Pheromonmenge nach der Evaporation zu berechnen
+\item zu ermitteln, welche Wahrscheinlichkeit einzelne Kanten haben, als nächstes von einer Ameise ausgewählt zu werden,
+\item die Menge an Pheromonen zu bestimmen, die eine Ameise auf einer Kante hinterlässt und
+\item die Pheromonmenge nach der Evaporation zu berechnen.
 \end{itemize}
 
-\paragraph*{}
-Für die Betrachtung der verschiedenen Formeln soll folgender Graph als Grundlage dienen:
+\noindent
+Für die Betrachtung der verschiedenen Formeln soll der folgende Graph als Grundlage dienen: \\
 
-\paragraph*{}
 \begin{tikzpicture}
   [scale=.8,auto=left,every node/.style={circle,fill=green!20}]
   \node (nn) at (3,10) {Nest};
@@ -71,21 +72,23 @@ Für die Betrachtung der verschiedenen Formeln soll folgender Graph als Grundlag
 
 \subsubsection*{Exploration (Erkundung)}
 
-Solange die Ameise keinen Futterknoten gefunden hat, befindet sie sich in der Explorationsphase (Erkundungsphase). Wir nehmen an, dass sie sich momentan beim Knoten $K_1$ befindet. Sie hat bis dahin bereits die Knoten $\{Nest\}$ besucht. Um Loops zu vermeiden, ist es einer Ameise nicht gestattet, einen Knoten zweimal zu besuchen. Die Menge der begehbaren Kanten ist demnach $\{k_2, k_3\}$. Die Pheromonwerte an den beiden Kanten sind $\{phero_{k_2}, phero_{k_3}\}$. 
+Solange die Ameise keinen Futterknoten gefunden hat, befindet sie sich in der Explorationsphase (Erkundungsphase). Wir nehmen an, dass sie sich momentan beim Knoten $K_1$ befindet. Sie hat bis dahin bereits den Knoten $\{Nest\}$ besucht. Um Loops zu vermeiden, ist es einer Ameise nicht gestattet, einen Knoten zweimal zu besuchen. Die Menge der begehbaren Kanten ist demnach $\{k_2, k_3\}$. Die Pheromonwerte an den beiden Kanten sind $\{phero_{k_2}, phero_{k_3}\}$. 
 
-Die Wahrscheinlichkeit für eine Kante berechnet sich durch:
+Die Wahrscheinlichkeit für das Begehen einer Kante berechnet sich durch:
 
 \[ p_{k_x} = \frac{phero_{k_x}^\alpha}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha} \]
 
-Der Exponent $\alpha$ ist eine experimentell festgestellte Grösse und wird in der Literatur mit $2$ angegeben. Um den Exponenten vernünftig anwenden zu können, müssen sich die Pheromonwerte zwischen $0$ und $1$ befinden, ansonsten ist das Resultat nicht vorhersehbar. Dies erreicht man, indem man die maximale Menge an Pheromonen $phero_{max}$ auf den zur Auswahl stehenden Kanten ermittelt und folgende Formel auf alle Pheromonwerte anwendet. Als untere Grenze ($phero_{min}$) wird jeweils $0$ verwendet.
+\noindent
+Der Exponent $\alpha$ ist eine experimentell festgestellte Grösse und wird in der Literatur mit $2$ angegeben. Um den Exponenten vernünftig anwenden zu können, müssen sich die Pheromonwerte zwischen $0$ und $1$ befinden, ansonsten ist das Resultat nicht vorhersehbar. Dies wird erreicht, indem man die maximale Menge an Pheromonen $phero_{max}$ auf den zur Auswahl stehenden Kanten ermittelt und folgende Formel auf alle Pheromonwerte anwendet. Als untere Grenze ($phero_{min}$) wird jeweils $0$ verwendet.
 
 \[ phero_{k_i} = \frac{phero_{k_i} - phero_{min}}{phero_{max} - phero_{min}} \] 
 
-Wie man gleich an einem Rechenbeispiel erkennen kann, verstärkt der Exponent $\alpha$ die Unterschiede zwischen den Pheromonwerten. 
+\noindent
+Wie man gleich an einem Rechenbeispiel erkennen kann, verstärkt der Exponent $\alpha$ die Unterschiede zwischen den Pheromonwerten.
 
 \paragraph*{Rechenbeispiel}
 
-Wir betrachten immer noch den Fall von oben und nehmen für die Pheromonwerte der Kanten $k_2$ und $k_3$ die Werte $phero_{k_2} = 15 $ und $phero_{k_3} = 46$ an. Zuerst müssen wir diese Werte auf Zahlen zwischen $0$ und $1$ normieren:
+Wir betrachten immer noch den obigen Fall und nehmen für die Pheromonwerte der Kanten $k_2$ und $k_3$ die Werte $phero_{k_2} = 15 $ und $phero_{k_3} = 46$ an. Zuerst müssen wir diese Werte auf Zahlen zwischen $0$ und $1$ normieren:
 
 \begin{equation*}
 \begin{split}
@@ -103,6 +106,7 @@ phero_{k_3} & = \frac{phero_{k_3} - phero_{min}}{phero_{max} - phero_{min}} \\
 \end{split}
 \end{equation*}
 
+\noindent
 Ohne $\alpha$ zu beachten, wären die Zähler der Wahrscheinlichkeitsformel nun $0.37$ und $1$. Die Differenz ist demnach $1 - 0.37 = 0.63$. Wenn $\alpha = 2$ verwendet wird, betragen die Werte $0.37^2 = 0.1369$ und $1^2 = 1$. Die Differenz ist nun $1 - 0.1369 = 0.8631$. Es wird also wahrscheinlicher, dass $k_3$ als nächste Kante gewählt wird.
 
 Die berechneten Wahrscheinlichkeiten für beide Kanten betragen mit $\alpha = 2$:
@@ -121,9 +125,10 @@ p_{k_3} & = \frac{1^2}{0.37^2 + 1^2} \\
 \end{split}
 \end{equation*}
 
-Die Kante $k_3$ hat demnach eine ca. 7 mal höhere Chance, als nächste ausgewählt zu werden als $k_2$.
+\noindent
+Die Kante $k_3$ hat demnach eine ca. siebenmal höhere Chance, als nächste ausgewählt zu werden, als $k_2$.
 
-Um die nächste Kante tatsächlich auswählen zu können, werden die Wahrscheinlichkeiten gewichtet und durch eine Zufallszahl ausgewählt. Dazu wird zuerst ein n-Tupel der Form $(p_0, p_0 + p_1, p_0 + p_1 + p_2, ..., \sum\nolimits_{i=0}^n p_n)$ erstellt. Danach generiert man eine Zufallszahl zwischen $0$ und $1$ und ermittelt mittels Bisektion den korrespondierenden Wert im Tupel. Unser Tupel besteht nur aus zwei Einträgen $(0.12, 0.12 + 0.82) = (0.12, 1)$. $k_2$ wird ausgewählt, wenn die Zufallszahl $z \in [0, 0.12)$, $k_3$, falls $z \in [0.12, 1)$.
+Um die nächste Kante tatsächlich auswählen zu können, werden die Wahrscheinlichkeiten gewichtet und durch eine Zufallszahl ausgewählt. Dazu wird zuerst ein $n$-Tupel der Form $(p_0, p_0 + p_1, p_0 + p_1 + p_2, ..., \sum\nolimits_{i=0}^n p_n)$ erstellt. Danach generiert man eine Zufallszahl zwischen $0$ und $1$ und ermittelt mittels Bisektion den korrespondierenden Wert im Tupel. Unser Tupel besteht nur aus zwei Einträgen $(0.12, 0.12 + 0.88) = (0.12, 1)$. $k_2$ wird ausgewählt, wenn die Zufallszahl $z \in [0, 0.12)$, $k_3$, falls $z \in [0.12, 1)$.
 
 \paragraph*{Erweiterung}
 
@@ -131,13 +136,13 @@ Die oben aufgeführte Formel zur Berechnung der Wahrscheinlichkeit lässt sich a
 
 \[ p_{k_i} = \frac{phero_{k_i}^\alpha \cdot cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot cost_{k_i}^\beta} \] 
 
-Auch hier müssen die Kosten normiert werden. Das Ziel ist, die Wahrscheinlichkeit stärker zu verringern, je grösser die Kosten der entsprechenden Kante sind. Das heisst, dass wenn der Kostenwert zwischen $0$ und $1$ normiert wird, höhere Kosten näher bei $0$ und tiefere näher bei $1$ sein müssen. Dies wird durch die folgende Normierungsformel erreicht:
+\noindent
+Auch hier müssen die Kosten normiert werden. Das Ziel ist, die Wahrscheinlichkeit stärker zu verringern, je grösser die Kosten der entsprechenden Kante sind. Das heisst, dass, wenn der Kostenwert zwischen $0$ und $1$ normiert wird, höhere Kosten näher bei $0$ und tiefere näher bei $1$ sein müssen. Dies wird durch die folgende Normierungsformel erreicht:
 
 \[ cost_{k_i} = \frac{1}{\frac{cost_{k_i}}{cost_{min}}} \]
 
-Für dieses Beispiel seinen $cost_{k_2} = 10$ und $cost_{k_3} = 20$
-
-In unserem Beispiel sind die neuen Kosten demnach
+\noindent
+Für dieses Beispiel seien $cost_{k_2} = 10$ und $cost_{k_3} = 20$. In unserem Beispiel sind die neuen Kosten demnach
 
 \begin{equation*}
 \begin{split}
@@ -154,39 +159,44 @@ cost_{k_3} & = \frac{1}{\frac{20}{10}} \\
 \end{split}
 \end{equation*}
 
-Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_3$ die Pheromonwerte mit $0.5$ multipliziert und dadurch verringert werden. Die Unterschiede zwischen den Kosten-Modifikatoren kann durch $\beta$ beeinflusst werden. Hohe Werte verstärken die Unterschiede, Werte zwischen $0$ und $1$ verringern sie.
+\noindent
+Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_3$ die Pheromonwerte mit $0.5$ multipliziert und dadurch verringert werden. Die Unterschiede zwischen den Kosten-Modifikatoren können durch $\beta$ beeinflusst werden. Hohe Werte verstärken die Unterschiede, Werte zwischen $0$ und $1$ verringern sie.
 
 \subsubsection*{Exploitation (Verwertung)}
 
-Die zweite Phase des Algorithmus ist die Verwertung des Ergebnisses. Sie beginnt, wenn die Ameise den Futterknoten erreicht hat. Ab diesem Zeitpunkt geht sie den von ihr gefundenen Pfad zurück und erhöht die Pheromonmenge auf jeder Kante, die sie entlang läuft.
+Die zweite Phase des Algorithmus ist die Verwertung des Ergebnisses. Sie beginnt, wenn die Ameise den Futterknoten erreicht hat. Ab diesem Zeitpunkt geht sie den von ihr gefundenen Pfad zurück und erhöht die Pheromonmenge auf jeder Kante, der sie entlangläuft.
 
-Die Menge an Pheromonen ($phero_{inc}$), die zu der bestehenden hinzu addiert wird hängt dabei direkt von der gefundenen Pfadlänge ($pathlength$) ab:
+Die Menge an Pheromonen ($phero_{inc}$), die zu der bestehenden hinzu addiert wird, hängt dabei direkt von der gefundenen Pfadlänge ($pathlength$) ab:
 
-\[ phero_{inc} = {\frac{1}{pathlength}}^\gamma \]
+\[ phero_{inc} = \left({\frac{1}{pathlength}}\right)^\gamma \]
 
+\noindent
 Der neue Pheromonwert beträgt danach 
 
 \[ phero_{k_i} = phero_{k_i} + phero_{inc} \]
 
-Das heisst, dass bei längeren Pfaden generell weniger Pheromone platziert werden. Der Exponent $\gamma$ verstärkt die Unterschiede zwischen den Mengen, genau wie das $\alpha$ und $\beta$ in der Formel zur Berechnung der Wahrscheinlichkeiten. Die Pfadlänge muss immer $> 1$ sein. Dies kann bei der Erstellung des Graphen sichergestellt werden.
+\noindent
+Das heisst, dass bei längeren Pfaden generell weniger Pheromone platziert werden. Der Exponent $\gamma$ verstärkt die Unterschiede zwischen den Mengen, genau wie das $\alpha$ und $\beta$ in der Formel zur Berechnung der Wahrscheinlichkeiten tun. Die Pfadlänge muss immer $> 1$ sein. Dies kann bei der Erstellung des Graphen sichergestellt werden.
 
-Sobald die Ameise das Nest erreicht, verliert sie die aktuelle Lösung und beginnt wieder von vorn.
+Sobald die Ameise das Nest erreicht, verliert sie die aktuelle Lösung, und beginnt wieder von vorn.
 
 \paragraph*{Erweiterung}
 
 Eine sinnvolle, auch von uns implementierte Erweiterung ist die Reduzierung der addierten Menge an Pheromonen, falls sich bereits eine grosse Menge auf der Kante befindet. Dies verhindert, dass auf einer Kante immer mehr Pheromone abgelagert werden, was dazu führen würde, dass andere Kanten keine Chance mehr hätten, ausgewählt zu werden.
 
-Dazu errechnen wir einen Multiplikator. Der Multiplikator soll nah an $0$ sein, wenn die sich bereits auf der Kante befindende Menge an Pheromonen gross ist und nah an $1$, wenn dieser Wert klein ist.
+Dazu berechnen wir einen Multiplikator. Der Multiplikator soll nah an $0$ sein, wenn die sich bereits auf der Kante befindende Menge an Pheromonen gross ist, und nah an $1$, wenn dieser Wert klein ist.
 
-Dazu speichern wir zu jeder Zeit die Pheromonmenge der Kante mit den meisten Pheromonen über den gesamten Graph hinweg gesehen in  $phero_{max}$. Die Menge auf einer spezifischen Kante ist $phero_{k_i}$. Daraus errechnet sich folgender Multiplikator:
+Ferner wird zu jeder Zeit die Pheromonmenge der Kante mit den meisten Pheromonen über den gesamten Graph hinweg gesehen in  $phero_{max}$ gespeichert. Die Menge auf einer spezifischen Kante ist $phero_{k_i}$. Daraus errechnet sich folgender Multiplikator:
 
-\[ phero_{mul} ={ 1 - \frac{phero_{k_i}}{phero_{max}}}^\delta \]
+\[ phero_{mul} = \left({ 1 - \frac{phero_{k_i}}{phero_{max}}}\right)^\delta \]
 
+\noindent
 Dies führt zu folgender Formel zur Berechnung der Menge an Pheromonen, die zur bestehenden hinzu addiert werden soll:
 
-\[ phero_{inc} = phero_{inc} * phero_{mul} \]
+\[ phero_{inc} = phero_{inc} \cdot phero_{mul} \]
 
-$\delta$ kann wie bereits mehrmals erwähnt, zur Gewichtung verwendet werden und beträgt in unserer Implementation standardmässig $0.1$.
+\noindent
+$\delta$ kann, wie bereits mehrmals erwähnt, zur Gewichtung verwendet werden und beträgt in unserer Implementation standardmässig $0.1$.
 
 Rechenbeispiel: Die maximale Menge an Pheromonen im Graph sei $phero_{max} = 13$, die Mengen auf den Knoten $k_1 = 5$ und $k_2 = 12$. Das ergibt für $phero_{mul_{k_1}} = 1 - \frac{5}{13} = 0.62$ und $phero_{mul_{k_2}} = 1 - \frac{12}{13} = 0.08$. Man sieht, dass auf die Kante mit höherer Konzentration viel weniger dazu addiert wird als auf die mit der geringeren Konzentration.
 
@@ -196,11 +206,12 @@ Im letzten Schritt werden die Pheromonwerte auf allen Kanten verringert. Die Ver
 
 \[ phero_{k_i} = (1 - phero_{red}) \cdot phero_{k_i} \]
 
-Das ergibt z.B. bei einer Pheromonmenge $phero_{k_i} = 10$ und $phero_{red} = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
+\noindent
+Das ergibt z.B. bei einer Pheromonmenge $phero_{k_i} = 10$ und $phero_{red} = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 \cdot 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
 
 \section{Aufbau der Applikation}
 
-Die Applikation besteht hauptsächlich aus zwei unterschiedlichen voneinander losgelösten Teilen: dem Benutzerinterface (GUI) und der Simulation (Backend).
+Die Applikation besteht hauptsächlich aus zwei unterschiedlichen, voneinander losgelösten Teilen: dem Benutzerinterface (GUI) und der Simulation (Backend).
 
 Die Simulation kennt dabei die GUI-Schicht nicht, sondern wird von ihr angesprochen, wenn weitere Schritte des Algorithmus berechnet werden sollen.
 
@@ -240,36 +251,21 @@ Zwei verschiedene Varianten für das spätere Aussehen des Programms standen im 
 	\caption{Mockup-Variante 2: Einstellungen im rechten Fensterbereich}
 \end{figure}
 
+\section{Auswertungen: Konvergenz, Parameter}
+
 \section{Screenshots}
-
-\subsection{Bedienung}
-
-
-
-\subsection{Beispiele}
 
 \begin{figure}[h]
   \centering
 	\includegraphics [width=0.85\textwidth]{images/screenshots/good1.png} 
 	\caption{Gute Konvergenz mit $\alpha = 4$}
 \end{figure}
-\label{fig:good_convergence}
 
 \begin{figure}[h]
   \centering
 	\includegraphics [width=0.85\textwidth]{images/screenshots/good1_chart.png} 
 	\caption{Konvergenzverlauf mit $\alpha = 4$}
 \end{figure}
-\label{fig:good_convergence_chart}
-
-In Abbildung \ref{fig:good_convergence} ist eine Konfiguration mit hohem $\alpha$ abgebildet. Dies führt dazu, dass 
-
-\begin{enumerate}
-\item der Algorithmus schnell konvergiert, wie man in Abbildung \ref{fig:good_convergence_chart} sehen kann und
-\item der Algorithmus zu einer akzeptablen Lösung führt
-\end{enumerate}
-
-Abbildung \ref{fig:good_convergence_chart} zeigt die Anzahl verschiedener Lösungen, die gleichzeitig existieren.
 
 \begin{figure}[h]
   \centering
@@ -292,17 +288,18 @@ Wir selbst haben zwar keinen Vergleich mit Dijkstra oder A* aufgestellt, trotzde
 \begin{table}[h]
 \begin{tabular}{ | l | r | }
 \hline
-Dijstra & ~140ms \\
+Dijkstra & $\sim\SI{140}{\milli\s}$ \\
 \hline
-A* & ~110ms \\
+A* & $\sim\SI{110}{\milli\s}$ \\
 \hline
-Ant & ~13900ms \\
+Ant & $\sim\SI{13900}{\milli\s}$  \\
 \hline
 \end{tabular}
 \caption{Vergleich zwischen Dijkstra, A* und Ant}
 \end{table}
 
-Man kann klar erkennen, dass der Ameisen Optimierungs-Algorithmus für die Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit kommt noch, dass Dijstra und A* immer den optimalen Weg finden, der Ant-Algorithmus jedoch nicht zwingend.
+\noindent
+Es lässt sich klar erkennen, dass der Ant-Algorithmus für die Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit kommt noch, dass Dijkstra und A* immer den optimalen Weg finden, der Ant-Algorithmus jedoch nicht zwingend.
 
 \citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen. Es ist jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus nicht.
 
