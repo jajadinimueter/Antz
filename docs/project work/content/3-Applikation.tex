@@ -35,7 +35,7 @@ Wichtig sind natürlich die verschiedenen Funktionen, die in diesem kurzen Codeb
 \item[reset\_ants\_with\_solution] Die Ameisen, die mit einer fertigen Lösung wieder beim Nest angekommen sind, werden zurückgesetzt und können wiederverwendet werden. 
 \end{description}
 
-\subsection{Formeln}
+\subsection{Ablauf und Formeln}
 
 Für die verschiedenen Teilschritte sind ein paar wenige, einfache Formeln nötig. Sie werden benötigt um die Wahrscheinlichkeit einer Kante zu ermitteln, von der Ameise ausgewählt zu werden, die Menge an Pheromonen zu bestimmen, die eine Ameise auf einer Kante hinterlässt und die bei der Evaporation verringert wird.
 
@@ -147,7 +147,7 @@ cost_{k_4} & = \frac{1}{\frac{46}{15}} \\
 
 Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_4$ die Pheromonwerte mit $0.33$ multipliziert und dadurch verringert werden. Die Unterschiede zwischen den Kosten-Modifikatoren kann durch $\beta$ beeinflusst werden. Hohe Werte verstärken die Unterschiede, Werte zwischen $0$ und $1$ verringern sie.
 
-\subsubsection{Exploitation (Verwertung)}
+\subsubsection*{Exploitation (Verwertung)}
 
 Die zweite Phase des Algorithmus ist die Verwertung des Ergebnissen. Sie beginnt, wenn die Ameise den Futterknoten erreicht. In dem Moment geht sie den von ihr gefundenen Pfad zurück und erhöht die Pheromonmenge auf jeder Kante, die sie entlang läuft.
 
@@ -155,7 +155,21 @@ Die Menge an Pheromonen hängt dabei direkt von der gefundenen Pfadlänge ab:
 
 \[ phero_{inc} = {\frac{1}{pathlength}}^\gamma \]
 
-Das heisst, dass bei längeren Pfaden generell weniger Pheromone platziert werden. Der Exponent $\gamma$ verstärkt die Unterschiede zwischen den Mengen, genau wie das $\alpha$ in der Formel zur Berechnung der Wahrscheinlichkeiten. Die Pfadlänge muss konstant $> 1$ sein. Dies kann bei der Erstellung des Graphen sichergestellt werden.
+Der neue Pheromonwert beträgt danach 
+
+\[ phero_{k_i} = phero_{k_i} + phero_{inc} \]
+
+Das heisst, dass bei längeren Pfaden generell weniger Pheromone platziert werden. Der Exponent $\gamma$ verstärkt die Unterschiede zwischen den Mengen, genau wie das $\alpha$ und $\beta$ in der Formel zur Berechnung der Wahrscheinlichkeiten. Die Pfadlänge muss immer $> 1$ sein. Dies kann bei der Erstellung des Graphen sichergestellt werden.
+
+Sobald die Ameise das Nest erreicht, verliert sie die aktuelle Lösung und beginnt wieder von vorn.
+
+\subsubsection*{Evaporation}
+
+Im letzten Schritt werden die Pheromonwerte auf allen Kanten verringert. Die Verringerung ist kein absoluter Wert, ansonsten würden früher oder später Zahlen $< 1$ erreicht. Daher errechnet sich der neue Pheromonwert einer Kante bei einer Reduktion von $\epsilon \in [0, 1]$ durch
+
+\[ phero_{k_i} = (1 - \epsilon) \cdot phero_{k_i} \]
+
+Das ergibt z.B. bei einer Pheromonmenge $phero_{k_n} = 10$ und $\epsilon = 0.01$ einen neuen Wert von $phero_{k_n} = 0.99 * 10 = 9.9$. $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die Reduktion.
 
 \section{Aufbau der Applikation}
 
