@@ -115,7 +115,6 @@ def get_weighted_choice(probabilities):
     if probabilities:
         cdf = [probabilities[0][1]]
         for i in range(1, len(probabilities)):
-            assert probabilities[i][1] != 0
             cdf.append(cdf[i - 1] + probabilities[i][1])
         r = random.random()
         ind = bisect.bisect(cdf, r)
