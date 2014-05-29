@@ -311,7 +311,7 @@ def main():
 
         if ctx.runner and ctx.running:
             if not ctx.paused:
-                ctx.runner.move()
+                ctx.runner.next_step()
 
             # Clear the screen
             #

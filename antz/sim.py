@@ -143,11 +143,10 @@ class ShortestPathAlgorithm(Algorithm):
 
     ALPHA = 2
     BETA = 2
-    GAMMA = 2
+    GAMMA = 1
     PHERO_DECREASE = 0.01
-    EXISTING_DECREASE_POW = 0.1
+    EXISTING_DECREASE_POW = 0
     PHERO_UPDATE_INSTANT = False
-    COST_MULTIPLICATOR = 1
 
     # type and attributes are used by ui to show
     # additional configuration options
@@ -157,10 +156,8 @@ class ShortestPathAlgorithm(Algorithm):
         Attribute('Alpha', 'alpha', float, default=ALPHA),
         Attribute('Beta', 'beta', float, default=BETA),
         Attribute('Gamma', 'gamma', float, default=GAMMA),
-        # Attribute('Cost-Multiplicator', 'cost_multiplicator', float, default=COST_MULTIPLICATOR),
         Attribute('Pheromone Decrease', 'phero_decrease', float, default=PHERO_DECREASE),
         Attribute('Existing Decrease Exp', 'existing_decrease_pow', float, default=EXISTING_DECREASE_POW),
-        # Attribute('Phero Update Instant', 'phero_update_instant', bool, default=PHERO_UPDATE_INSTANT),
     ]
 
     class AlgorithmState(object):
@@ -169,6 +166,7 @@ class ShortestPathAlgorithm(Algorithm):
             self._pheromone_edges = set()
             self._solution_counts = collections.defaultdict(int)
             self._best_solution = None
+            self._edge_probs = {}
             self._max_phero = 0
             self._local_best_solution = None
             self._rounds = 0
@@ -226,7 +224,6 @@ class ShortestPathAlgorithm(Algorithm):
         self.beta = self.BETA
         self.gamma = self.GAMMA
         self.phero_decrease = self.PHERO_DECREASE
-        self.cost_multiplicator = self.COST_MULTIPLICATOR
         self.existing_decrease_pow = self.EXISTING_DECREASE_POW
         self.phero_update_instant = self.PHERO_UPDATE_INSTANT
 
@@ -241,61 +238,58 @@ class ShortestPathAlgorithm(Algorithm):
         if state.solution:
             return state.edges.pop()
         else:
-            edges = self._get_edges_to_consider(node, exclude_nodes=state.nodes)
-            if edges:
-                probabilities = ctx.state._edge_probs.get(node)
-                if not probabilities:
-                    pkind = self._get_default_pheromone_kind(ant)
+            edges = self._get_edges_to_consider(node, exclude_nodes=state.nodes,
+                                                exclude_edges=state.edges)
 
-                    pheromone_levels = [(edge, edge.pheromone_level(pkind))
-                                        for edge in edges]
-                    pheromone_levels_only = [level for _, level in pheromone_levels]
+            if not edges:
+                return
 
-                    min_level = 0
-                    max_level = max(pheromone_levels_only)
+            probabilities = ctx.state._edge_probs.get(node)
+            if not probabilities:
+                pkind = self._get_default_pheromone_kind(ant)
 
-                    min_cost = 0
-                    max_cost = min([edge.cost for edge in edges])
+                pheromone_levels = [(edge, edge.pheromone_level(pkind))
+                                    for edge in edges]
+                pheromone_levels_only = [level for _, level in pheromone_levels]
 
-                    # noinspection PyShadowingNames
-                    def calculate_probability(cost, level, min_level, max_level,
-                                              min_cost, max_cost):
-                        level = (level - min_level) / (max_level - min_level)
-                        cost = 1 / ((cost - min_cost) / (max_cost - min_cost))
-                        level **= self.alpha
-                        if cost:
-                            cost **= self.beta
-                            level *= cost
-                        return level
+                min_level = 0
+                max_level = max(pheromone_levels_only)
 
-                    probabilities = [(edge, calculate_probability(edge.cost, level, min_level,
-                                                                  max_level, min_cost, max_cost))
-                                     for edge, level in pheromone_levels]
+                min_cost = 0
+                max_cost = min([edge.cost for edge in edges])
 
-                    probablity_sum = sum([prob for _, prob in probabilities])
-                    probablity_sum = probablity_sum or 1
+                # noinspection PyShadowingNames
+                def calculate_probability(cost, level, min_level, max_level,
+                                          min_cost, max_cost):
+                    level = (level - min_level) / (max_level - min_level)
+                    cost = 1 / ((cost - min_cost) / (max_cost - min_cost))
+                    level **= self.alpha
+                    cost **= self.beta
+                    level *= cost
+                    return level
 
-                    probabilities = [(edge, prob / probablity_sum)
-                                     for edge, prob in probabilities]
+                probabilities = [(edge, calculate_probability(edge.cost, level, min_level,
+                                                              max_level, min_cost, max_cost))
+                                 for edge, level in pheromone_levels]
 
-                    ctx.state._edge_probs[node] = probabilities
+                probablity_sum = sum([prob for _, prob in probabilities])
+                probablity_sum = probablity_sum or 1
 
-                return get_weighted_choice(probabilities)
+                probabilities = [(edge, prob / probablity_sum)
+                                 for edge, prob in probabilities]
+
+                ctx.state._edge_probs[node] = probabilities
+
+            return get_weighted_choice(probabilities)
 
     def _evaporate(self, ctx):
-        to_remove = set()
+        # to_remove = set()
         for edge in ctx.state._pheromone_edges:
             store = edge.pheromone_store
             kinds = store.kinds
             for k in kinds:
                 level = store.get(k)
-                if level < 10 ** -10:
-                    level = 0
-                    to_remove.add(edge)
                 store.set(Pheromone(k, (1.0 - self.phero_decrease) * level))
-
-        for edge in to_remove:
-            ctx.state._pheromone_edges.remove(edge)
 
     def visit_edge(self, ctx, ant, edge):
         """
@@ -307,7 +301,8 @@ class ShortestPathAlgorithm(Algorithm):
         if not state.solution:
             state.add_edge(edge)
         else:
-            current_phero = edge.pheromone_level(ant.pheromone_kind('default'))
+            current_phero = edge.pheromone_level(
+                ant.pheromone_kind('default'))
 
             min_phero = 0
             max_phero = ctx.state._max_phero
@@ -315,9 +310,8 @@ class ShortestPathAlgorithm(Algorithm):
             phero_inc = (1 / state.solution[1]) ** self.gamma
 
             if current_phero and max_phero:
-                existing_multiplicator = (current_phero - min_phero) / (max_phero - min_phero)
-                existing_multiplicator = 1 - existing_multiplicator
-                existing_multiplicator **= self.existing_decrease_pow
+                existing_multiplicator = ((1 - (current_phero - min_phero) / (max_phero - min_phero))
+                                          ** self.existing_decrease_pow)
                 phero_inc *= existing_multiplicator
 
             edge.increase_pheromone(
@@ -441,7 +435,7 @@ class ShortestPathAlgorithm(Algorithm):
         """
         return not node_is_obstacle(node)
 
-    def _get_edges_to_consider(self, node, exclude_nodes=None):
+    def _get_edges_to_consider(self, node, exclude_nodes=None, exclude_edges=None):
         """
         Returns edges which are not yet accessed by the ant (passed by
         `exclude_edges` and which are accessible (not obstacles).
@@ -449,9 +443,11 @@ class ShortestPathAlgorithm(Algorithm):
 
         edges = node.edges
         exclude_nodes = exclude_nodes or set()
+        exclude_edges = exclude_edges or set()
 
         edges = [e for e in edges
-                 if e.other_node(node) not in exclude_nodes]
+                 if e.other_node(node) not in exclude_nodes
+                 and e not in exclude_edges]
 
         edges = [e for e in edges
                  if self._can_pass(e.other_node(node))]
@@ -827,7 +823,7 @@ class Runner(object):
     def remove_ant(self, ant):
         self._ants.remove(ant)
 
-    def move(self):
+    def next_step(self):
         """
         Move all ants
         """

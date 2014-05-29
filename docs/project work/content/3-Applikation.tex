@@ -121,11 +121,19 @@ wahrscheinlicher, dass $k_3$ als nächste Kante gewählt wird.
 
 Die berechneten Wahrscheinlichkeiten für beide Kanten betragen mit $\alpha = 2$:
 
-\begin{equation*} \begin{split} p_{k_2} & = \frac{0.37^2}{0.37^2 + 1^2} \\ & =
-0.12 \end{split} \end{equation*}
+\begin{equation*} 
+\begin{split} 
+p_{k_2} & = \frac{0.37^2}{0.37^2 + 1^2} \\ 
+& =0.12 
+\end{split} 
+\end{equation*}
 
-\begin{equation*} \begin{split} p_{k_3} & = \frac{1^2}{0.37^2 + 1^2} \\ & = 0.88
-\end{split} \end{equation*}
+\begin{equation*} 
+\begin{split} 
+p_{k_3} & = \frac{1^2}{0.37^2 + 1^2} \\ 
+& = 0.88
+\end{split} 
+\end{equation*}
 
 \noindent Die Kante $k_3$ hat demnach eine ca. siebenmal höhere Chance, als
 nächste ausgewählt zu werden, als $k_2$.
@@ -162,11 +170,19 @@ sein müssen. Dies wird durch die folgende Normierungsformel erreicht:
 \noindent Für dieses Beispiel seien $cost_{k_2} = 10$ und $cost_{k_3} = 20$. In
 unserem Beispiel sind die neuen Kosten demnach
 
-\begin{equation*} \begin{split} cost_{k_2} & = \frac{1}{\frac{10}{10}} \\ & = 1
-\end{split} \end{equation*}
+\begin{equation*} 
+\begin{split} 
+cost_{k_2} & = \frac{1}{\frac{10}{10}} \\ 
+		   & = 1
+\end{split} 
+\end{equation*}
 
-\begin{equation*} \begin{split} cost_{k_3} & = \frac{1}{\frac{20}{10}} \\ & =
-\frac{10}{20} & = 0.5 \end{split} \end{equation*}
+\begin{equation*}
+\begin{split} 
+cost_{k_3} & = \frac{1}{\frac{20}{10}} \\ 
+           & = \frac{10}{20} & = 0.5 
+\end{split} 
+\end{equation*}
 
 \noindent Das bedeutet, dass bei der Auswertung der Wahrscheinlichkeit von $k_3$
 die Pheromonwerte mit $0.5$ multipliziert und dadurch verringert werden. Die
@@ -268,9 +284,12 @@ angesprochen, wenn weitere Schritte des Algorithmus berechnet werden sollen.
 
 \pagebreak \subsection{Klassendiagramm}
 
-\begin{figure}[h] \centering \rotatebox{90}{
+\begin{figure}[h] 
+\centering 
+\rotatebox{90}{
 \includegraphics[width=0.85\textheight] {images/class_diagram.png}}
-\caption{Klassendiagramm} \end{figure}
+\caption{Klassendiagramm} 
+\end{figure}
 
 \pagebreak \subsubsection*{Ergänzungen zum Klassendiagramm}
 
@@ -312,18 +331,24 @@ Einstellungen im rechten Fensterbereich} \end{figure}
 Der Programm kann durch Doppelklick auf \texttt{main.exe} im entpackten
 \texttt{Antz.zip} Ordner gestartet werden (Abbildung \ref{fig:bedienung0}).
 
-\begin{figure}[h] \centering \includegraphics
+\begin{figure}[h] 
+\centering 
+\includegraphics
 [width=0.5\textwidth]{images/screenshots/bedienung_0.png} 
-\caption{Starten durch Doppelklick auf main.exe} \end{figure}
+\caption{Starten durch Doppelklick auf main.exe} 
 \label{fig:bedienung0}
+\end{figure}
 
 Das Programm startet und eine Oberfläche wie in Abbildung \ref{fig:bedienung1}
 erscheint.
 
-\begin{figure}[h] \centering \includegraphics
+\begin{figure}[h] 
+\centering 
+\includegraphics
 [width=0.85\textwidth]{images/screenshots/bedienung_1.png} 
-\caption{Oberfläche direkt nach dem Start des Programms} \end{figure}
+\caption{Oberfläche direkt nach dem Start des Programms} 
 \label{fig:bedienung1}
+\end{figure}
 
 \begin{description}
 \item[1] Die Anzahl Ameisen kann hier eingestellt werden. Es wird empfohlen, den
@@ -354,10 +379,15 @@ Sobald ein Graph mit Reset oder Start generiert wurde, können mit der linken
 Maustaste Hindernisse gezeichnet werden. Mit der rechten Maustaste können sie
 gelöscht werden.
 
-\begin{figure}[H] \centering \includegraphics
+\begin{figure}[H] 
+\centering 
+\includegraphics
 [width=0.85\textwidth]{images/screenshots/bedienung_2.png} 
-\caption{Oberfläche nach dem Start der Simulation} \end{figure}
+\caption{Oberfläche nach dem Start der Simulation}
 \label{fig:bedienung2}
+ \end{figure}
+
+Abbildung \ref{fig:bedienung2} zeigt eine laufende Simulation.
 
 \begin{description}
 \item[1] Zeigt die Framerate an. 
@@ -375,21 +405,52 @@ Ameise auf diesem Pfad.
 
 \subsection{Beispiele}
 
-\begin{figure}[h] \centering \includegraphics
-[width=0.85\textwidth]{images/screenshots/good1.png} \caption{Gute Konvergenz
-mit $\alpha = 4$} \end{figure}
+Es folgen zwei Beispiele, welche die Auswirkungen unterschiedlicher
+$\alpha$-Werte demonstrieren sollen. Es wird der Stand nach 500 Schritten
+aufgeführt.
 
-\begin{figure}[h] \centering \includegraphics
-[width=0.85\textwidth]{images/screenshots/good1_chart.png}
-\caption{Konvergenzverlauf mit $\alpha = 4$} \end{figure}
+\begin{table}[H] 
+\begin{tabular}{ | r | r | r | r | } 
+\hline $\alpha$ & Anzahl Lösungen & Beste Lösung & Lokal beste Lösung  \\ 
+\hline 1 & 105 & 261.42 & 496.57 \\ 
+\hline 2 & 193 & 290.71 & 290.71  \\ 
+\hline 4 & 32 & 218.99 & 387.28  \\ 
+\hline 10 & 3 & 278.99 & 315.56  \\ 
+\hline \end{tabular}
+\caption{Verschiedene $\alpha$-Werte} 
+\end{table}
 
-\begin{figure}[h] \centering \includegraphics
-[width=0.85\textwidth]{images/screenshots/bad1.png} \caption{Schlechte
-Konvergenz mit $\alpha = 1$} \end{figure}
+\begin{figure}[H] 
+\centering 
+\includegraphics
+[width=0.85\textwidth]{images/screenshots/eg_alpha_1.png} 
+\caption{$\alpha = 1$} 
+\label{fig:eg_alpha_1}
+\end{figure}
 
-\begin{figure}[h] \centering \includegraphics
-[width=0.85\textwidth]{images/screenshots/bad1_chart.png}
-\caption{Konvergenzverlauf mit $\alpha = 1$} \end{figure}
+\begin{figure}[H] 
+\centering 
+\includegraphics
+[width=0.85\textwidth]{images/screenshots/eg_alpha_2.png} 
+\caption{$\alpha = 2$} 
+\label{fig:eg_alpha_2}
+\end{figure}
+
+\begin{figure}[H] 
+\centering 
+\includegraphics
+[width=0.85\textwidth]{images/screenshots/eg_alpha_4.png} 
+\caption{$\alpha = 4$} 
+\label{fig:eg_alpha_4}
+\end{figure}
+
+\begin{figure}[H] 
+\centering 
+\includegraphics
+[width=0.85\textwidth]{images/screenshots/eg_alpha_10.png} 
+\caption{$\alpha = 10$} 
+\label{fig:eg_alpha_10}
+\end{figure}
 
 \section{Vergleich mit Dijkstra und A*}
 
@@ -404,10 +465,14 @@ ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangen sie zu
 folgenden
 Resultaten:
 
-\begin{table}[h] \begin{tabular}{ | l | r | } \hline Dijkstra &
-$\sim\SI{140}{\milli\s}$ \\ \hline A* & $\sim\SI{110}{\milli\s}$ \\ \hline Ant &
-$\sim\SI{13900}{\milli\s}$  \\ \hline \end{tabular} \caption{Vergleich zwischen
-Dijkstra, A* und Ant} \end{table}
+\begin{table}[h] 
+\begin{tabular}{ | l | r | } 
+\hline Dijkstra & $\sim\SI{140}{\milli\s}$ \\ 
+\hline A* & $\sim\SI{110}{\milli\s}$ \\ 
+\hline Ant & $\sim\SI{13900}{\milli\s}$  \\ 
+\hline \end{tabular}
+\caption{Vergleich zwischen Dijkstra, A* und Ant} 
+\end{table}
 
 \noindent Es lässt sich klar erkennen, dass der Ant-Algorithmus für die
 Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit
