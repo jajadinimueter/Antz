@@ -292,17 +292,69 @@ Einstellungen im rechten Fensterbereich} \end{figure}
 
 \section{Bedienungsanleitung}
 
+Der Programm kann durch Doppelklick auf \texttt{main.exe} im entpackten
+\texttt{Antz.zip} Ordner gestartet werden (Abbildung \ref{fig:bedienung0}).
+
 \begin{figure}[h] \centering \includegraphics
-[width=0.85\textwidth]{images/screenshots/bedienung_0.png} 
-\caption{Starten durch Klick auf main.exe} \end{figure}
+[width=0.5\textwidth]{images/screenshots/bedienung_0.png} 
+\caption{Starten durch Doppelklick auf main.exe} \end{figure}
+\label{fig:bedienung0}
+
+Das Programm startet und eine Oberfläche wie in Abbildung \ref{fig:bedienung1}
+erscheint.
 
 \begin{figure}[h] \centering \includegraphics
 [width=0.85\textwidth]{images/screenshots/bedienung_1.png} 
 \caption{Oberfläche direkt nach dem Start des Programms} \end{figure}
+\label{fig:bedienung1}
 
-\begin{figure}[h] \centering \includegraphics
+\begin{description}
+\item[1] Die Anzahl Ameisen kann hier eingestellt werden. Es wird empfohlen, der
+Wert unter 2000 zu halten, da das Programm ansonsten sehr langsam wird.
+\item[2] Hier können Nodes ein- oder ausgeblendet werden. 
+\item[3] Hier können Kanten ein- oder ausgeblendet werden.
+\item[4] Ein hoher $\alpha$-Wert führt dazu, dass Pheromonmengen-Unterschiede
+stärker ins Gewicht fallen.
+\item[5] Ein hoher $\beta$-Wert führt dazu, dass die Ameisen sich verstärkt für
+die Kante mit den wenigsten Kosten entscheiden. Bei einem sehr hohen Wert, z.B.
+20 begehen die Ameisen die längeren Diagonalen nicht mehr.
+\item[6] Der $\gamma$-Wert beeinflusst die Pheromonmengen-Erhöhung auf einer
+Kante. Ein hoher Wert vergrössert die Unterschiede zwischen langen und kürzeren
+Pfaden.
+\item[7] Steuert die Pheromon-Evaporation. Je höher der Wert, desto schneller
+verschwinden die Pheromone auf den Kanten.
+\item[8] Steuert, wie stark die existierende Menge an Pheromonen sich auf die
+Verminderung der Erhöhung der Menge auswirkt. Ein höherer Wert führt zu
+stärkerer Verminderung.
+\item[9] Startet die Simulation.
+\item[10] Startet die Simulation mit demselben Graph und eingezeichneten
+Hindernissen neu.
+\item[11] Pausiert die Simulation, kann mit Start weitergeführt werden.
+\item[12] Reset generiert einen neuen Graph.
+\end{description}
+
+Sobald ein Graph mit Reset oder Start generiert wurde, können mit der linken
+Maustaste Hindernisse gezeichnet werden. Mit der rechten Maustaste können sie
+gelöscht werden.
+
+\begin{figure}[H] \centering \includegraphics
 [width=0.85\textwidth]{images/screenshots/bedienung_2.png} 
 \caption{Oberfläche nach dem Start der Simulation} \end{figure}
+\label{fig:bedienung2}
+
+\begin{description}
+\item[1] Zeigt die Framerate an. 
+\item[2] Zeigt an, wie viele Runden bereits gemacht wurden. Eine Runde
+beinhaltet eine Bewegung aller Ameisen.
+\item[3] Zeigt an, wie viele parallele Lösungen momentan existieren. Eine kleine
+Zahl $<20$ ist generell besser.
+\item[4] Zeigt den insgesamt besten Pfad an, auch wenn sich momentan keine
+Ameise auf diesem Pfad befindet.
+\item[5] Zeigt den im Moment besten Pfad an, es befindet sich mindestens eine
+Ameise auf diesem Pfad.
+\item[6] Zeigt den im Moment besten Pfad graphisch an.
+\item[7] Zeigt den insgesamt besten Pfad graphisch an.
+\end{description}
 
 \subsection{Beispiele}
 
@@ -324,12 +376,15 @@ Konvergenz mit $\alpha = 1$} \end{figure}
 
 \section{Vergleich mit Dijkstra und A*}
 
-Im Rahmen dieser Projektarbeit wurde zwar kein Vergleich mit den Algorithmen von 
-Dijkstra oder A* aufgestellt, trotzdem soll hier kurz darauf eingegangen und dafür
+Im Rahmen dieser Projektarbeit wurde zwar kein Vergleich mit den Algorithmen von
+
+Dijkstra oder A* aufgestellt, trotzdem soll hier kurz darauf eingegangen und
+dafür
 die Resultate von \citet*{leo-perf} verwendet werden.
 
 \citeauthor*{leo-perf} untersuchen die drei Algorithmen Dijkstra, A* und Ant auf
-ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangen sie zu folgenden
+ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangen sie zu
+folgenden
 Resultaten:
 
 \begin{table}[h] \begin{tabular}{ | l | r | } \hline Dijkstra &
@@ -348,9 +403,6 @@ jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch
 verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn
 z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus
 dagegen nicht.
-
-
-
 
 \section{Schwierigkeiten}
 
