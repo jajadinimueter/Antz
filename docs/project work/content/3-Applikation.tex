@@ -25,11 +25,16 @@ Weg geschickt.
 
 \noindent Programmiert könnte der Algorithmus etwa so aussehen:
 
-\lstset{language=Python} \begin{lstlisting} def ant_algorithm(ants, graph): for
-ant in ants: next_edge = choose_next_edge(ant.node, graph) ant.node =
-next_edge.other_node(ant.node) if ant.has_solution:
-ant.update_phermone_trail(next_edge) evaporate_pheromones(graph)
-reset_ants_with_solution(ants) \end{lstlisting}
+\lstset{language=Python} 
+\begin{lstlisting} 
+def ant_algorithm(ants, graph): 
+	for ant in ants: next_edge = choose_next_edge(ant.node, graph) 
+		ant.node = next_edge.other_node(ant.node) 
+		if ant.has_solution:
+			ant.update_phermone_trail(next_edge) 
+	evaporate_pheromones(graph)
+	reset_ants_with_solution(ants) 
+\end{lstlisting}
 
 \noindent Wichtig sind natürlich die verschiedenen Funktionen, die in diesem
 kurzen Codeblock aufgerufen werden:
