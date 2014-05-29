@@ -168,16 +168,6 @@ breakatwhitespace=true tabsize=3 }
 % add table of contents to pdf bookmarks
 \IfPackageLoaded{hyperref}{\pdfbookmark[1]{\contentsname}{toc}} \tableofcontents
 
-\IfPackagesLoaded{glossaries,longtable,tabu}{%
-  \clearpage % print out acronym list
-  \IfGlossariesStyleDefined{longtabuFancyHeader}%
-   {\printglossary[type=\acronymtype,style=longtabuFancyHeader]}%
-  % print out symbol list
-  \IfGlossariesStyleDefined{longtabuFancyHeader}%
-   {\printglossary[type=symbolslist,style=longtabuFancyHeader]}%
-  % print out glossary
-  \printglossary[style=altlist] } % end of glossaries
-
 % --- Main Document --- --- --- --- --- --- ---
 \mainmatter %
 % (files loaded with include must not have the prefix .tex)
