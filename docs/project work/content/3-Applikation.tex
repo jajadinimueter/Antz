@@ -291,7 +291,7 @@ angesprochen, wenn weitere Schritte des Algorithmus berechnet werden sollen.
 \caption{Klassendiagramm} 
 \end{figure}
 
-\pagebreak \subsubsection*{Ergänzungen zum Klassendiagramm}
+\pagebreak \subsubsection{Ergänzungen zum Klassendiagramm}
 
 Dem Klassendiagramm kann entnommen werden, dass die einzelnen Klassen sehr lose
 gekoppelt sind. So werden z.B. dem \texttt{Algorithm} Interface der
@@ -382,7 +382,7 @@ Hindernissen neu.
 \item[12] Reset generiert einen neuen Graph.
 \end{description}
 
-Sobald ein Graph mit Reset oder Start generiert wurde, können mit der linken
+\noindent Sobald ein Graph mit Reset oder Start generiert wurde, können mit der linken
 Maustaste Hindernisse gezeichnet werden. Mit der rechten Maustaste können sie
 gelöscht werden.
 
@@ -394,7 +394,7 @@ gelöscht werden.
 \label{fig:bedienung2}
  \end{figure}
 
-Abbildung \ref{fig:bedienung2} zeigt eine laufende Simulation.
+\noindent Abbildung \ref{fig:bedienung2} zeigt eine laufende Simulation.
 
 \begin{description}
 \item[1] Zeigt die Framerate an. 
@@ -410,13 +410,18 @@ Ameise auf diesem Pfad.
 \item[7] Zeigt den insgesamt besten Pfad graphisch an.
 \end{description}
 
+\newpage
+
+\vbox{
 \subsection{Beispiele}
 
 Es folgen zwei Beispiele, welche die Auswirkungen unterschiedlicher
 $\alpha$-Werte demonstrieren sollen. Es wird der Stand nach 500 Schritten
 aufgeführt.
+}
 
-\begin{table}[H] 
+\begin{table}[H]
+\small\sffamily\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{ | r | r | r | r | } 
 \hline $\alpha$ & Anzahl Lösungen & Beste Lösung & Lokal beste Lösung  \\ 
 \hline 1 & 105 & 261.42 & 496.57 \\ 
@@ -427,11 +432,11 @@ aufgeführt.
 \caption{Verschiedene $\alpha$-Werte} 
 \end{table}
 
-Bei der Suche nach der besten Lösung ist keine klare Tendenz zu erkennen. Alle 
-Konfiguration finden in etwa die gleiche Lösung. Nur konvergiert die Lösung bei 
+\noindent Bei der Suche nach der besten Lösung ist keine klare Tendenz zu erkennen. Alle 
+Konfigurationen finden in etwa die gleiche Lösung. Nur konvergiert die Lösung bei 
 hohen $\alpha$-Werten stark zu sehr wenig unterschiedlichen Möglichkeiten. Dies 
 führt dazu, dass der Algorithmus seine Flexibilität verliert. Alternative,
-eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden.
+eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \\
 
 \begin{figure}[H] 
 \centering 
@@ -440,6 +445,8 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden.
 \caption{$\alpha = 1$} 
 \label{fig:eg_alpha_1}
 \end{figure}
+
+\newpage
 
 \begin{figure}[H] 
 \centering 
@@ -468,10 +475,8 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden.
 \section{Vergleich mit Dijkstra und A*}
 
 Im Rahmen dieser Projektarbeit wurde zwar kein Vergleich mit den Algorithmen von
-
 Dijkstra oder A* aufgestellt, trotzdem soll hier kurz darauf eingegangen und
-dafür
-die Resultate von \citet*{leo-perf} verwendet werden.
+dafür die Resultate von \citet*{leo-perf} verwendet werden.
 
 \citeauthor*{leo-perf} untersuchen die drei Algorithmen Dijkstra, A* und Ant auf
 ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangen sie zu
@@ -498,6 +503,9 @@ jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch
 verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn
 z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus
 dagegen nicht.
+
+\newpage
+
 
 \section{Schwierigkeiten}
 
