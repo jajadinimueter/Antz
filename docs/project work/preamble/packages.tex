@@ -386,7 +386,7 @@
    bottom,      % Footnotes appear always on bottom. This is necessary
                 % especially when floats are used
    stable,      % Make footnotes stable in section titles
-   perpage,     % Reset on each page
+   %perpage,     % Reset on each page									% auskommentiert am 29.05.2014
    %para,       % Place footnotes side by side of in one paragraph.
    %side,       % Place footnotes in the margin
    ragged,      % Use RaggedRight
@@ -399,8 +399,8 @@
 %%              With this package they can be reset only at 
 %%              defined headings, such as chapters.
 %% Doc: chngcntr.pdf
-% \usepackage{chngcntr}
-% \counterwithout{footnote}{chapter}
+\usepackage{chngcntr}		% aktiviert am 29.05.2014
+\counterwithout{footnote}{chapter}
 
 %% Description: provides the command \tablefootnote to be used in
 %%              a table or sidewaystable environment, 
