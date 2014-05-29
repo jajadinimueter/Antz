@@ -241,6 +241,18 @@ $phero_{red} = 0.01$ einen neuen Wert von $phero_{k_i} = 0.99 \cdot 10 = 9.9$.
 $0.01$ ist zugleich der in der Literatur empfohlene Standardwert für die
 Reduktion.
 
+\subsection{Warum funktioniert der Algorithmus}
+
+Der Algorithmus baut darauf auf, dass auf schnelleren Routen pro Zeiteinheit
+mehr Ameisen zum Nest zurückkommen. Das heisst, dass auf diesen Routen in
+kürzerer Zeit mehr Pheromone abgelagert werden, was dazu führt, dass Ameisen,
+die vom Nest starten, mit einer höheren Wahrscheinlichkeit die schnellere Route
+begehen. Durch die Evaporation wird dieser Effekt noch verstärkt. Der
+Algorithmus liefert keine exakte Lösung, sondern meist eine gute Näherung. Er
+kann sich jedoch auf Veränderungen, wie z.B. das entfernen oder blockieren eines
+Knoten sehr gut einstellen, weil der grösste Teil des Weges durch die
+Pheromonmengen immer noch bestimmt ist.
+
 \section{Aufbau der Applikation}
 
 Die Applikation besteht hauptsächlich aus zwei unterschiedlichen, voneinander
@@ -431,3 +443,4 @@ gearbeitet zu haben, sah unser GUI-Code schnell aus wie ein Auszug aus einem
 Anfänger-Tutorial. Der Code war sehr unstrukturiert. In der letzten Iteration
 mussten wir deswegen ein grösseres Refactoring vornehmen. Ansonsten wären die
 Funktionalitäten wie Restart und Reset kaum möglich gewesen.
+
