@@ -4,42 +4,161 @@
 
 \chapter{Einführung}
 
-Im Rahmen des Softwareprojekts 2 gilt es, aus dem Bereich der Algorithmen und Datenstrukturen oder der Numerik eine lauffähige Applikation zu programmieren und angemessen zu dokumentieren. Die Auswahl der vorgeschlagenen Themen war breit gestreut (auch ein eigenes Thema konnte nach Absprache mit dem Fachbetreuer umgesetzt werden).
+Im Rahmen des Softwareprojekts 2 gilt es, aus dem Bereich der Algorithmen und
+Datenstrukturen oder der Numerik eine lauffähige Applikation zu programmieren
+und angemessen zu dokumentieren. Die Auswahl der vorgeschlagenen Themen war
+breit gestreut (auch ein eigenes Thema konnte nach Absprache mit dem
+Fachbetreuer umgesetzt werden).
 
-Ziele dieses Softwareprojekts sind unter anderem, unser bisheriges Wissen in der Praxis anzuwenden und unsere Programmierkenntnisse zu vertiefen. Ebenso soll die eigene Erfahrung im   Projektmanagement vertieft werden (Planung, Schätzung, Arbeitsteilung).
+Ziele dieses Softwareprojekts sind unter anderem, unser bisheriges Wissen in der
+Praxis anzuwenden und unsere Programmierkenntnisse zu vertiefen. Ebenso soll die
+eigene Erfahrung im   Projektmanagement vertieft werden (Planung, Schätzung,
+Arbeitsteilung).
 
-In diesem ersten Kapitel erfolgt eine Einführung in allgemeine Aspekte des Themas. Einen Überblick über das Projekt liefert das zweite Kapitel, während das Programm detailliert im dritten Kapitel vorgestellt wird. Im vierten Kapitel werden die Erkenntnisse aus dem Projekt dargestellt, bevor eine Zusammenfassung folgt. 
+In diesem ersten Kapitel erfolgt eine Einführung in allgemeine Aspekte des
+Themas. Einen Überblick über das Projekt liefert das zweite Kapitel, während das
+Programm detailliert im dritten Kapitel vorgestellt wird. Im vierten Kapitel
+werden die Erkenntnisse aus dem Projekt dargestellt, bevor eine Zusammenfassung
+folgt.
 
-\noindent
-Insbesondere danken wir Syrus Mozafar für die hilfreiche Projektbegleitung und Lars Kruse für die fachliche Beratung unseres Projektes.
+\noindent Insbesondere danken wir Syrus Mozafar für die hilfreiche
+Projektbegleitung und Lars Kruse für die fachliche Beratung unseres Projektes.
 
 \section{Themenwahl}
 
-Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen für kürzeste Pfade zwischen A und B gewählt, nämlich die Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei kombinatorischen Optimierungsproblemen vielseitig einsetzbar.
+Für das Thema dieser Arbeit wurde eine Variante aus dem Bereich der Algorithmen
+für kürzeste Pfade zwischen A und B gewählt, nämlich die
+Ameisenkolonie-Optimierung (ACO). Diese Algorithmen basieren ursprünglich auf
+dem Verhalten natürlicher Ameisen bei der Futtersuche und sind bei
+kombinatorischen Optimierungsproblemen vielseitig einsetzbar.
 
-Aus dem breiten Bereich des Themas galt es, eine Entscheidung für eine umsetzbare Lösung zu treffen. Zu entscheiden war beispielsweise, ob der Fokus mehr auf die Implementierung eines möglichst effizienten Algorithmus, auf dem Vergleich zwischen verschiedenen Algorithmen oder stärker auf der graphischen Veranschaulichung liegen sollte. Diese Fragen waren auch eng mit der Wahl der Technologie für die Umsetzung verbunden. Ferner stellte sich bald heraus, dass etwa hinsichtlich der verfügbaren Rechenkapazität eines durchschnittlichen Computers die Anzahl der Ameisen\footnote{Vgl. \citet*[S. 217]{ds-ant}; für viele Optimierungsprobleme besonders auch geographischer Art wird besser eine Ameisenkolonie anstelle einer einzelnen Ameise verwendet.} (Sprites) gewisse Grenzen nicht überschreiten sollte.
+Aus dem breiten Bereich des Themas galt es, eine Entscheidung für eine
+umsetzbare Lösung zu treffen. Zu entscheiden war beispielsweise, ob der Fokus
+mehr auf die Implementierung eines möglichst effizienten Algorithmus, auf dem
+Vergleich zwischen verschiedenen Algorithmen oder stärker auf der graphischen
+Veranschaulichung liegen sollte. Diese Fragen waren auch eng mit der Wahl der
+Technologie für die Umsetzung verbunden. Ferner stellte sich bald heraus, dass
+etwa hinsichtlich der verfügbaren Rechenkapazität eines durchschnittlichen
+Computers die Anzahl der Ameisen\footnote{Vgl. \citet*[S. 217]{ds-ant}; für
+viele Optimierungsprobleme besonders auch geographischer Art wird besser eine
+Ameisenkolonie anstelle einer einzelnen Ameise verwendet.} (Sprites) gewisse
+Grenzen nicht überschreiten sollte.
 
 \section{Wahl der Technologie}
 
-Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wie quintus als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen (sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen Leistung sehr gut ist. Das fertige Programm lässt sich so in eine ausführbare Datei umwandeln.
+Zuerst wurde geprüft, ob das Projekt mit JavaScript und einem Game Framework wie
+quintus als Website umgesetzt werden könnte (Canvas für 2D). Allerdings hat ein
+Test gezeigt, dass bereits ab einer Anzahl von 10'000 einzelnen Elementen
+(sprites) das Rendering in HTML5 bezüglich der Geschwindigkeit überhaupt nicht
+akzeptabel war. Daher wurde entschieden, den Algorithmus mit Python und dem
+Framework pygame umzusetzen, das auf der C-Library STL basiert und dessen
+Leistung sehr gut ist. Das fertige Programm lässt sich so in eine ausführbare
+Datei umwandeln.
 
 \section{Anforderungen}
 
-Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen Klasse präsentiert.
+Die erstellte Applikation sollte auf einem Computer lauffähig sein (ausführbare
+Datei), allenfalls in Form einer Webseite in einem Browser laufen. Der Code ist
+angemessen zu dokumentieren und das Projekt in Form einer Arbeit für ein
+interessiertes Publikum zu dokumentieren. Am Ende wird das Projekt der ganzen
+Klasse präsentiert.
 
-Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten Pheromons. Dies auch, wenn den Ameisen im laufenden Betrieb Hindernisse in den Weg gelegt werden. Dabei sollte mit der Einstellung verschiedener Parameter die einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich werden. Idealerweise führt der Algorithmus zu einer Konvergenz, dass also eine grosse Anzahl Ameisen den kürzesten Weg nehmen. Dagegen stand nicht im Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine ganz spezifische Aufgabe mittels des Programms zu lösen.
+Das zu entwickelnde Programm sollte in erster Linie mit guter graphischer
+Darstellung aufzeigen, wie abstrahierte Ameisen gemäss dem zugrunde gelegten
+Algorithmus in steigender Anzahl Durchläufen einen zunehmend kürzeren Weg vom
+Nest zur Futterquelle finden, unter Einfluss des von den Ameisen emittierten
+Pheromons. Dies auch, wenn den Ameisen im laufenden Betrieb Hindernisse in den
+Weg gelegt werden. Dabei sollte mit der Einstellung verschiedener Parameter die
+einschlägigen Veränderungen in der Lösungsfindung anschaulich ersichtlich
+werden. Idealerweise führt der Algorithmus zu einer Konvergenz, dass also eine
+grosse Anzahl Ameisen den kürzesten Weg nehmen. Dagegen stand nicht im
+Vordergrund, einen möglichst effizienten Algorithmus zu programmieren oder eine
+ganz spezifische Aufgabe mittels des Programms zu lösen.
 
-Bezüglich der Programmarchitektur setzten wir uns zum Ziel, eine nach gängigen Entwurfsprinzipien möglichst gute und klare Struktur zu entwickeln, bei der die Abhängigkeiten der einzelnen Programmbausteine ersichtlich sind.
+Bezüglich der Programmarchitektur setzten wir uns zum Ziel, eine nach gängigen
+Entwurfsprinzipien möglichst gute und klare Struktur zu entwickeln, bei der die
+Abhängigkeiten der einzelnen Programmbausteine ersichtlich sind.
 
-\section{Theorie zum Algorithmus der Ameisenkolonieoptimierung} 
+\section{Theorie zum Algorithmus der Ameisenkolonieoptimierung}
 
-Die Ameisenkolonie-Optimierung (Ant Colony Optimization, ACO) richtet sich nach dem Verhalten von Ameisen bei der Wegfindung vom Nest zu Futterquellen, um damit verschiedene Probleme der kombinatorischen Optimierung zu lösen.\footnote{Vgl. \citet*[S. 1]{sch-koa}. ACO-Algorithmen als Klasse gehören selbst zur übergeordneten Klasse der Algorithmen, die sich nach dem Verhalten natürlicher Ameisen richten, vgl. \citet*[S. 22]{ds-ant}.} Dabei senden die Ameisen auf Futtersuche den Duftstoff Pheromon aus.\footnote{Vgl. \citet*[S. 1\,ff.]{ds-ant}.} Auf kürzeren Wegen ist die Pheromonkonzentration im Laufe der Zeit höher. Andere Ameisen richten sich bei ihrer Wegfindung nach der Menge des vorhandenen Pheromons, so dass sie eher einen Weg mit hoher Pheromonkonzentration und damit einen kürzeren Pfad einschlagen.\footnote{Im Modell führt die Berücksichtigung der sich ändernden Pheromonkonzentration rascher zu guten Lösungen, wenn unter minimalen Kosten der kürzeste Weg in komplexen Graphen gefunden werden soll, vgl. \citet*[S. 9\,ff.; 22]{ds-ant}.} Es bildet sich eine sogenannte Ameisenstrasse aus: \enquote{One of the most surprising behavioral patterns exhibited by ants is the ability of certain ant species to find what computer scientists call shortest paths.}\footnote{\citet*[S. IX]{ds-ant}.}
+Die Ameisenkolonie-Optimierung (Ant Colony Optimization, ACO) richtet sich nach
+dem Verhalten von Ameisen bei der Wegfindung vom Nest zu Futterquellen, um damit
+verschiedene Probleme der kombinatorischen Optimierung zu lösen.\footnote{Vgl.
+\citet*[S. 1]{sch-koa}. ACO-Algorithmen als Klasse gehören selbst zur
+übergeordneten Klasse der Algorithmen, die sich nach dem Verhalten natürlicher
+Ameisen richten, vgl. \citet*[S. 22]{ds-ant}.} Dabei senden die Ameisen auf
+Futtersuche den Duftstoff Pheromon aus.\footnote{Vgl. \citet*[S.
+1\,ff.]{ds-ant}.} Auf kürzeren Wegen ist die Pheromonkonzentration im Laufe der
+Zeit höher. Andere Ameisen richten sich bei ihrer Wegfindung nach der Menge des
+vorhandenen Pheromons, so dass sie eher einen Weg mit hoher
+Pheromonkonzentration und damit einen kürzeren Pfad einschlagen.\footnote{Im
+Modell führt die Berücksichtigung der sich ändernden Pheromonkonzentration
+rascher zu guten Lösungen, wenn unter minimalen Kosten der kürzeste Weg in
+komplexen Graphen gefunden werden soll, vgl. \citet*[S. 9\,ff.; 22]{ds-ant}.} Es
+bildet sich eine sogenannte Ameisenstrasse aus: \enquote{One of the most
+surprising behavioral patterns exhibited by ants is the ability of certain ant
+species to find what computer scientists call shortest
+paths.}\footnote{\citet*[S. IX]{ds-ant}.}
 
-Dieses Ameisenverhalten wurde auf Algorithmen übertragen.\footnote{Für einen vertieften Einblick in die Theorie hinter den ACO-Algorithmen vgl. \citet*[S. 121\,ff.]{ds-ant}, insbesondere auch zur Konvergenz 127\,ff. und S. 261\,f.} Der erste dieser Art wurde 1991 von Marco Dorigo publiziert, und zwar zur Lösung des Problems des Handlungsreisenden (Traveling Salesman Problem, TSP).\footnote{Vgl. dazu auch \citet*[S. 65\,ff.]{ds-ant}.} Zunächst ging es mehr darum, in spielerischer Weise den allgemeinen Wert dieses Ansatzes aufzuzeigen. Intensive Forschung in diesem Bereich führte zu laufenden Verbesserungen. 1999 steuerte Thomas Stützle entscheidende Ergänzungen bei.\footnote{Vgl. \citet*{ds-ant, wiki-antalg}.} ACO-Algorithmen gehören als Metaheuristik\footnote{\citet*[S. 62]{ds-ant}: \enquote{A metaheuristic is a set of algorithmic concepts that can be used to define heuristic methods applicable to a wide set of different problems. In other words, a meta-heuristic can be seen as a general algorithmic framework which can be applied to different optimization problems with relatively few modifications to make them adapted to a specific problem.}} zur Klasse der modellbasierten Suche\footnote{In der modellbasierten Suche (MSB) werden die besten Lösungskandidaten in einem iterativen Prozess durch ein Modell erzeugt, das auf Wahrscheinlichkeiten basiert und entsprechend durch Parameter eingestellt werden kann, vgl. \citet*[S. 138\,ff.]{ds-ant}. Die Suche konzentriert sich zunehmend auf jene Bereiche, die Lösungskandidaten möglichst hoher Qualität aufweisen.} und lassen sich grundlegend so charakterisieren: \blockquote{Zwei herausstechende Merkmale sind Einfachheit und Allgemeingültigkeit der Metaheuristik. Die allgemein zugrunde liegenden und abgebildeten Prinzipien erlauben eine vielfältige Ausgestaltung und breit gefächerte Anwendung des Konzepts. Vielfältige ACO-Algorithmen wurden entwickelt. Die ersten Umsetzungen bewiesen die Anwendbarkeit der Metaheuristik zur Lösung NP-harter Optimierungsprobleme, zeigten aber gleichzeitig Probleme auf, wie die vorschnelle Konvergenz in lokale Optima.\footnote{\citet*[S. 19]{sch-koa}.}}
+Dieses Ameisenverhalten wurde auf Algorithmen übertragen.\footnote{Für einen
+vertieften Einblick in die Theorie hinter den ACO-Algorithmen vgl. \citet*[S.
+121\,ff.]{ds-ant}, insbesondere auch zur Konvergenz 127\,ff. und S. 261\,f.} Der
+erste dieser Art wurde 1991 von Marco Dorigo publiziert, und zwar zur Lösung des
+Problems des Handlungsreisenden (Traveling Salesman Problem, TSP).\footnote{Vgl.
+dazu auch \citet*[S. 65\,ff.]{ds-ant}.} Zunächst ging es mehr darum, in
+spielerischer Weise den allgemeinen Wert dieses Ansatzes aufzuzeigen. Intensive
+Forschung in diesem Bereich führte zu laufenden Verbesserungen. 1999 steuerte
+Thomas Stützle entscheidende Ergänzungen bei.\footnote{Vgl. \citet*{ds-ant,
+wiki-antalg}.} ACO-Algorithmen gehören als Metaheuristik\footnote{\citet*[S.
+62]{ds-ant}: \enquote{A metaheuristic is a set of algorithmic concepts that can
+be used to define heuristic methods applicable to a wide set of different
+problems. In other words, a meta-heuristic can be seen as a general algorithmic
+framework which can be applied to different optimization problems with
+relatively few modifications to make them adapted to a specific problem.}} zur
+Klasse der modellbasierten Suche\footnote{In der modellbasierten Suche (MSB)
+werden die besten Lösungskandidaten in einem iterativen Prozess durch ein Modell
+erzeugt, das auf Wahrscheinlichkeiten basiert und entsprechend durch Parameter
+eingestellt werden kann, vgl. \citet*[S. 138\,ff.]{ds-ant}. Die Suche
+konzentriert sich zunehmend auf jene Bereiche, die Lösungskandidaten möglichst
+hoher Qualität aufweisen.} und lassen sich grundlegend so charakterisieren:
+\blockquote{Zwei herausstechende Merkmale sind Einfachheit und
+Allgemeingültigkeit der Metaheuristik. Die allgemein zugrunde liegenden und
+abgebildeten Prinzipien erlauben eine vielfältige Ausgestaltung und breit
+gefächerte Anwendung des Konzepts. Vielfältige ACO-Algorithmen wurden
+entwickelt. Die ersten Umsetzungen bewiesen die Anwendbarkeit der Metaheuristik
+zur Lösung NP-harter Optimierungsprobleme, zeigten aber gleichzeitig Probleme
+auf, wie die vorschnelle Konvergenz in lokale Optima.\footnote{\citet*[S.
+19]{sch-koa}.}}
 
-\noindent
-Der konstruierte Graph mit den künstlichen Ameisen entsprechen dem wahrscheinlichkeitsbasierten Modell. Durch die Einstellung von Parametern für die ausgeschüttete Pheromonmenge wie auch für die Kosten zur Begehung der einzelnen Kanten kann das Verhalten der künstlichen Ameisen beziehungsweise der Prozess der Lösungssuche entsprechend verändert werden.\footnote{\citet*[Vgl.][S. 151]{ds-ant}.} Im allgemeinen liefern heuristische Algorithmen dieser Art innerhalb der für die Berechnung zur Verfügung stehenden Zeit nicht zwingend eine oder gar die korrekte Lösung, sondern nur eine möglichst gute Lösung. Die Effizienz der Berechnung wird im Vergleich zum Finden der besten Lösung höher gewichtet. In kurzer Zeit soll eine hinreichend gute Lösung gefunden werden.\footnote{Vgl. \citet*[S. 25\,ff.]{ds-ant}.}
+\noindent Der konstruierte Graph mit den künstlichen Ameisen entsprechen dem
+wahrscheinlichkeitsbasierten Modell. Durch die Einstellung von Parametern für
+die ausgeschüttete Pheromonmenge wie auch für die Kosten zur Begehung der
+einzelnen Kanten kann das Verhalten der künstlichen Ameisen beziehungsweise der
+Prozess der Lösungssuche entsprechend verändert
+werden.\footnote{\citet*[Vgl.][S. 151]{ds-ant}.} Im allgemeinen liefern
+heuristische Algorithmen dieser Art innerhalb der für die Berechnung zur
+Verfügung stehenden Zeit nicht zwingend eine oder gar die korrekte Lösung,
+sondern nur eine möglichst gute Lösung. Die Effizienz der Berechnung wird im
+Vergleich zum Finden der besten Lösung höher gewichtet. In kurzer Zeit soll eine
+hinreichend gute Lösung gefunden werden.\footnote{Vgl. \citet*[S.
+25\,ff.]{ds-ant}.}
 
-Gerade wegen der vielfältigen Anwendungsmöglichkeiten in Fragen der Optimierung wurden ACO-Algorithmen mit einigem Erfolg implementiert. Sie lassen sich insbesondere auf graphenbasierte Probleme anwenden, z.B. für die Routenplanung, für Teilmengenprobleme (Rucksackproblem), im Data Mining, Netzwerk-Routing oder für die Ablaufplanung in Fertigungsprozessen.\footnote{Vgl. \citet*[S. 15\,ff.]{sch-koa}; \citet*[S. 153\,ff.]{ds-ant}; \citet*{wiki-antalg}.} Allerdings eignen sich ACO-Algorithmen nicht für alle Arten von Problemen.\footnote{Vgl. \citet*[S. 121]{ds-ant}: \enquote{There exist a variety of problems for which other algorithms appear to be superior to ACO algorithms. Examples are the job shop problem and the graph coloring problem.}} Ein wichtiger Teil der Forschung beschäftigt sich damit abzuklären, für welche Bereiche sich diese Algorithmen besonders gut eignen.
+Gerade wegen der vielfältigen Anwendungsmöglichkeiten in Fragen der Optimierung
+wurden ACO-Algorithmen mit einigem Erfolg implementiert. Sie lassen sich
+insbesondere auf graphenbasierte Probleme anwenden, z.B. für die Routenplanung,
+für Teilmengenprobleme (Rucksackproblem), im Data Mining, Netzwerk-Routing oder
+für die Ablaufplanung in Fertigungsprozessen.\footnote{Vgl. \citet*[S.
+15\,ff.]{sch-koa}; \citet*[S. 153\,ff.]{ds-ant}; \citet*{wiki-antalg}.}
+Allerdings eignen sich ACO-Algorithmen nicht für alle Arten von
+Problemen.\footnote{Vgl. \citet*[S. 121]{ds-ant}: \enquote{There exist a variety
+of problems for which other algorithms appear to be superior to ACO algorithms.
+Examples are the job shop problem and the graph coloring problem.}} Ein
+wichtiger Teil der Forschung beschäftigt sich damit abzuklären, für welche
+Bereiche sich diese Algorithmen besonders gut eignen.
 
-Ein Überblick über die Literatur zu ACO-Algorithmen wird hier nicht gegeben. Insgesamt findet sich eine beträchtliche Anzahl einschlägiger Publikationen zum Thema, die aufgrund anhaltender Forschungstätigkeit laufend grösser wird. Mit die wichtigste Publikation ist das umfangreiche, breit ausgerichtete Buch \textit{Ant Colony Optimization} von Marco Dorigo und Thomas Stützle.\footnote{\citet*{ds-ant}.}
+Ein Überblick über die Literatur zu ACO-Algorithmen wird hier nicht gegeben.
+Insgesamt findet sich eine beträchtliche Anzahl einschlägiger Publikationen zum
+Thema, die aufgrund anhaltender Forschungstätigkeit laufend grösser wird. Mit
+die wichtigste Publikation ist das umfangreiche, breit ausgerichtete Buch
+\textit{Ant Colony Optimization} von Marco Dorigo und Thomas
+Stützle.\footnote{\citet*{ds-ant}.}

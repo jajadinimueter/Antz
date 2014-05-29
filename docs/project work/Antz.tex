@@ -12,7 +12,7 @@
 %% Doc: scrguien.pdf
 \documentclass[%
    %draft=true,     % draft mode (no images, layout errors shown)
-   draft=false,     % final mode 
+   draft=false,     % final mode
 %%% --- Paper Settings ---
    paper=a4,% [Todo: add alternatives]
    paper=portrait, % landscape
@@ -30,10 +30,9 @@
 % Must be loaded first!
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % packages to allow more \write outputs
-\input{preamble/packages-SolutionsNoRoomForNewWrite.tex}
-% packages required for the template
-\usepackage{codesection}
-\usepackage{templatetools}
+\input{preamble/packages-SolutionsNoRoomForNewWrite.tex} % packages required for
+% the template
+\usepackage{codesection} \usepackage{templatetools}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % encoding
@@ -42,13 +41,13 @@
 % automatic selection of encoding
 % insert chars for umlaut a and sz
 \usepackage{selinput}
-\SelectInputMappings{adieresis={ä},germandbls={ß},Euro={€}} 
+\SelectInputMappings{adieresis={ä},germandbls={ß},Euro={€}}
 
 % Encoding of _files and directories_
 % (ensures that any file can be loaded without problems)
 \usepackage[%
-   extendedchars, encoding, multidot, space,
-   filenameencoding=latin1, % Windows XP, Vista, 7
+   extendedchars, encoding, multidot, space, filenameencoding=latin1, % Windows
+   % XP, Vista, 7
    % filenameencoding=utf8,   % Linux, OS X
 ]{grffile}
 
@@ -57,13 +56,11 @@
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %% select/load fonts
-\input{fonts/fonts.tex}
-%\input{fonts/font-commercial.tex}
+\input{fonts/fonts.tex} %\input{fonts/font-commercial.tex}
 %% load packages
-\input{preamble/packages.tex}
-%% apply style settings
-\input{preamble/style.tex}
-%% new commands / definitions (required by the template!)
+\input{preamble/packages.tex} %% apply style settings
+\input{preamble/style.tex} %% new commands / definitions (required by the
+% template!)
 \input{preamble/commands.tex}
 
 % display the layouts
@@ -76,21 +73,19 @@
 %%% Switch between colored links (web) and black links (print)
 \IfDefined{UseDefinition}{%
   %\UseDefinition{Target}{Print}
-  \UseDefinition{Target}{Web}
-}% end of UseDefinition
+  \UseDefinition{Target}{Web} }% end of UseDefinition
 
 \IfPackageLoaded{hyperref}{%
 %%% set layout of PDF pages
-\hypersetup{pdfpagelayout=OneColumn}
-  % options:
+\hypersetup{pdfpagelayout=OneColumn} % options:
   %  SinglePage     Displays a single page; advancing flips the page
   %  OneColumn      Displays the document in one column; continuous scrolling.
-  %  TwoColumnLeft  Displays the document in two columns, 
+  %  TwoColumnLeft  Displays the document in two columns,
   %                 odd-numbered pages to the left.
-  %  TwoColumnRight Displays the document in two columns, 
+  %  TwoColumnRight Displays the document in two columns,
   %                 odd-numbered pages to the right.
-  %  TwoPageLeft    Displays two pages, odd-numbered pages to the left 
-  %  TwoPageRight   Displays two pages, odd-numbered pages to the right 
+  %  TwoPageLeft    Displays two pages, odd-numbered pages to the left
+  %  TwoPageRight   Displays two pages, odd-numbered pages to the right
 }% (end of hyperref)
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,9 +113,8 @@
 %%% bibtex file(s)
 % add multiple files with comma separation
 % biblatex requires files before document
-\IfPackageLoaded{biblatex}{
-  % add all .bib files:
-  \addbibresource{bib/BibtexDatabase.bib}
+\IfPackageLoaded{biblatex}{ % add all .bib files:
+  \addbibresource{bib/BibtexDatabase.bib} %
   % \addbibresource{bib/BibtexData-anytopic.bib}
 }% end: biblatex
 
@@ -132,42 +126,23 @@
 
 %% document content %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\includeonly{
- content/0-title,
- content/0-Abstract,
- content/1-Einfuehrung,
- content/2-Projekt,
- content/3-Applikation,
- content/4-Fazit,
- content/5-Zusammenfassung,
- content/Z-Appendix,
- content/Z-Publications,
-} % end includeonly
+\includeonly{ content/0-title, content/0-Abstract, content/1-Einfuehrung,
+content/2-Projekt, content/3-Applikation, content/4-Fazit,
+content/5-Zusammenfassung, content/Z-Appendix, content/Z-Publications, } % end
+% includeonly
 
 %%% document start %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\definecolor{dkgreen}{rgb}{0,0.6,0}
-\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{dkgreen}{rgb}{0,0.6,0} \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\lstset{frame=tb,
-  language=Python,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=none,
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  breakatwhitespace=true
-  tabsize=3
-}
+\lstset{frame=tb, language=Python, aboveskip=3mm, belowskip=3mm,
+showstringspaces=false, columns=flexible, basicstyle={\small\ttfamily},
+numbers=none, numberstyle=\tiny\color{gray}, keywordstyle=\color{blue},
+commentstyle=\color{dkgreen}, stringstyle=\color{mauve}, breaklines=true,
+breakatwhitespace=true tabsize=3 }
 
 \lstset{language=Python}
 
@@ -176,8 +151,7 @@
 \pagestyle{empty}
 
 % -- title page --
-\include{content/0-title}
-\cleardoublepage
+\include{content/0-title} \cleardoublepage
 
 % -- abstract --
 % (only in phd thesis)
@@ -187,36 +161,29 @@
 % (only in bachelor/master thesis)
 %\input{content/Z-Declaration.tex}	% auskommentiert (17.05.2014)
 
-\frontmatter
-\IfPackageLoaded{scrpage2}{\pagestyle{scrheadings}}
+\frontmatter \IfPackageLoaded{scrpage2}{\pagestyle{scrheadings}}
 
 % -- table of contents --
 %
 % add table of contents to pdf bookmarks
-\IfPackageLoaded{hyperref}{\pdfbookmark[1]{\contentsname}{toc}}
-\tableofcontents
+\IfPackageLoaded{hyperref}{\pdfbookmark[1]{\contentsname}{toc}} \tableofcontents
 
 \IfPackagesLoaded{glossaries,longtable,tabu}{%
-  \clearpage
-  % print out acronym list   
+  \clearpage % print out acronym list
   \IfGlossariesStyleDefined{longtabuFancyHeader}%
    {\printglossary[type=\acronymtype,style=longtabuFancyHeader]}%
-  % print out symbol list 
+  % print out symbol list
   \IfGlossariesStyleDefined{longtabuFancyHeader}%
    {\printglossary[type=symbolslist,style=longtabuFancyHeader]}%
   % print out glossary
-  \printglossary[style=altlist]
-} % end of glossaries
+  \printglossary[style=altlist] } % end of glossaries
 
 % --- Main Document --- --- --- --- --- --- ---
-\mainmatter
-%
+\mainmatter %
 % (files loaded with include must not have the prefix .tex)
 %
-\include{content/1-Einfuehrung}
-\include{content/2-Projekt}
-\include{content/3-Applikation}
-\include{content/4-Fazit}
+\include{content/1-Einfuehrung} \include{content/2-Projekt}
+\include{content/3-Applikation} \include{content/4-Fazit} %
 % \include{content/5-Zusammenfassung}
 
 %%% -- end of main content
@@ -228,13 +195,11 @@
 % -- bibliography --
 % (must be placed _before_ appendix)
 
-\IfPackageLoaded{biblatex}{
-  \cleardoublepage
-  \IfDefined{phantomsection}{\phantomsection}\label{sec:bibliography}
-  
+\IfPackageLoaded{biblatex}{ \cleardoublepage
+\IfDefined{phantomsection}{\phantomsection}\label{sec:bibliography}
+
   % show all biblatex entries
-  \nocite{*}
-  \printbibliography[%
+  \nocite{*} \printbibliography[%
     %heading=bibintoc, % (bibintoc, bibnumbered)
   ]
 
@@ -252,11 +217,9 @@
 %\IfDefined{lstlistoflistings}{\cleardoublepage\lstlistoflistings}
 
 % --- Appendix --- --- --- --- --- --- ---
-\cleardoublepage
-\appendix
-% Add `Appendix` to TOC
-\addcontentsline{toc}{part}{\appendixname}
-% must be _input_, otherwise the TOC entry is at the wrong place
+\cleardoublepage \appendix % Add `Appendix` to TOC
+\addcontentsline{toc}{part}{\appendixname} % must be _input_, otherwise the TOC
+% entry is at the wrong place
 \input{content/Z-Appendix.tex}
 
 %% -- Index --
