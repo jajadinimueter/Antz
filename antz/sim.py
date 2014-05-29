@@ -85,6 +85,17 @@ class Algorithm(object):
         Called after one turn
         """
 
+    def create_state(self):
+        """
+        Returns a state object which has to be passed on every
+        method call.
+        """
+
+    def create_ant_state(self):
+        """
+        Returns a state object which should be attaced to an ant
+        """
+
     def __repr__(self):
         """
         Default repr implementation for convenience 
@@ -271,17 +282,17 @@ class ShortestPathAlgorithm(Algorithm):
 
                 return get_weighted_choice(probabilities)
 
-    def evaporate(self, ctx):
+    def _evaporate(self, ctx):
         to_remove = set()
         for edge in ctx.state._pheromone_edges:
             store = edge.pheromone_store
             kinds = store.kinds
             for k in kinds:
-                level = store.get_amount(k)
+                level = store.get(k)
                 if level < 10 ** -10:
                     level = 0
                     to_remove.add(edge)
-                store.set(k, (1.0 - self.phero_decrease) * level)
+                store.set(Pheromone(k, (1.0 - self.phero_decrease) * level))
 
         for edge in to_remove:
             ctx.state._pheromone_edges.remove(edge)
@@ -420,7 +431,7 @@ class ShortestPathAlgorithm(Algorithm):
                 ctx.state._best_solution = None
 
         # evaporate pheromones
-        self.evaporate(ctx)
+        self._evaporate(ctx)
 
     def _can_pass(self, node):
         """
@@ -661,26 +672,23 @@ class WaypointEdge(antz_graph.Edge):
 
     def __init__(self, node_from, node_to, pheromone_store=None, **kwargs):
         antz_graph.Edge.__init__(self, node_from, node_to, **kwargs)
-        self._ps = pheromone_store or PheromoneStore()
+        self._pheromone_store = pheromone_store or PheromoneStore()
 
     @property
     def pheromone_store(self):
-        return self._ps
+        return self._pheromone_store
 
     def pheromone_level(self, kind):
-        return self._ps.get_amount(kind) or 10 ** -10
+        return self._pheromone_store.get(kind) or 10 ** -10
 
     def increase_pheromone(self, pheromone):
-        self._ps.increase(pheromone)
+        self._pheromone_store.increase(pheromone)
 
     def decrease_pheromone(self, pheromone):
-        self._ps.decreases(pheromone)
+        self._pheromone_store.decreases(pheromone)
 
-    def set_pheromone_level(self, kind, amount):
-        self._ps.set(kind, amount)
-
-    def evaporate_pheromone(self, kind=None):
-        self._ps.evaporate(kind)
+    def set_pheromone_level(self, pheromone):
+        self._pheromone_store.set(pheromone)
 
     def __repr__(self):
         return ('%s(node_from=%s, node_to=%s)'
@@ -699,9 +707,6 @@ class PheromoneStore(object):
     def kinds(self):
         return self._level.keys()
 
-    def get_amount(self, kind):
-        return self._get(kind)
-
     def increase(self, pheromone):
         k = pheromone.kind
         self._set(k, self._get(k) + pheromone.amount)
@@ -717,8 +722,11 @@ class PheromoneStore(object):
     def _set(self, kind, amount):
         self._level[kind] = amount
 
-    def set(self, kind, amount):
-        self._set(kind, amount)
+    def get(self, kind):
+        return self._get(kind)
+
+    def set(self, pheromone):
+        self._set(pheromone.kind, pheromone.amount)
 
     def decrease(self, pheromone):
         self._decrease(pheromone.kind, pheromone.amount)
