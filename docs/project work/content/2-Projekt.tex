@@ -30,38 +30,21 @@ Die regelmässige Kommunikation unter beiden Projektpartnern erfolgte entweder i
 
 \section{Projektplanung}
 
-
-%%% Ideen %%%
-
-??? Vgl. unser Projektplanungstool --> Anhang \\
-
-??? Eventuell die Besprechungen mit Syrus integrieren (Feedback, Tipps, Stand, etc.) \\
-
-
-
-\vspace*{1cm}
-
-%%%%%%
-
-
-Bei der Planung für dieses Softwareprojekt waren drei Meilensteine anzusetzen. Für die einzelnen Meilensteine wurden vier, drei und fünf Wochen angesetzt. Erwartungsgemäss dauerte der letzte Meilenstein etwas länger, wofür eine entsprechende Reserve von zwei Wochen eingeplant war.
+Bei der Planung für dieses Softwareprojekt waren drei Meilensteine anzusetzen.\footnote{Vgl. auch die Screenshots aus dem verwenden Projektplanungstool in Anhang \ref{sec:planungstool}.} Für die einzelnen Meilensteine wurden vier, drei und fünf Wochen angesetzt. Erwartungsgemäss dauerte der letzte Meilenstein etwas länger, wofür eine entsprechende Reserve von zwei Wochen eingeplant war.
 
 Zur effizienten Planung der drei Zwischenabgaben\footnote{Die drei Abgabereporte finden sich in Anhang A.} war das folgende Planungsdreieck zweckdienlich. Insbesondere auch für die Priorisierung noch ausstehender User Stories innerhalb und zwischen den drei Meilensteinen. \\
 
-
 \begin{figure}[h]
   \centering
-	\includegraphics [width=0.65\textwidth]{images/Planungsdreieck_Quelle.png} 
+	\includegraphics [width=0.65\textwidth]{images/Planungsdreieck.png} 
 	\caption{Planungsdreieck (Quelle: Einführende Präsentation von Syrus Mozafar)}
 \end{figure}
-
-
-\vspace*{0.5cm}
 
 \noindent
 Der offizielle Projektplan gab folgende äussere Rahmenbedingungen vor:
 
-\begin{table}[h]
+%\FloatBarrier
+\begin{table}[H]
 \small\sffamily\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{| p{2.5cm} | l |}
   \hline
@@ -88,11 +71,12 @@ Der offizielle Projektplan gab folgende äussere Rahmenbedingungen vor:
 \caption{Offizielle Fixpunkte der Projektplanung}
 \end{table}
 
+\newpage
 
 
 \subsection{Meilenstein 1: Arthur}
 
-
+\vbox{
 Im ersten Meilenstein Arthur bestand das Ziel darin, das Programm mit einigen grundlegenden Funktionen lauffähig zu erstellen. Hier die entsprechende Beschreibung aus unserem Planungstool:
 
 \begin{itemize}[noitemsep]
@@ -100,8 +84,7 @@ Im ersten Meilenstein Arthur bestand das Ziel darin, das Programm mit einigen gr
 \item There will be some UI controls like sliders to adjust some values.
 \item The exact algorithm MUST NOT be implemented. But ants want to find food and return to the hive when found. \\\\
 \end{itemize}
-
-
+}
 
 % \renewcommand{\arraystretch}{2}	% vor einer Tabelle
 
@@ -140,12 +123,18 @@ Im ersten Meilenstein Arthur bestand das Ziel darin, das Programm mit einigen gr
 \caption{User Stories des ersten Meilensteines}
 \end{table}
 
-\subsubsection*{Fazit}
+%\renewcommand{\arraystretch}{1}	% nach einer Tabelle
 
-Diese Iteration war sehr erfolgreich, da wir bereits eine lauffähige Lösung produzieren
-konnten. Auch die eingeplanten Stunden konnten wir relativ gut einhalten. Nur den
-Aufwand, um die Simulation soweit mit pyGame zu verknüpfen, dass sich bewegende Sprites
-angezeigt werden, haben wir unterschätzt.
+\vspace*{0.5cm}
+
+
+???
+Kurzer Kommentar über die Abweichungen zwischen Schätzung und effektivem Aufwand. \\
+
+
+\vspace*{1cm}
+
+
 
 \subsection{Meilenstein 2: Cobannus}
 
@@ -156,6 +145,8 @@ Für den zweiten Meilenstein Cobannus galt es folgendes Ziel zu erreichen:
 \item This release includes the fully working solution including finding the shortest path through a set of points.
 \end{itemize}
 }
+
+
 
 \begin{table}[H]
 \small\sffamily\renewcommand{\arraystretch}{1.5}
@@ -181,13 +172,7 @@ Für den zweiten Meilenstein Cobannus galt es folgendes Ziel zu erreichen:
 \caption{User Stories des zweiten Meilensteines}
 \end{table}
 
-\subsubsection*{Fazit}
-
-Auch eine sehr erfolgreiche Iteration. Alle Stories konnten abgearbeitet werden und die
-Abweichungen von der Schätzung hielten sich im Rahmen. In dieser Iteration
-implementierten wir den Algorithmus, der zu einem kürzesten Pfad führen sollte. Leider
-war diese Lösung sehr defizitär. Was diese Iteration im Nachhinein etwas schlechter
-aussehen lässt.
+\vspace*{0.5cm}
 
 \subsection{Meilenstein 3: Tarvos}
 
@@ -198,6 +183,7 @@ Im dritten Meilenstein Tarvos waren folgende Ziele zu erreichen:
 \item Furthermore, additional UI controls may be added to configure all aspects of the algorithm
 \end{itemize}
 
+
 \begin{table}[H]
 \small\sffamily\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{| p{12cm} | c | c |}
@@ -207,25 +193,16 @@ Im dritten Meilenstein Tarvos waren folgende Ziele zu erreichen:
   Documentation and presentation. & 10\,pt & 15\,pt \\
   \hline
   As a user I want to define the glucose content of different food piles. &
-  1\,pt & - \\
+  1\,pt &1\,pt \\
   \hline
-  As a user I expect the ant collecting the food with most glucose content first. & 2\,pt & - \\
+  As a user I expect the ant collecting the food with most glucose content first. & 2\,pt &2\,pt \\
   \hline
-  As a user I expect the ants collecting the food. Means the amount of food decreases over time. & 2\,pt & - \\
+  As a user I expect the ants collecting the food. Means the amount of food decreases over time. & 2\,pt & 2\,pt \\
   \hline
   Documentation and Presentation (II). & 10\,pt & 10\,pt \\
   \hline
 \end{tabular}
 \captionbelow{User Stories des dritten Meilensteines}
 \end{table}
-
-\subsubsection*{Fazit}
-
-Der Meilenstein ``Tarvos'' konnte nicht wie geplant durchgeführt werden, da 
-bereits viel Zeit in Refactoring-Arbeiten und Anpassungen des Algorithmus 
-investiert wurde. Zentrale Eigenschaften des Algorithmus wurden erst in dieser
-Iteration verstanden und mussten noch entsprechend angepasst werden. Dazu 
-gehören die Normierung aller Werte auf das Interval $[0,1]$ und die Bedeutung
-der Exponenten.
 
 \input{content/Technologien}
