@@ -16,7 +16,7 @@ Der ACO-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonome
 Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines
 Graphen bis zu einem Futter-Knoten. Die Ameise muss sich bei jedem Knoten
 entscheiden, über welche Kante sie zum nächsten Knoten gelangen möchte. Diese
-Entscheidung basiert hauptsächlich auf der Menge an Pheromon, die sich auf
+Entscheidung basiert hauptsächlich auf der Menge an Pheromonen, die sich auf
 dieser Kante befindet. Dies wird wiederholt, bis die Ameise den Futterknoten
 erreicht. Danach befindet sie sich auf dem Rückweg zum Nest. Sie geht denselben
 Weg, den sie gekommen ist, zurück und erhöht jeweils die Pheromonwerte auf den
@@ -28,7 +28,8 @@ Programmiert könnte der Algorithmus etwa so aussehen:
 \lstset{language=Python} 
 \begin{lstlisting} 
 def ant_algorithm(ants, graph): 
-	for ant in ants: next_edge = choose_next_edge(ant.node, graph) 
+	for ant in ants: 
+		next_edge = choose_next_edge(ant.node, graph) 
 		ant.node = next_edge.other_node(ant.node) 
 		if ant.has_solution:
 			ant.update_phermone_trail(next_edge) 
@@ -36,7 +37,7 @@ def ant_algorithm(ants, graph):
 	reset_ants_with_solution(ants) 
 \end{lstlisting}
 
-\noindent Wichtig sind natürlich die verschiedenen Funktionen, die in diesem
+\noindent Wichtig sind die verschiedenen Funktionen, die in diesem
 kurzen Codeblock aufgerufen werden:
 
 \begin{description} \item[choose\_next\_edge] Bestimmt auf der Grundlage von
@@ -89,7 +90,7 @@ Die Wahrscheinlichkeit für das Begehen einer Kante berechnet sich durch:
 \noindent Der Exponent $\alpha$ ist eine experimentell festgestellte Grösse und
 wird in der Literatur mit $2$ angegeben. Um den Exponenten vernünftig anwenden
 zu können, müssen sich die Pheromonwerte zwischen $0$ und $1$ befinden,
-ansonsten ist das Resultat nicht vorhersehbar. Dies wird erreicht, indem man die
+ansonsten ist das Resultat nicht kontrollierbar. Dies wird erreicht, indem man die
 maximale Menge an Pheromonen $phero_{max}$ auf den zur Auswahl stehenden Kanten
 ermittelt und folgende Formel auf alle Pheromonwerte anwendet. Als untere Grenze
 ($phero_{min}$) wird jeweils $0$ verwendet.
@@ -117,7 +118,7 @@ phero_{min}}{phero_{max} - phero_{min}} \\ & = \frac{46 - 0}{46 - 0} \\ & = 1
 Wahrscheinlichkeitsformel nun $0.37$ und $1$. Die Differenz ist demnach $1 -
 0.37 = 0.63$. Wenn $\alpha = 2$ verwendet wird, betragen die Werte $0.37^2 =
 0.1369$ und $1^2 = 1$. Die Differenz ist nun $1 - 0.1369 = 0.8631$. Es wird also
-wahrscheinlicher, dass $k_3$ als nächste Kante gewählt wird.
+wahrscheinlicher, dass $k_3$ te Kante gewählt wird.
 
 Die berechneten Wahrscheinlichkeiten für beide Kanten betragen mit $\alpha = 2$:
 
@@ -136,7 +137,7 @@ p_{k_3} & = \frac{1^2}{0.37^2 + 1^2} \\
 \end{equation*}
 
 \noindent Die Kante $k_3$ hat demnach eine ca. siebenmal höhere Chance, als
-nächste ausgewählt zu werden, als $k_2$.
+nächste ausgewählt zu werden.
 
 Um die nächste Kante tatsächlich auswählen zu können, werden die
 Wahrscheinlichkeiten gewichtet und durch eine Zufallszahl ausgewählt. Dazu wird
@@ -401,7 +402,7 @@ gelöscht werden.
 \item[2] Zeigt an, wie viele Runden bereits gemacht wurden. Eine Runde
 beinhaltet eine Bewegung aller Ameisen.
 \item[3] Zeigt an, wie viele parallele Lösungen momentan existieren. Eine kleine
-Zahl ($<20$) ist generell besser.
+Zahl ($<100$) ist generell besser.
 \item[4] Zeigt den insgesamt besten Pfad an, auch wenn sich momentan keine
 Ameise auf diesem Pfad befindet.
 \item[5] Zeigt den im Moment besten Pfad an, es befindet sich mindestens eine
@@ -434,7 +435,7 @@ aufgeführt.
 
 \noindent Bei der Suche nach der besten Lösung ist keine klare Tendenz zu erkennen. Alle 
 Konfigurationen finden in etwa die gleiche Lösung. Nur konvergiert die Lösung bei 
-hohen $\alpha$-Werten stark zu sehr wenig unterschiedlichen Möglichkeiten. Dies 
+hohen $\alpha$-Werten schnell zu sehr wenig unterschiedlichen Möglichkeiten. Dies 
 führt dazu, dass der Algorithmus seine Flexibilität verliert. Alternative,
 eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \\
 
@@ -442,7 +443,7 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \
 \centering 
 \includegraphics
 [width=0.85\textwidth]{images/screenshots/eg_alpha_1.png} 
-\caption{$\alpha = 1$} 
+\caption{$Bespiel-Durchlauf mit \alpha = 1$} 
 \label{fig:eg_alpha_1}
 \end{figure}
 
@@ -452,7 +453,7 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \
 \centering 
 \includegraphics
 [width=0.85\textwidth]{images/screenshots/eg_alpha_2.png} 
-\caption{$\alpha = 2$} 
+\caption{$Bespiel-Durchlauf mit \alpha = 2$} 
 \label{fig:eg_alpha_2}
 \end{figure}
 
@@ -460,7 +461,7 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \
 \centering 
 \includegraphics
 [width=0.85\textwidth]{images/screenshots/eg_alpha_4.png} 
-\caption{$\alpha = 4$} 
+\caption{$Bespiel-Durchlauf mit \alpha = 4$} 
 \label{fig:eg_alpha_4}
 \end{figure}
 
@@ -468,7 +469,7 @@ eventuell bessere Pfade können dadurch nicht mehr in Betracht gezogen werden. \
 \centering 
 \includegraphics
 [width=0.85\textwidth]{images/screenshots/eg_alpha_10.png} 
-\caption{$\alpha = 10$} 
+\caption{$Bespiel-Durchlauf mit \alpha = 10$} 
 \label{fig:eg_alpha_10}
 \end{figure}
 
@@ -498,7 +499,7 @@ kommt noch, dass Dijkstra und A* immer den optimalen Weg finden, der
 Ant-Algorithmus jedoch nicht zwingend.
 
 \citeauthor*{leo-perf} untersuchen auch die Eignung des Ant-Algorithmus für das
-Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen. Es ist
+Travelling Salesman Problem und gelangen dabei zu ähnlichen Ergebnissen. Es ist
 jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch
 verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn
 z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus
@@ -509,8 +510,7 @@ dagegen nicht.
 
 \section{Schwierigkeiten}
 
-Wir hatten bei der Programmierung einige Schwierigkeiten. Hier eine Auflistung,
-die eventuell nicht vollständig ist:
+Wir hatten bei der Programmierung einige Schwierigkeiten. Hier eine Auswahl:
 
 \paragraph*{Algorithmus}
 
