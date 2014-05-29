@@ -68,7 +68,7 @@ und zwischen den drei Meilensteinen. \\
 
 \begin{figure}[h]
   \centering
-	\includegraphics [width=0.65\textwidth]{images/Planungsdreieck.png} 
+	\includegraphics [width=0.65\textwidth]{images/Planungsdreieck.png}
 	\caption{Planungsdreieck (Quelle: Einführende Präsentation von Syrus Mozafar)}
 \end{figure}
 
@@ -104,7 +104,6 @@ Der offizielle Projektplan gab folgende äussere Rahmenbedingungen vor:
 \end{table}
 
 \newpage
-
 
 \subsection{Meilenstein 1: Arthur}
 
@@ -165,19 +164,12 @@ direction of pheromones. & 1\,pt & 1\,pt \\
 \caption{User Stories des ersten Meilensteines}
 \end{table}
 
-%\renewcommand{\arraystretch}{1}	% nach einer Tabelle
+\subsubsection*{Fazit}
 
-\vspace*{0.5cm}
-
-
-???
-Kurzer Kommentar über die Abweichungen zwischen Schätzung und effektivem
-Aufwand. \\
-
-
-\vspace*{1cm}
-
-
+Diese Iteration war sehr erfolgreich, da wir bereits eine lauffähige Lösung produzieren
+konnten. Auch die eingeplanten Stunden konnten wir relativ gut einhalten. Nur den
+Aufwand, um die Simulation soweit mit pyGame zu verknüpfen, dass sich bewegende Sprites
+angezeigt werden, haben wir unterschätzt.
 
 \subsection{Meilenstein 2: Cobannus}
 
@@ -189,8 +181,6 @@ Für den zweiten Meilenstein Cobannus galt es folgendes Ziel zu erreichen:
 shortest path through a set of points.
 \end{itemize}
 }
-
-
 
 \begin{table}[H]
 \small\sffamily\renewcommand{\arraystretch}{1.5}
@@ -222,7 +212,13 @@ points. & 1\,pt & 1\,pt \\
 \caption{User Stories des zweiten Meilensteines}
 \end{table}
 
-\vspace*{0.5cm}
+\subsubsection*{Fazit}
+
+Auch eine sehr erfolgreiche Iteration. Alle Stories konnten abgearbeitet werden und die
+Abweichungen von der Schätzung hielten sich im Rahmen. In dieser Iteration
+implementierten wir den Algorithmus, der zu einem kürzesten Pfad führen sollte. Leider
+war diese Lösung sehr defizitär. Was diese Iteration im Nachhinein etwas schlechter
+aussehen lässt.
 
 \subsection{Meilenstein 3: Tarvos}
 
@@ -235,7 +231,6 @@ amount of glucose, food pile disintegration and so on.
 of the algorithm
 \end{itemize}
 
-
 \begin{table}[H]
 \small\sffamily\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{| p{12cm} | c | c |}
@@ -245,13 +240,11 @@ of the algorithm
   Documentation and presentation. & 10\,pt & 15\,pt \\
   \hline
   As a user I want to define the glucose content of different food piles. &
-  1\,pt &1\,pt \\
+  1\,pt & - \\
   \hline
-  As a user I expect the ant collecting the food with most glucose content
-first. & 2\,pt &2\,pt \\
+  As a user I expect the ant collecting the food with most glucose content first. & 2\,pt & - \\
   \hline
-  As a user I expect the ants collecting the food. Means the amount of food
-decreases over time. & 2\,pt & 2\,pt \\
+  As a user I expect the ants collecting the food. Means the amount of food decreases over time. & 2\,pt & - \\
   \hline
   Documentation and Presentation (II). & 10\,pt & 10\,pt \\
   \hline
@@ -259,5 +252,13 @@ decreases over time. & 2\,pt & 2\,pt \\
 \captionbelow{User Stories des dritten Meilensteines}
 \end{table}
 
-\input{content/Technologien}
+\subsubsection*{Fazit}
 
+Der Meilenstein ``Tarvos'' konnte nicht wie geplant durchgeführt werden, da 
+bereits viel Zeit in Refactoring-Arbeiten und Anpassungen des Algorithmus 
+investiert wurde. Zentrale Eigenschaften des Algorithmus wurden erst in dieser
+Iteration verstanden und mussten noch entsprechend angepasst werden. Dazu 
+gehören die Normierung aller Werte auf das Interval $[0,1]$ und die Bedeutung
+der Exponenten.
+
+\input{content/Technologien}
