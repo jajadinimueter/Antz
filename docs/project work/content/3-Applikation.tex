@@ -10,7 +10,7 @@ die Interaktionen zwischen den verschiedenen Applikationsschichten.
 
 Programmausschnitte werden  in Python-Code wiedergegeben.
 
-\section{Algorithmus}
+\section{Algorithmus}\label{sec:algorithm}
 
 Der ACO-Algorithmus ist in den Grundzügen einfach. Eine gewisse Anzahl autonomer
 Agenten (Ameisen) bewegt sich ausgehend von einem Nest-Knoten entlang eines
@@ -23,7 +23,7 @@ Weg, den sie gekommen ist, zurück und erhöht jeweils die Pheromonwerte auf den
 Kanten, die sie benutzt. Wenn sie das Nest erreicht hat, wird sie erneut auf den
 Weg geschickt.
 
-\paragraph*{} \noindent Programmiert könnte der Algorithmus etwa so aussehen:
+\noindent Programmiert könnte der Algorithmus etwa so aussehen:
 
 \lstset{language=Python} \begin{lstlisting} def ant_algorithm(ants, graph): for
 ant in ants: next_edge = choose_next_edge(ant.node, graph) ant.node =
@@ -324,12 +324,12 @@ Konvergenz mit $\alpha = 1$} \end{figure}
 
 \section{Vergleich mit Dijkstra und A*}
 
-Wir selbst haben zwar keinen Vergleich mit Dijkstra oder A* aufgestellt,
-trotzdem möchten wir kurz darauf eingeben und dafür die Resultate von
-\citet*{leo-perf} eingehen.
+Im Rahmen dieser Projektarbeit wurde zwar kein Vergleich mit den Algorithmen von 
+Dijkstra oder A* aufgestellt, trotzdem soll hier kurz darauf eingegangen und dafür
+die Resultate von \citet*{leo-perf} verwendet werden.
 
-\citeauthor*{leo-perf} untersuchen die drei Algorithmen Dijstra, A* und Ant auf
-ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangt er zu folgenden
+\citeauthor*{leo-perf} untersuchen die drei Algorithmen Dijkstra, A* und Ant auf
+ihre Effizienz beim Finden eines kürzesten Pfades. Dabei gelangen sie zu folgenden
 Resultaten:
 
 \begin{table}[h] \begin{tabular}{ | l | r | } \hline Dijkstra &
@@ -342,14 +342,17 @@ Pfadfindung nicht besonders gut geeignet ist. Zu der höheren Ausführungszeit
 kommt noch, dass Dijkstra und A* immer den optimalen Weg finden, der
 Ant-Algorithmus jedoch nicht zwingend.
 
-\citeauthor*{leo-perf} untersucht auch die Eignung des Ant-Algorithmus für das
+\citeauthor*{leo-perf} untersuchen auch die Eignung des Ant-Algorithmus für das
 Travelling Salesman Problem und gelangt dabei zu ähnlichen Ergebnissen. Es ist
 jedoch anzunehmen, dass sich der Ameisenalgorithmus bei sich dynamisch
 verändernden Verhältnissen schneller anpassen kann. Dijkstra und A* müssen, wenn
 z.B. ein Knoten wegfällt, alle Distanzen neu berechnen. Der Ameisenalgorithmus
-nicht.
+dagegen nicht.
 
-\subsection{Schwierigkeiten}
+
+
+
+\section{Schwierigkeiten}
 
 Wir hatten bei der Programmierung einige Schwierigkeiten. Hier eine Auflistung,
 die eventuell nicht vollständig ist:
@@ -358,7 +361,7 @@ die eventuell nicht vollständig ist:
 
 Wie im Kapitel \ref{sec:algorithm} besprochen, müssen verschiedene Werte auf das
 Interval $[0,1]$ normiert werden. Dies haben wir erst sehr spät herausgefunden.
-Somit waren die Ergebnisse, die wir erhielten nicht konstant, wodurch wir durch
+Somit waren die Ergebnisse, die wir erhielten, nicht konstant, wodurch wir durch
 Debugging sehr viel Zeit verloren haben. Insbesondere haben wir relativ spät
 (erst in der letzten Iteration) richtig verstanden, wie sich die Exponenten auf
 die Wahrscheinlichkeiten auswirken.
@@ -367,12 +370,12 @@ die Wahrscheinlichkeiten auswirken.
 
 Die Performance war lange sehr schlecht, wegen zu häufiger Iterationen über z.B.
 die Kanten, um Pheromone zu evaporieren. Diese Probleme konnten jedoch bereits
-in der 2. Iteration behoben werden.
+in der zweiten Iteration behoben werden.
 
 \paragraph*{Code-Stil und Refactorings}
 
 Dadurch, dass wir das Game-Framework pyGame verwendet haben, ohne vorher damit
-gearbeitet zu haben, sah unser GUI-Code schnell aus, wie ein Auszug aus einem
+gearbeitet zu haben, sah unser GUI-Code schnell aus wie ein Auszug aus einem
 Anfänger-Tutorial. Der Code war sehr unstrukturiert. In der letzten Iteration
 mussten wir deswegen ein grösseres Refactoring vornehmen. Ansonsten wären die
 Funktionalitäten wie Restart und Reset kaum möglich gewesen.
