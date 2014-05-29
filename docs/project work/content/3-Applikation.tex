@@ -177,7 +177,7 @@ Dies führt zu folgender Formel zur Berechnung der Menge an Pheromonen, die zur 
 
 \[ phero_{inc} = phero_{inc} * phero_{mul} \]
 
-$\delta$ ist wie bereits mehrmals erwähnt zur Gewichtung und beträgt in unserer Implementation standardmässig 0.1.
+$\delta$ ist wie bereits mehrmals erwähnt zur Gewichtung und beträgt in unserer Implementation standardmässig $0.1$.
 
 Rechenbeispiel: Die maximale Menge an Pheromonen im Graph sei $phero_{max} = 13$, die Mengen auf den Knoten $k_1 = 5$ und $k_2 = 12$. Das ergibt für $phero_{mul_{k_1}} = 1 - \frac{5}{13} = 0.62$ und $phero_{mul_{k_2}} = 1 - \frac{12}{13} = 0.08$. Man sieht, dass auf die Kante mit höherer Konzentration viel weniger dazu addiert wird als auf die mit der geringeren Konzentration. 
 
