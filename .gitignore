@@ -18,6 +18,7 @@
 # *.ps
 # *.eps
 /docs/project work/*.pdf
+/docs/presentation/*.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
@@ -84,8 +85,8 @@
 *.xdy
 *.pyc
 antz.egg-info
-build 
-dist 
+build
+dist
 build
 
 /.idea
