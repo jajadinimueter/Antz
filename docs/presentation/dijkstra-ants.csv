@@ -1,0 +1,20 @@
+Algorithmus;Konfiguration;Zeit;Pfadlänge
+dijkstra;;2.427100039;81.21320344
+ant;alpha=4, beta=4, phero\_decrease=0.02;7.454999971;93.60660172
+ant;alpha=4, beta=1, phero\_decrease=0.01;7.611500049;94.84062043
+ant;alpha=3, beta=1, phero\_decrease=0.0;8.233500004;95.08326112
+ant;alpha=4, beta=1, phero\_decrease=0.0;8.618199992;95.42640687
+ant;alpha=4, beta=0, phero\_decrease=0.0;7.243000007;95.44722215
+ant;alpha=4, beta=3, phero\_decrease=0.0;7.2625;98.09188309
+ant;alpha=4, beta=4, phero\_decrease=0.0;7.773699999;98.19238816
+ant;alpha=3, beta=0, phero\_decrease=0.02;7.68670001;99.34671709
+ant;alpha=3, beta=3, phero\_decrease=0.0;7.692499995;99.50609665
+ant;alpha=0, beta=0, phero\_decrease=0.02;3.67760005;161.1665222
+ant;alpha=0, beta=2, phero\_decrease=0.04;3.684200001;161.6396103
+ant;alpha=0, beta=2, phero\_decrease=0.02;3.877799964;163.246212
+ant;alpha=0, beta=1, phero\_decrease=0.03;4.701600027;163.4386002
+ant;alpha=0, beta=1, phero\_decrease=0.01;3.764199996;163.8528137
+ant;alpha=0, beta=0, phero\_decrease=0.04;3.810399961;164.0452019
+ant;alpha=0, beta=3, phero\_decrease=0.04;3.746000028;165.2756493
+ant;alpha=0, beta=1, phero\_decrease=0.04;3.753399968;166.9533188
+ant;alpha=0, beta=0, phero\_decrease=0.03;3.432899976;169.773124
