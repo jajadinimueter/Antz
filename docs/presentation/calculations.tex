@@ -1,0 +1,40 @@
+\section{Berechnungen}
+
+\frame{
+	\frametitle{Berechnungen}
+	\begin{description}
+		\item [Kantenauswahl] $p_{k_i} = \frac{phero_{k_i}^\alpha \cdot
+		cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot
+		cost_{k_i}^\beta}$
+		\item [Pheromon-Update] $phero = phero +
+		\left({\frac{1}{pathlength}}\right)^\gamma$
+		\item [Pheromon-Evaporation] $phero = phero \cdot \left({ 1 - \frac{phero_{k_i}}{phero_{max}}}\right)^\delta$
+	\end{description}
+}
+
+\frame{
+	\frametitle{Gewichtete Wahrscheinlichkeit}
+	
+	Beispiel: Kanten $\{K_1, K_2\}$; $phero_{k_1} = 5; phero_{k_2} = 10; \alpha = 2; \beta = 0$ 
+	
+	\[ p_{k_i} = \frac{phero_{k_i}^\alpha \cdot
+			cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot
+			cost_{k_i}^\beta} \]
+	
+	\only<1>{Alle Wahrscheinlichkeiten berechnen:}
+	\only<2>{Gewichtung:}
+	
+	\begin{itemize}
+		\only<1>{
+			\item $p_{k_1} = \frac{5^2 (\cdot 1)}{5^2 + 10^2} = 0.2$
+			\item $p_{k_2} = \frac{10^2 (\cdot 1)}{5^2 + 10^2} = 0.8$
+		}
+		\only<2>{
+			\item $gew = (p_{k_1}, p_{k_1} + p_{k_2}) = (0.2, 1)$
+			\item $r = random.random() = 0.46$
+			\item $tuple_{index} = bisect(gew, r) = 1$
+			\item $r$ öfters zwischen $(0.2,1]$
+		}
+		
+	\end{itemize} 
+}
