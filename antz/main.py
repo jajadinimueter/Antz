@@ -4,6 +4,7 @@ import pygame
 import pygame.draw
 from pygame.locals import *
 
+from antz import dijkstra
 from antz import sim
 from antz.chart import SolutionChartThread
 from antz.graph_gen import GridGraphGenerator, RandomGraphGenerator
@@ -59,6 +60,11 @@ def stop_button_pressed(e, app, app_ctx):
 # noinspection PyUnusedLocal
 def restart_button_pressed(e, app, app_ctx):
     if app_ctx.algorithm and app_ctx.graph:
+        app_ctx.dijsktra_dist, app_ctx.dijsktra_preds = dijkstra.shortest_path(
+            app_ctx.graph, app_ctx.nest_node, app_ctx.food_node)
+
+        print(app_ctx.dijsktra_dist[app_ctx.food_node])
+
         app_ctx.running = False
 
         app_ctx.ant_sprites = pygame.sprite.Group()
@@ -148,6 +154,9 @@ class ApplicationContext(object):
     """
 
     def __init__(self, solvers):
+        self.dijsktra_dist = None
+        self.dijsktra_preds = None
+
         self.running = False
         self.paused = True
 
@@ -159,6 +168,7 @@ class ApplicationContext(object):
         self.graph = None
         self.colony = None
         self.nest_node = None
+        self.food_node = None
         self.solvers = solvers
 
         self.edge_lines = {}
