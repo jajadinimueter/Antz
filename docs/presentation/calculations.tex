@@ -5,17 +5,19 @@
 	\begin{description}
 		\item [Kantenauswahl] $p_{k_i} = \frac{phero_{k_i}^\alpha \cdot
 		cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot
-		cost_{k_i}^\beta}$
+		cost_{k_i}^\beta}$ \pause
 		\item [Pheromon-Update] $phero = phero +
-		\left({\frac{1}{pathlength}}\right)^\gamma$
-		\item [Pheromon-Evaporation] $phero = phero \cdot \left({ 1 - \frac{phero_{k_i}}{phero_{max}}}\right)^\delta$
+		\left({\frac{1}{pathlength}}\right)^\gamma$  \pause
+		\item [Pheromon-Evaporation] $phero = phero \cdot \left({ 1 -
+\frac{phero_{k_i}}{phero_{max}}}\right)^\delta$
 	\end{description}
 }
 
 \frame{
 	\frametitle{Gewichtete Wahrscheinlichkeit}
 	
-	Beispiel: Kanten $\{K_1, K_2\}$; $phero_{k_1} = 5; phero_{k_2} = 10; \alpha = 2; \beta = 0$ 
+	Beispiel: Kanten $\{K_1, K_2\}$; $phero_{k_1} = 5; phero_{k_2} = 10; \alpha =
+2; \beta = 0$ 
 	
 	\[ p_{k_i} = \frac{phero_{k_i}^\alpha \cdot
 			cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot
@@ -37,4 +39,61 @@
 		}
 		
 	\end{itemize} 
+}
+
+\frame{
+	\frametitle{Einflussnahme}
+	
+	\only<1-2>{
+		\begin{description}
+		\item [$\alpha$] Verstärkung der Unterschiede zwischen Pheromonwerten \pause
+		\item [$\beta$] Verstärkung der Unterschiede zwischen Kosten und Gewichtung
+von Kosten
+		\end{description}
+	}
+	
+	\only<3-6>{
+		\only<3-5>{
+			\[ p_{k_i} = \frac{phero_{k_i}^\alpha \cdot
+					cost_{k_i}^\beta}{\sum\nolimits_{i=0}^n phero_{k_i}^\alpha \cdot
+					cost_{k_i}^\beta} \]
+		}
+	
+		\only<3>{
+			\begin{itemize}
+			\item Alle Werte werden zwischen 0 und 1 normiert
+			\item $phero_1 = 0.7; phero_2 = 0.3; cost_1 = 0.8; cost_2 = 0.5$
+			\end{itemize}
+		}
+		
+		\only<4>{
+			\begin{itemize}
+			\item Mit $\alpha = 1; \beta = 1$
+			\end{itemize}
+			
+			\[ p_1 = \frac{0.7^1 \cdot 0.8^1}
+				{0.7^1 \cdot 0.8^1 + 0.3^1 \cdot 0.5^1} = 0.79 \]
+			\[ p_2 = \frac{0.3^1 \cdot 0.5^1}
+				{0.7^1 \cdot 0.8^1 + 0.3^1 \cdot 0.5^1} = 0.21 \]
+		}
+
+		\only<5>{
+			\begin{itemize}
+			\item Mit $\alpha = 2; \beta = 2$
+			\end{itemize}
+			
+			\[ p_1 = \frac{0.7^2 \cdot 0.8^2}
+				{0.7^2 \cdot 0.8^2 + 0.3^2 \cdot 0.5^2} = 0.93 \]
+			\[ p_2 = \frac{0.3^2 \cdot 0.5^2}
+				{0.7^2 \cdot 0.8^2 + 0.3^2 \cdot 0.5^2} = 0.07\]
+		}
+		
+		\only<6>{
+			\framsubtitle{Fazit}
+			\begin{itemize}
+			\item Die Unterschiede haben sich verstärkt
+			\item Die Wahrscheinlichkeit ist grösser, dass die Ameise $p_1$ wählt
+			\end{itemize}
+		}
+	}
 }
