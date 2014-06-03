@@ -6,6 +6,7 @@ class Node(object):
     def __init__(self, name=None):
         self._graph = None
         self._name = name
+        self._edges = None
 
     @property
     def name(self):
@@ -17,8 +18,9 @@ class Node(object):
         This function returns the edges for this node.
         Will be patched by the graph.
         """
-        if self._graph:
-            return self._graph.get_edges(self)
+        if self._graph and not self._edges:
+            self._edges = self._graph.get_edges(self)
+        return self._edges
 
     def distance_to(self, other):
         return self._calculate_distance_to(other)
@@ -42,13 +44,17 @@ class Edge(object):
             raise ValueError('Both nodes must be set')
         self._node_from = node_from
         self._node_to = node_to
+        self._nodes = {
+            node_from: node_to,
+            node_to: node_from
+        }
+        self._node_set = {node_from, node_to}
         self._bidirectional = bidirectional
         if cost is ():
             cost = node_to - node_from
         cost = cost or 0
         self._cost = cost
-        self._nodes = [node_from, node_to]
-        
+
     @property
     def node_from(self):
         return self._node_from
@@ -79,18 +85,11 @@ class Edge(object):
         take bidirectional into account. If you may not move
         in the direction of other node, None will be returned.
         """
-        if not self.bidirectional:
-            if not current_node == self._node_from:
-                return None
-
-        if current_node == self.node_from:
-            return self.node_to
-        if current_node == self.node_to:
-            return self.node_from
+        return self._nodes[current_node]
 
     @property
     def nodes(self):
-        return sets.ImmutableSet(self._nodes)
+        return self._node_set
 
 
 class Graph(object):

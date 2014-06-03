@@ -88,16 +88,17 @@ class GridGraphGenerator(object):
         nest_node = random.sample(g.nodes, 1).pop()
 
         food_node = nest_node
-        edges_visited = []
 
         hops = 0
-        max_hops = random.randrange(self._min_food_hops,
-                                    self._max_food_hops)
+        if self._min_food_hops == self._max_food_hops:
+            max_hops = self._max_food_hops
+        else:
+            max_hops = random.randrange(self._min_food_hops,
+                                        self._max_food_hops)
 
         # find a food node, respect max hops
         while True:
-            next_edges = set([e for e in food_node.edges
-                             if e not in edges_visited])
+            next_edges = set([e for e in food_node.edges])
 
             if not next_edges:
                 break

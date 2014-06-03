@@ -335,7 +335,7 @@ class ShortestPathAlgorithm(Algorithm):
         hit a food or a nest node and react accordingly.
         """
 
-        if not self._can_pass(node):
+        if node.obstacle:
             # if the ant hits an obstacle, kill it
             raise Reset()
         else:
@@ -343,11 +343,10 @@ class ShortestPathAlgorithm(Algorithm):
 
             solution = (tuple(ant.state.edges), ant.state.solution_length)
 
-            if node_is_food(node):
+            if node.food:
                 # the ant found a solution
                 ant.state.solution = solution
-                self._add_solution(ctx, ant)
-            elif node_is_nest(node):
+            elif node.nest:
                 # when it's a nest and we are on our way
                 # back -> reset the ant
                 if ant.state.solution:
@@ -365,9 +364,9 @@ class ShortestPathAlgorithm(Algorithm):
         state = ant.state
         state.turns += 1
 
-        rand = random.random()
         if not state.solution:
             if ctx.state._best_solution:
+                rand = random.random()
                 if rand < 0.2 and state.turns > random.randrange(200, 400):
                     raise Reset()
 
@@ -432,7 +431,7 @@ class ShortestPathAlgorithm(Algorithm):
 
         ATM checks only whether the node is an obstacle or not.
         """
-        return not node_is_obstacle(node)
+        return not node.obstacle
 
     def _get_edges_to_consider(self, node, exclude_nodes=None, exclude_edges=None):
         """
@@ -446,10 +445,8 @@ class ShortestPathAlgorithm(Algorithm):
 
         edges = [e for e in edges
                  if e.other_node(node) not in exclude_nodes
-                 and e not in exclude_edges]
-
-        edges = [e for e in edges
-                 if self._can_pass(e.other_node(node))]
+                 and e not in exclude_edges
+                 and self._can_pass(e.other_node(node))]
 
         return edges
 
